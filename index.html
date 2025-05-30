@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Academia</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Academia App</h2>
+        <ul>
+            <li><a href="#" onclick="mostrarTela('home')">🏠 Painel</a></li>
+            <li><a href="#" onclick="mostrarTela('cadastrar')">📝 Cadastrar Treino</a></li>
+            <li><a href="#" onclick="mostrarTela('historico')">📜 Histórico</a></li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div id="home" class="tela">
+            <h1>Bem-vindo ao App de Academia!</h1>
+            <p>Escolha uma opção no menu.</p>
+        </div>
+
+        <div id="cadastrar" class="tela" style="display:none;">
+            <h1>Cadastrar Treino</h1>
+            <form id="formTreino">
+                <label>Nome do Exercício:</label><br>
+                <input type="text" id="exercicio" required><br><br>
+
+                <label>Séries:</label><br>
+                <input type="number" id="series" required><br><br>
+
+                <label>Repetições:</label><br>
+                <input type="number" id="repeticoes" required><br><br>
+
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
+
+        <div id="historico" class="tela" style="display:none;">
+            <h1>Histórico de Treinos</h1>
+            <ul id="listaTreinos"></ul>
+        </div>
+    </div>
+
+<script src="script.js"></script>
+</body>
+</html>
