@@ -20,20 +20,18 @@
         </ul>
     </div>
     <h3>Filtrar:</h3>
-<label>Pessoa:</label>
-<select id="filtroPessoa" onchange="filtrar()"></select>
-
-<label>Grupo Muscular:</label>
-<select id="filtroGrupo" onchange="filtrar()"></select>
 
     <div class="main">
         <div id="home" class="tela">
             <h1>Bem-vindo ao App de Academia!</h1>
             <p>Escolha uma opção no menu.</p>
         </div>
-
-        <div id="cadastrar" class="tela" style="display:none;">
+               <div id="cadastrar" class="tela" style="display:none;">
     <h1>Cadastrar Treino</h1>
+     <label>Pessoa:</label>
+            <select id="filtroPessoa" onchange="filtrar()"></select>
+            <label>Grupo Muscular:</label>
+            <select id="filtroGrupo" onchange="filtrar()"></select>
     <form id="formTreino">
         <label>Nome da Pessoa:</label><br>
         <input type="text" id="pessoa" required><br><br>
