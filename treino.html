@@ -1,116 +1,121 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Iniciar Treino</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Treino</title>
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
+    /* Layout padrão - cores, navbar */
     body {
+      font-family: Arial, sans-serif;
       margin: 0;
-      background: #f7f9fc;
+      background-color: #f5f5f5;
       color: #333;
-      display: flex;
-      min-height: 100vh;
-      flex-direction: column;
     }
 
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: #2c3e50;
-      color: #ecf0f1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 30px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 1000;
-    }
-
-    .navbar h2 {
-      margin: 0;
-      font-weight: 700;
-      font-size: 1.6rem;
-    }
-
-    .navbar-links {
-      display: flex;
-      gap: 20px;
-    }
-
-    .navbar a {
-      color: #bdc3c7;
-      text-decoration: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      transition: background 0.3s, color 0.3s;
-      font-weight: 600;
-    }
-
-    .navbar a:hover,
-    .navbar a.active {
-      background: #2980b9;
+    nav {
+      background-color: #005f73;
       color: white;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      font-weight: bold;
     }
 
-    .main-content {
-      padding: 100px 30px 40px;
-      flex: 1;
-      max-width: 100%;
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: normal;
+      font-size: 16px;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
     h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-weight: 700;
-      color: #2c3e50;
-    }
-
-    .card {
-      background: white;
-      color: #333;
-      margin: 20px auto;
-      padding: 20px;
-      max-width: 500px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .atividade-header {
-      text-align: center;
+      color: #0a9396;
       margin-bottom: 20px;
     }
 
+    label {
+      font-weight: 600;
+    }
+
+    select, button {
+      font-size: 16px;
+      padding: 8px;
+      margin: 10px 0 20px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      max-width: 300px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #0a9396;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: #007f7f;
+    }
+
+    button:disabled {
+      background-color: #a7a7a7;
+      cursor: not-allowed;
+    }
+
+    .card {
+      background: #e0fbfc;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.1);
+    }
+
     .atividade-header h2 {
-      font-size: 1.8rem;
-      color: #2c3e50;
+      margin: 0 0 15px 0;
+      color: #005f73;
     }
 
     .series div {
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
-    .series input[type="number"] {
-      width: 60px;
-      padding: 5px;
-      margin-right: 5px;
+    input.input-reps, input.input-carga {
+      width: 70px;
+      margin-right: 15px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
 
-    .check-serie {
-      margin-left: 5px;
+    input.check-serie {
+      transform: scale(1.2);
+      margin-right: 8px;
+      vertical-align: middle;
+      cursor: pointer;
     }
 
     .cronometro-serie {
-      font-size: 0.9rem;
-      color: #e67e22;
-      margin-left: 10px;
+      font-weight: bold;
+      color: #005f73;
     }
 
     .hidden {
@@ -118,306 +123,274 @@
     }
 
     .botoes-controle {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
+      margin-top: 20px;
     }
 
-    .botao-pular, .botao-completar, .botao-encerrar {
-      flex: 1;
-      margin: 0 5px;
-      padding: 12px;
-      font-size: 1rem;
+    .botoes-controle button {
+      margin-right: 15px;
+      padding: 10px 18px;
       border-radius: 8px;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .botao-pular {
-      background: #8e44ad;
-      color: white;
-    }
-
-    .botao-completar {
-      background: #2ecc71;
-      color: white;
     }
 
     .botao-encerrar {
-      background: #c0392b;
-      color: white;
+      margin-top: 30px;
+      background-color: #bb3e03;
+      width: 100%;
+      font-size: 18px;
+      padding: 14px;
+      border-radius: 10px;
     }
 
     .botao-encerrar:hover {
-      background: #922b21;
-    }
-
-    select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-
-    button {
-      background: #2980b9;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #2471a3;
-    }
-
-    @media (max-width: 768px) {
-      .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px 20px;
-      }
-
-      .navbar-links {
-        flex-direction: column;
-        width: 100%;
-        gap: 10px;
-        margin-top: 10px;
-      }
-
-      .main-content {
-        padding: 120px 20px 40px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .navbar h2 {
-        font-size: 1.4rem;
-      }
-
-      .navbar a {
-        font-size: 0.9rem;
-      }
+      background-color: #a53302;
     }
   </style>
 </head>
 <body>
 
-  <nav class="navbar">
-    <h2>Academia</h2>
-    <div class="navbar-links">
-      <a href="index.html">Cadastro</a>
-      <a href="visualizar.html">Visualizar</a>
-      <a href="treino.html" class="active">Treino</a>
-      <a href="historico.html">Historico</a>
-    </div>
-  </nav>
+<nav>
+  Meu Treinador
+  <a href="treino.html">Treino</a>
+  <a href="historico.html">Histórico</a>
+</nav>
 
-  <main class="main-content">
-    <h1>Iniciar Treino</h1>
+<main>
+  <h1>Treino</h1>
+  <label for="treinoSelect">Selecione um treino:</label>
+  <select id="treinoSelect">
+    <option value="">Carregando treinos...</option>
+  </select>
+  <button id="iniciarBtn">Iniciar Treino</button>
 
-    <div class="card">
-      <label for="treinoSelect">Selecione um treino:</label>
-      <select id="treinoSelect">
-        <option value="">Carregando...</option>
-      </select>
-      <button id="iniciarBtn">Iniciar Treino</button>
-    </div>
+  <div id="treinoContainer"></div>
+</main>
 
-    <div id="treinoContainer"></div>
-  </main>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, getDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  const firebaseConfig = {
+    // Substitua pelas suas credenciais do Firebase
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_AUTH_DOMAIN",
+    projectId: "SEU_PROJECT_ID",
+    storageBucket: "SEU_BUCKET",
+    messagingSenderId: "SEU_MESSAGING_ID",
+    appId: "SEU_APP_ID"
+  };
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-      authDomain: "academia-bd-9d4da.firebaseapp.com",
-      projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.appspot.com",
-      messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
-    };
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const treinoSelect = document.getElementById("treinoSelect");
+  const iniciarBtn = document.getElementById("iniciarBtn");
+  const treinoContainer = document.getElementById("treinoContainer");
 
-    const treinoSelect = document.getElementById("treinoSelect");
-    const iniciarBtn = document.getElementById("iniciarBtn");
-    const treinoContainer = document.getElementById("treinoContainer");
+  let atual = 0;
+  let grupos = [];
+  let dadosPreenchidos = {};
+  let timers = {};
 
-    let atual = 0;
-    let grupos = [];
-    let dadosPreenchidos = {};
+  async function carregarTreinos() {
+    const snapshot = await getDocs(collection(db, "treinos"));
+    treinoSelect.innerHTML = '<option value="">Selecione</option>';
 
-    async function carregarTreinos() {
-      const snapshot = await getDocs(collection(db, "treinos"));
-      treinoSelect.innerHTML = '<option value="">Selecione</option>';
-
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const option = document.createElement("option");
-        option.value = docSnap.id;
-        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
-        treinoSelect.appendChild(option);
-      });
-    }
-
-    carregarTreinos();
-
-    iniciarBtn.addEventListener("click", async () => {
-      const treinoId = treinoSelect.value;
-      if (!treinoId) {
-        alert("Selecione um treino");
-        return;
-      }
-
-      const docSnap = await getDoc(doc(db, "treinos", treinoId));
-      if (!docSnap.exists()) {
-        alert("Treino não encontrado");
-        return;
-      }
-
+    snapshot.forEach(docSnap => {
       const data = docSnap.data();
-      grupos = data.grupos;
-      atual = 0;
-      dadosPreenchidos = {};
-
-      treinoSelect.disabled = true;
-      iniciarBtn.disabled = true;
-
-      exibirExercicio(atual);
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+      treinoSelect.appendChild(option);
     });
 
-    function exibirExercicio(index) {
-      const grupo = grupos[index];
-      treinoContainer.innerHTML = "";
+    if (treinoSelect.options.length === 1) {
+      treinoSelect.innerHTML = '<option value="">Nenhum treino disponível</option>';
+    }
+  }
 
-      const chaveGrupo = `grupo${index}`;
-      if (!dadosPreenchidos[chaveGrupo]) {
-        dadosPreenchidos[chaveGrupo] = Array.from({ length: grupo.serie }).map(() => ({
-          repeticoes: grupo.repeticao || '',
-          carga: '',
-          check: false,
-          tempo: "00:00"
-        }));
-      }
+  carregarTreinos();
 
-      const div = document.createElement("div");
-      div.className = "card";
+  iniciarBtn.addEventListener("click", async () => {
+    const treinoId = treinoSelect.value;
+    if (!treinoId) {
+      alert("Selecione um treino");
+      return;
+    }
 
-      div.innerHTML = `
-        <div class="atividade-header">
-          <h2>${grupo.grupo}</h2>
-        </div>
+    const docSnap = await getDoc(doc(db, "treinos", treinoId));
+    if (!docSnap.exists()) {
+      alert("Treino não encontrado");
+      return;
+    }
 
-        <div class="series">
-          ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
-            <div>
-              <label>Série ${i + 1}</label><br/>
-              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps" />
-              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga" />
-              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''} /> ✔
-              <span class="cronometro-serie ${serie.check ? '' : 'hidden'}">${serie.tempo}</span>
-            </div>
-          `).join('')}
-        </div>
+    const data = docSnap.data();
+    grupos = data.grupos;
+    atual = 0;
+    dadosPreenchidos = {};
+    timers = {};
 
-        <div class="botoes-controle">
-          <button id="anteriorBtn" class="botao-pular">⬅️ Anterior</button>
-          <button id="proximoBtn" class="botao-completar">➡️ Próximo</button>
-        </div>
+    treinoSelect.disabled = true;
+    iniciarBtn.disabled = true;
 
-        <button id="encerrarBtn" class="botao-encerrar" style="margin-top:20px;">⚡ Encerrar Treino</button>
-      `;
+    exibirExercicio(atual);
+  });
 
-      treinoContainer.appendChild(div);
+  function exibirExercicio(index) {
+    const grupo = grupos[index];
+    treinoContainer.innerHTML = "";
 
-      // Eventos inputs reps
-      document.querySelectorAll(".input-reps").forEach(input => {
-        input.addEventListener("input", (e) => {
-          const idx = e.target.dataset.serie;
-          dadosPreenchidos[chaveGrupo][idx].repeticoes = e.target.value;
-        });
+    const chaveGrupo = `grupo${index}`;
+    if (!dadosPreenchidos[chaveGrupo]) {
+      dadosPreenchidos[chaveGrupo] = Array.from({ length: grupo.serie }).map(() => ({
+        repeticoes: grupo.repeticao || '',
+        carga: '',
+        check: false,
+        tempo: "00:00"
+      }));
+    }
+
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="atividade-header">
+        <h2>${grupo.grupo}</h2>
+      </div>
+
+      <div class="series">
+        ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
+          <div>
+            <label>Série ${i + 1}</label><br/>
+            <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps">
+            <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga">
+            <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''}> ✔
+            <span class="cronometro-serie ${serie.check ? '' : 'hidden'}">${serie.tempo}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="botoes-controle">
+        <button id="anteriorBtn" class="botao-pular">⬅️ Anterior</button>
+        <button id="proximoBtn" class="botao-completar">➡️ Próximo</button>
+      </div>
+
+      <button id="encerrarBtn" class="botao-encerrar" style="margin-top:20px;">⚡ Encerrar Treino</button>
+    `;
+
+    treinoContainer.appendChild(div);
+
+    // Listeners inputs reps
+    document.querySelectorAll(".input-reps").forEach(input => {
+      input.addEventListener("input", (e) => {
+        const idx = e.target.dataset.serie;
+        dadosPreenchidos[chaveGrupo][idx].repeticoes = e.target.value;
       });
+    });
 
-      // Eventos inputs carga
-      document.querySelectorAll(".input-carga").forEach(input => {
-        input.addEventListener("input", (e) => {
-          const idx = e.target.dataset.serie;
-          dadosPreenchidos[chaveGrupo][idx].carga = e.target.value;
-        });
+    // Listeners inputs carga
+    document.querySelectorAll(".input-carga").forEach(input => {
+      input.addEventListener("input", (e) => {
+        const idx = e.target.dataset.serie;
+        dadosPreenchidos[chaveGrupo][idx].carga = e.target.value;
       });
+    });
 
-      // Eventos checkbox série e cronômetro
-      document.querySelectorAll(".check-serie").forEach((checkbox) => {
-        checkbox.addEventListener("change", (e) => {
-          const idx = e.target.dataset.serie;
-          const timerEl = e.target.nextElementSibling;
-          if (e.target.checked) {
-            timerEl.classList.remove("hidden");
-            iniciarCronometro(timerEl, chaveGrupo, idx);
-            dadosPreenchidos[chaveGrupo][idx].check = true;
-          } else {
-            timerEl.classList.add("hidden");
-            dadosPreenchidos[chaveGrupo][idx].check = false;
-            dadosPreenchidos[chaveGrupo][idx].tempo = "00:00";
-            timerEl.textContent = "00:00";
-          }
-        });
-      });
+    // Listeners check
+    document.querySelectorAll(".check-serie").forEach((checkbox) => {
+      checkbox.addEventListener("change", (e) => {
+        const idx = e.target.dataset.serie;
+        const timerEl = e.target.nextElementSibling;
 
-      // Botão anterior
-      document.getElementById("anteriorBtn").addEventListener("click", () => {
-        if (atual > 0) {
-          atual--;
-          exibirExercicio(atual);
-        }
-      });
-
-      // Botão próximo
-      document.getElementById("proximoBtn").addEventListener("click", () => {
-        if (atual + 1 < grupos.length) {
-          atual++;
-          exibirExercicio(atual);
+        if (e.target.checked) {
+          timerEl.classList.remove("hidden");
+          iniciarCronometro(timerEl, chaveGrupo, idx);
+          dadosPreenchidos[chaveGrupo][idx].check = true;
         } else {
-          encerrarTreino();
+          timerEl.classList.add("hidden");
+          dadosPreenchidos[chaveGrupo][idx].check = false;
+          dadosPreenchidos[chaveGrupo][idx].tempo = "00:00";
+          timerEl.textContent = "00:00";
+          pararCronometro(chaveGrupo, idx);
         }
       });
+    });
 
-      // Botão encerrar treino
-      document.getElementById("encerrarBtn").addEventListener("click", () => {
+    document.getElementById("anteriorBtn").addEventListener("click", () => {
+      if (atual > 0) {
+        atual--;
+        exibirExercicio(atual);
+      }
+    });
+
+    document.getElementById("proximoBtn").addEventListener("click", () => {
+      if (atual + 1 < grupos.length) {
+        atual++;
+        exibirExercicio(atual);
+      } else {
         encerrarTreino();
-      });
+      }
+    });
+
+    document.getElementById("encerrarBtn").addEventListener("click", () => {
+      encerrarTreino();
+    });
+  }
+
+  // Funções de cronômetro
+  function iniciarCronometro(el, chave, idx) {
+    if (timers[chave] && timers[chave][idx]) return; // já existe
+
+    if (!timers[chave]) timers[chave] = {};
+
+    let [min, sec] = el.textContent.split(":").map(Number);
+    let segundos = min * 60 + sec;
+
+    timers[chave][idx] = setInterval(() => {
+      segundos++;
+      const minStr = Math.floor(segundos / 60).toString().padStart(2, '0');
+      const secStr = (segundos % 60).toString().padStart(2, '0');
+      el.textContent = `${minStr}:${secStr}`;
+      dadosPreenchidos[chave][idx].tempo = el.textContent;
+    }, 1000);
+  }
+
+  function pararCronometro(chave, idx) {
+    if (timers[chave] && timers[chave][idx]) {
+      clearInterval(timers[chave][idx]);
+      delete timers[chave][idx];
     }
+  }
 
-    function encerrarTreino() {
-      treinoContainer.innerHTML = "<h2 style='text-align:center'>🏆 Treino finalizado!</h2>";
-      treinoSelect.disabled = false;
-      iniciarBtn.disabled = false;
+  async function salvarTreinoFinalizado() {
+    if (!grupos || grupos.length === 0) return;
+
+    const treinoFinalizado = {
+      usuario: "Usuário Exemplo", // substitua por valor real se tiver autenticação
+      tipoTreino: treinoSelect.options[treinoSelect.selectedIndex].text || "Tipo Exemplo",
+      dataFinalizacao: new Date().toISOString(),
+      grupos: grupos.map((grupo, i) => ({
+        grupo: grupo.grupo,
+        series: dadosPreenchidos[`grupo${i}`] || []
+      })),
+    };
+
+    try {
+      const novaRef = doc(collection(db, "treinos-finalizados"));
+      await setDoc(novaRef, treinoFinalizado);
+      console.log("Treino finalizado salvo com sucesso.");
+    } catch (error) {
+      console.error("Erro ao salvar treino finalizado:", error);
     }
+  }
 
-    function iniciarCronometro(el, chave, idx) {
-      let [min, sec] = el.textContent.split(":").map(Number);
-      let segundos = min * 60 + sec;
+  async function encerrarTreino() {
+    await salvarTreinoFinalizado();
 
-      const interval = setInterval(() => {
-        segundos++;
-        const minStr = Math.floor(segundos / 60).toString().padStart(2, '0');
-        const secStr = (segundos % 60).toString().padStart(2, '0');
-        el.textContent = `${minStr}:${secStr}`;
-        dadosPreenchidos[chave][idx].tempo = `${minStr}:${secStr}`;
-      }, 1000);
+    treinoContainer.innerHTML = "<h2 style='text-align:center; color: #0a9396;'>🏆 Treino finalizado!</h2>";
+    treinoSelect.disabled = false;
+    iniciarBtn.disabled = false;
+  }
+</script>
 
-      el.addEventListener('dblclick', () => {
-        clearInterval(interval);
-        el.classList.add("hidden");
-      });
-    }
-  </script>
 </body>
 </html>
