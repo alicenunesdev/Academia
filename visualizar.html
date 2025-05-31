@@ -3,19 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <title>Visualizar Treinos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-     body {
+
+    body {
       margin: 0;
       background: #f7f9fc;
       color: #333;
       display: flex;
+      flex-direction: column;
       min-height: 100vh;
     }
-    
+
+    /* Navbar */
     .navbar {
       position: fixed;
       top: 0;
@@ -58,10 +62,9 @@
     }
 
     .main-content {
-      margin-left: 220px;
-      padding: 40px 30px;
+      padding: 80px 30px 40px;
       flex: 1;
-      max-width: 100%;
+      width: 100%;
     }
 
     h1 {
@@ -140,15 +143,40 @@
       margin-top: 100px;
     }
 
+    /* Responsividade */
+    @media (max-width: 900px) {
+      .navbar {
+        padding: 12px 20px;
+      }
+
+      .navbar h2 {
+        font-size: 1.4rem;
+      }
+
+      .navbar-links {
+        gap: 15px;
+      }
+    }
+
     @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .navbar-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
       .main-content {
-        margin-left: 60px;
-        padding: 20px 15px;
+        padding: 80px 20px 30px;
       }
 
       .treino-card {
         padding: 20px;
-        margin: 20px 10px;
       }
 
       .grupo-item {
@@ -166,8 +194,7 @@
 
     @media (max-width: 480px) {
       .main-content {
-        margin-left: 0;
-        padding: 15px 10px;
+        padding: 80px 15px 20px;
       }
 
       h1 {
@@ -187,14 +214,14 @@
 <body>
 
 <nav class="navbar">
-    <h2>Academia</h2>
-    <div class="navbar-links">
-      <a href="index.html">Cadastro</a>
-      <a href="visualizar.html" class="active">Visualizar</a>
-      <a href="treino.html" >Treino</a>
-      <a href="historico.html" >Histórico</a>
-    </div>
-  </nav>
+  <h2>Academia</h2>
+  <div class="navbar-links">
+    <a href="index.html">Cadastro</a>
+    <a href="visualizar.html" class="active">Visualizar</a>
+    <a href="treino.html">Treino</a>
+    <a href="historico.html">Histórico</a>
+  </div>
+</nav>
 
 <main class="main-content">
   <h1>Treinos Cadastrados</h1>
@@ -257,7 +284,6 @@
           <button class="delete-btn">Excluir</button>
         `;
 
-        // Adicionar evento para excluir
         card.querySelector("button.delete-btn").addEventListener("click", async () => {
           const confirmar = confirm(`Deseja realmente excluir o treino de ${data.usuario}?`);
           if (!confirmar) return;
@@ -279,24 +305,6 @@
   }
 
   carregarTreinos();
-</script>
-
-<script>
-  async function loadNavbar() {
-    const response = await fetch('navbar.html');
-    const navbarHTML = await response.text();
-    document.getElementById('navbar-container').innerHTML = navbarHTML;
-
-    // Marcar o link ativo
-    const path = window.location.pathname.split('/').pop();
-    const links = document.querySelectorAll('.navbar a');
-    links.forEach(link => {
-      if (link.getAttribute('href') === path) {
-        link.classList.add('active');
-      }
-    });
-  }
-  loadNavbar();
 </script>
 
 </body>
