@@ -3,11 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Academia</title>
+    <title>App Academia Firebase</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
-
 </head>
 <body>
 
@@ -19,39 +16,34 @@
             <li><a href="#" onclick="mostrarTela('historico')">📜 Histórico</a></li>
         </ul>
     </div>
-    <h3>Filtrar:</h3>
 
     <div class="main">
         <div id="home" class="tela">
             <h1>Bem-vindo ao App de Academia!</h1>
             <p>Escolha uma opção no menu.</p>
         </div>
-               <div id="cadastrar" class="tela" style="display:none;">
-    <h1>Cadastrar Treino</h1>
-     <label>Pessoa:</label>
-            <select id="filtroPessoa" onchange="filtrar()"></select>
-            <label>Grupo Muscular:</label>
-            <select id="filtroGrupo" onchange="filtrar()"></select>
-    <form id="formTreino">
-        <label>Nome da Pessoa:</label><br>
-        <input type="text" id="pessoa" required><br><br>
 
-        <label>Grupo Muscular:</label><br>
-        <input type="text" id="grupo" required><br><br>
+        <div id="cadastrar" class="tela" style="display:none;">
+            <h1>Cadastrar Treino</h1>
+            <form id="formTreino">
+                <label>Pessoa:</label><br>
+                <input type="text" id="pessoa" required><br><br>
 
-        <label>Nome do Exercício:</label><br>
-        <input type="text" id="exercicio" required><br><br>
+                <label>Grupo Muscular:</label><br>
+                <input type="text" id="grupo" required><br><br>
 
-        <label>Séries:</label><br>
-        <input type="number" id="series" required><br><br>
+                <label>Exercício:</label><br>
+                <input type="text" id="exercicio" required><br><br>
 
-        <label>Repetições:</label><br>
-        <input type="number" id="repeticoes" required><br><br>
+                <label>Séries:</label><br>
+                <input type="number" id="series" required><br><br>
 
-        <button type="submit">Salvar</button>
-    </form>
-</div>
+                <label>Repetições:</label><br>
+                <input type="number" id="repeticoes" required><br><br>
 
+                <button type="submit">Salvar</button>
+            </form>
+        </div>
 
         <div id="historico" class="tela" style="display:none;">
             <h1>Histórico de Treinos</h1>
@@ -59,6 +51,28 @@
         </div>
     </div>
 
-<script src="script.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+        authDomain: "academia-bd-9d4da.firebaseapp.com",
+        databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
+        projectId: "academia-bd-9d4da",
+        storageBucket: "academia-bd-9d4da.appspot.com",
+        messagingSenderId: "201289997890",
+        appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+        measurementId: "G-3J2FY1DEGW"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+    </script>
+
+    <!-- Script -->
+    <script src="script.js"></script>
 </body>
 </html>
