@@ -1,22 +1,328 @@
-{
-  "grupos": [
-    {
-      "grupo": "Inferior",
-      "serie": 3,
-      "repeticao": 12,
-      "exercicios": [
-        { "nome": "Agachamento" },
-        { "nome": "Leg Press" }
-      ]
-    },
-    {
-      "grupo": "Superior",
-      "serie": 4,
-      "repeticao": 10,
-      "exercicios": [
-        { "nome": "Supino" },
-        { "nome": "Remada" }
-      ]
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Treino</title>
+  <style>
+    /* Seu CSS atual aqui */
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-  ]
-}
+
+    body {
+      margin: 0;
+      background: #f7f9fc;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: #34495e;
+      color: #ecf0f1;
+      width: 220px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: fixed;
+    }
+
+    .navbar h2 {
+      margin: 0 0 40px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 12px 20px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+      display: block;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px 30px;
+      flex: 1;
+      max-width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .exercise-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .exercise-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    .exercise-card p {
+      font-size: 1.1rem;
+      margin: 8px 0;
+    }
+
+    .exercise-card input {
+      margin-top: 10px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      width: 80px;
+      text-align: center;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .buttons button {
+      padding: 12px 24px;
+      font-weight: 600;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .complete {
+      background: #27ae60;
+      color: white;
+    }
+
+    .complete:hover {
+      background: #1f8b4d;
+    }
+
+    .skip {
+      background: #f39c12;
+      color: white;
+    }
+
+    .skip:hover {
+      background: #d78b0e;
+    }
+
+    .end {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .end:hover {
+      background: #c0392b;
+    }
+
+    .cronometro {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e67e22;
+      margin-top: 15px;
+    }
+
+    @media(max-width: 768px) {
+      .navbar {
+        width: 60px;
+        padding: 20px 5px;
+      }
+
+      .navbar h2 {
+        display: none;
+      }
+
+      .navbar a {
+        padding: 12px 8px;
+        font-size: 0;
+      }
+
+      .main-content {
+        margin-left: 60px;
+        padding: 20px;
+      }
+
+      .exercise-card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <h2>Academia</h2>
+    <a href="index.html">Cadastro</a>
+    <a href="visualizar.html">Visualizar</a>
+    <a href="treino.html" class="active">Treino</a>
+  </nav>
+
+  <main class="main-content">
+    <div class="exercise-card" id="exerciseCard">
+      <!-- Conteúdo será inserido via JS -->
+      <h2>Carregando treino...</h2>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Config do seu Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const exerciseCard = document.getElementById("exerciseCard");
+
+    // ID do treino para carregar (ajuste conforme sua lógica, aqui coloque um fixo ou pegue da URL)
+    const treinoId = "ID_DO_TREINO_AQUI"; // troque pelo id do treino que quer puxar
+
+    let treinoData = null;
+    let grupoAtual = 0;
+    let exercicioAtual = 0;
+    let cronometroInterval = null;
+    let segundos = 0;
+
+    async function carregarTreino() {
+      const docSnap = await getDoc(doc(db, "treinos", treinoId));
+      if (!docSnap.exists()) {
+        exerciseCard.innerHTML = "<h2>Treino não encontrado</h2>";
+        return;
+      }
+
+      treinoData = docSnap.data();
+      grupoAtual = 0;
+      exercicioAtual = 0;
+      segundos = 0;
+
+      mostrarExercicio();
+      iniciarCronometro();
+    }
+
+    function mostrarExercicio() {
+      if (!treinoData) return;
+
+      const grupos = treinoData.grupos;
+      if (grupoAtual >= grupos.length) {
+        finalizarTreino();
+        return;
+      }
+
+      const grupo = grupos[grupoAtual];
+      if (exercicioAtual >= grupo.exercicios.length) {
+        // passou todos os exercícios do grupo atual, vai para próximo grupo
+        grupoAtual++;
+        exercicioAtual = 0;
+        mostrarExercicio();
+        return;
+      }
+
+      const ex = grupo.exercicios[exercicioAtual];
+
+      // Renderiza o exercício atual
+      exerciseCard.innerHTML = `
+        <h2>${ex.nome}</h2>
+        <p><strong>Grupo:</strong> ${grupo.grupo}</p>
+        <p><strong>Séries:</strong> ${grupo.serie}</p>
+        <p><strong>Repetições alvo:</strong> ${grupo.repeticao}</p>
+
+        <div style="margin-top: 20px;">
+          <label for="carga"><strong>Carga (kg):</strong></label><br>
+          <input type="number" id="carga" placeholder="Kg" min="0" step="0.1" />
+        </div>
+
+        <div class="cronometro" id="cronometro">Tempo: 00:00</div>
+
+        <div class="buttons">
+          <button class="complete" id="btnComplete">Completar</button>
+          <button class="skip" id="btnSkip">Pular</button>
+          <button class="end" id="btnEnd">Encerrar</button>
+        </div>
+      `;
+
+      // Configura os botões
+      document.getElementById("btnComplete").onclick = () => proximoExercicio();
+      document.getElementById("btnSkip").onclick = () => proximoExercicio();
+      document.getElementById("btnEnd").onclick = () => finalizarTreino();
+
+      segundos = 0; // reset cronômetro
+      atualizarCronometroVisual();
+      iniciarCronometro();
+    }
+
+    function proximoExercicio() {
+      pararCronometro();
+      exercicioAtual++;
+      mostrarExercicio();
+    }
+
+    function finalizarTreino() {
+      pararCronometro();
+      exerciseCard.innerHTML = `
+        <h2>Treino finalizado!</h2>
+        <p>Parabéns por completar o treino.</p>
+      `;
+    }
+
+    function iniciarCronometro() {
+      if(cronometroInterval) clearInterval(cronometroInterval);
+
+      cronometroInterval = setInterval(() => {
+        segundos++;
+        atualizarCronometroVisual();
+      }, 1000);
+    }
+
+    function pararCronometro() {
+      if (cronometroInterval) {
+        clearInterval(cronometroInterval);
+        cronometroInterval = null;
+      }
+    }
+
+    function atualizarCronometroVisual() {
+      const cronometroEl = document.getElementById("cronometro");
+      if (!cronometroEl) return;
+
+      const minutos = String(Math.floor(segundos / 60)).padStart(2, "0");
+      const seg = String(segundos % 60).padStart(2, "0");
+      cronometroEl.textContent = `Tempo: ${minutos}:${seg}`;
+    }
+
+    // Inicia a função de carregar o treino
+    carregarTreino();
+
+  </script>
+</body>
+</html>
