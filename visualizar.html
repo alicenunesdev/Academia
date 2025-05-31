@@ -1,86 +1,255 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Visualizar Treinos</title>
   <style>
-    body {
-      background: #ecf0f1;
-      font-family: sans-serif;
-      padding: 20px;
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
+    body {
+      margin: 0;
+      background: #f7f9fc;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px 30px;
+      flex: 1;
+      max-width: 100%;
+    }
+
     h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .treino-card {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.07);
+      margin-bottom: 25px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+
+    .treino-card h2 {
+      margin: 0 0 15px;
+      color: #2980b9;
+      font-weight: 700;
+    }
+
+    .treino-info {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
       color: #34495e;
     }
-    .card {
-      background: white;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+
+    .grupos-list {
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
     }
-    button {
-      padding: 8px 16px;
-      background: #2980b9;
+
+    .grupo-item {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 6px 0;
+      font-size: 1rem;
+      border-bottom: 1px solid #eee;
+      color: #2c3e50;
+    }
+
+    .grupo-item:last-child {
+      border-bottom: none;
+    }
+
+    button.delete-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #e74c3c;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 6px;
+      padding: 8px 12px;
       cursor: pointer;
-      margin-top: 10px;
+      font-weight: 700;
+      transition: background 0.3s;
     }
-    button:hover {
-      background: #1c5d87;
+
+    button.delete-btn:hover {
+      background: #c0392b;
+    }
+
+    #loading {
+      text-align: center;
+      font-size: 1.3rem;
+      color: #555;
+      margin-top: 100px;
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        margin-left: 60px;
+        padding: 20px 15px;
+      }
+
+      .treino-card {
+        padding: 20px;
+        margin: 20px 10px;
+      }
+
+      .grupo-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      button.delete-btn {
+        top: 15px;
+        right: 15px;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        margin-left: 0;
+        padding: 15px 10px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .treino-card {
+        margin: 15px 5px;
+      }
+
+      .grupo-item span {
+        font-size: 0.95rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Visualizar Treinos</h1>
-  <p>Usuário: <span id="usuario"></span></p>
-  <div id="treinos"></div>
-  <button onclick="logout()">Sair</button>
 
-  <script>
-    const usuario = localStorage.getItem("usuarioLogado");
-    if (!usuario) {
-      alert("Faça login primeiro.");
-      window.location.href = "login.html";
-    }
-    document.getElementById("usuario").innerText = usuario;
+<div id="navbar-container"></div>
 
-    const treinos = JSON.parse(localStorage.getItem(`treinos_${usuario}`)) || [];
-    const div = document.getElementById("treinos");
+<main class="main-content">
+  <h1>Treinos Cadastrados</h1>
+  <div id="loading">Carregando treinos...</div>
+  <div id="treinos-list"></div>
+</main>
 
-    if (treinos.length === 0) {
-      div.innerHTML = "<p>Sem treinos cadastrados.</p>";
-    } else {
-      treinos.forEach((t, i) => {
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+    authDomain: "academia-bd-9d4da.firebaseapp.com",
+    projectId: "academia-bd-9d4da",
+    storageBucket: "academia-bd-9d4da.appspot.com",
+    messagingSenderId: "201289997890",
+    appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const treinosList = document.getElementById("treinos-list");
+  const loading = document.getElementById("loading");
+
+  async function carregarTreinos() {
+    loading.style.display = "block";
+    treinosList.innerHTML = "";
+
+    try {
+      const querySnapshot = await getDocs(collection(db, "treinos"));
+
+      if (querySnapshot.empty) {
+        loading.textContent = "Nenhum treino cadastrado.";
+        return;
+      }
+
+      loading.style.display = "none";
+
+      querySnapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const id = docSnap.id;
+
         const card = document.createElement("div");
-        card.className = "card";
+        card.classList.add("treino-card");
+
         card.innerHTML = `
-          <h3>Treino ${i + 1}</h3>
-          <p><b>Exercícios:</b> ${t.exercicios}</p>
-          <p><b>Observações:</b> ${t.observacoes}</p>
-          <button onclick="registrarEvolucao(${i})">Marcar como Realizado</button>
+          <h2>${data.usuario}</h2>
+          <div class="treino-info"><strong>Tipo de Treino:</strong> ${data.tipoTreino}</div>
+          <div class="grupos-list">
+            ${data.grupos.map(grupo => `
+              <div class="grupo-item">
+                <span>${grupo.grupo}</span>
+                <span>Séries: ${grupo.serie}</span>
+                <span>Repetições: ${grupo.repeticao}</span>
+              </div>
+            `).join('')}
+          </div>
+          <button class="delete-btn">Excluir</button>
         `;
-        div.appendChild(card);
-      });
-    }
 
-    function registrarEvolucao(index) {
-      const treino = treinos[index];
-      const historico = JSON.parse(localStorage.getItem(`historico_${usuario}`)) || [];
-      historico.push({
-        ...treino,
-        data: new Date().toLocaleString()
-      });
-      localStorage.setItem(`historico_${usuario}`, JSON.stringify(historico));
-      alert("Treino registrado na evolução!");
-    }
+        // Adicionar evento para excluir
+        card.querySelector("button.delete-btn").addEventListener("click", async () => {
+          const confirmar = confirm(`Deseja realmente excluir o treino de ${data.usuario}?`);
+          if (!confirmar) return;
 
-    function logout() {
-      localStorage.removeItem("usuarioLogado");
-      window.location.href = "login.html";
+          try {
+            await deleteDoc(doc(db, "treinos", id));
+            alert("Treino excluído com sucesso!");
+            carregarTreinos();
+          } catch (error) {
+            alert("Erro ao excluir treino: " + error.message);
+          }
+        });
+
+        treinosList.appendChild(card);
+      });
+    } catch (error) {
+      loading.textContent = "Erro ao carregar treinos: " + error.message;
     }
-  </script>
+  }
+
+  carregarTreinos();
+</script>
+
+<script>
+  async function loadNavbar() {
+    const response = await fetch('navbar.html');
+    const navbarHTML = await response.text();
+    document.getElementById('navbar-container').innerHTML = navbarHTML;
+
+    // Marcar o link ativo
+    const path = window.location.pathname.split('/').pop();
+    const links = document.querySelectorAll('.navbar a');
+    links.forEach(link => {
+      if (link.getAttribute('href') === path) {
+        link.classList.add('active');
+      }
+    });
+  }
+  loadNavbar();
+</script>
+
 </body>
 </html>
