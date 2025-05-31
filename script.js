@@ -1,10 +1,10 @@
-// 🔗 Sua API do Google Sheets (Google Apps Script)
+// URL da sua API do Google Apps Script
 const API_URL = "https://script.google.com/macros/s/AKfycbzKMk3WGjg5FUqfNDFOJIoNYbwEF30bEtkcsmmfllmZK4Df341lfnpIx2TxAptMjt20Uw/exec";
 
-let treinos = [];
-let treinoEditando = null;
+let dadosTreinos = [];
+let editandoId = null;
 
-// 🔄 Troca de telas
+// Função para trocar de tela
 function mostrarTela(tela) {
     document.querySelectorAll('.tela').forEach(el => el.style.display = 'none');
     document.getElementById(tela).style.display = 'block';
@@ -14,30 +14,32 @@ function mostrarTela(tela) {
     }
 }
 
-// 🎯 Enviar treino (Criar ou Editar)
+// Função para salvar treino
 document.getElementById('formTreino').addEventListener('submit', function (e) {
     e.preventDefault();
 
     const dados = {
-        id: treinoEditando ?? '', // vazio para criar, preenchido para editar
+        id: editandoId, // se estiver editando, mantém o ID
         pessoa: document.getElementById('pessoa').value,
         grupo: document.getElementById('grupo').value,
         exercicio: document.getElementById('exercicio').value,
         series: document.getElementById('series').value,
         repeticoes: document.getElementById('repeticoes').value,
-        data: new Date().toLocaleDateString()
+        data: new Date().toLocaleDateString('pt-BR')
     };
 
     fetch(API_URL, {
         method: 'POST',
         body: JSON.stringify(dados),
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
     .then(res => {
         if (res.ok) {
             alert('Treino salvo com sucesso!');
             document.getElementById('formTreino').reset();
-            treinoEditando = null;
+            editandoId = null;
             mostrarTela('historico');
         } else {
             alert('Erro ao salvar treino.');
@@ -46,24 +48,28 @@ document.getElementById('formTreino').addEventListener('submit', function (e) {
     .catch(err => console.error('Erro:', err));
 });
 
-// 🔍 Carregar Histórico
+// Função para carregar o histórico
 function carregarHistorico() {
     fetch(API_URL)
         .then(res => res.json())
         .then(data => {
-            treinos = data;
-            mostrarLista(data);
-            carregarFiltros();
+            dadosTreinos = data;
+            listarTreinos(data);
         })
         .catch(err => console.error('Erro:', err));
 }
 
-// 📝 Mostrar Lista
-function mostrarLista(lista) {
-    const ul = document.getElementById('listaTreinos');
-    ul.innerHTML = '';
+// Função que exibe a lista de treinos
+function listarTreinos(data) {
+    const lista = document.getElementById('listaTreinos');
+    lista.innerHTML = '';
 
-    lista.forEach(item => {
+    if (data.length === 0) {
+        lista.innerHTML = '<li>Nenhum treino cadastrado.</li>';
+        return;
+    }
+
+    data.forEach(item => {
         const li = document.createElement('li');
         li.innerHTML = `
             <b>${item.pessoa}</b> — 
@@ -71,16 +77,16 @@ function mostrarLista(lista) {
             ${item.exercicio} 
             (${item.series}x${item.repeticoes}) 
             em ${item.data}
-            <button onclick="editarTreino('${item.id}')">✏️</button>
-            <button onclick="excluirTreino('${item.id}')">❌</button>
+            <button onclick="editarTreino('${item.id}')">✏️ Editar</button>
+            <button onclick="excluirTreino('${item.id}')">🗑️ Excluir</button>
         `;
-        ul.appendChild(li);
+        lista.appendChild(li);
     });
 }
 
-// ✏️ Editar
+// Função para editar treino
 function editarTreino(id) {
-    const treino = treinos.find(t => t.id === id);
+    const treino = dadosTreinos.find(item => item.id === id);
     if (!treino) return;
 
     document.getElementById('pessoa').value = treino.pessoa;
@@ -89,51 +95,40 @@ function editarTreino(id) {
     document.getElementById('series').value = treino.series;
     document.getElementById('repeticoes').value = treino.repeticoes;
 
-    treinoEditando = treino.id;
+    editandoId = id;
     mostrarTela('cadastrar');
 }
 
-// ❌ Excluir
+// Função para excluir treino
 function excluirTreino(id) {
-    if (!confirm('Tem certeza que deseja excluir esse treino?')) return;
+    if (!confirm('Deseja realmente excluir este treino?')) return;
 
-    fetch(`${API_URL}?id=${id}`, { method: 'DELETE' })
-        .then(res => {
-            if (res.ok) {
-                alert('Treino excluído!');
-                carregarHistorico();
-            } else {
-                alert('Erro ao excluir treino.');
-            }
-        })
-        .catch(err => console.error('Erro:', err));
+    fetch(`${API_URL}?id=${id}`, {
+        method: 'DELETE'
+    })
+    .then(res => {
+        if (res.ok) {
+            alert('Treino excluído com sucesso!');
+            carregarHistorico();
+        } else {
+            alert('Erro ao excluir treino.');
+        }
+    })
+    .catch(err => console.error('Erro:', err));
 }
 
-// 🔍 Filtro
-function filtrar() {
-    const pessoa = document.getElementById('filtroPessoa').value.toLowerCase();
-    const grupo = document.getElementById('filtroGrupo').value.toLowerCase();
-
-    const filtrados = treinos.filter(t => 
-        (pessoa === '' || t.pessoa.toLowerCase().includes(pessoa)) &&
-        (grupo === '' || t.grupo.toLowerCase().includes(grupo))
+// Função para filtrar por pessoa
+function filtrarPorPessoa(nome) {
+    const filtrados = dadosTreinos.filter(item => 
+        item.pessoa.toLowerCase().includes(nome.toLowerCase())
     );
-
-    mostrarLista(filtrados);
+    listarTreinos(filtrados);
 }
 
-// 🚦 Carregar filtros automáticos
-function carregarFiltros() {
-    const pessoas = [...new Set(treinos.map(t => t.pessoa))];
-    const grupos = [...new Set(treinos.map(t => t.grupo))];
-
-    document.getElementById('filtroPessoa').innerHTML = `
-        <option value="">Todas</option>
-        ${pessoas.map(p => `<option value="${p}">${p}</option>`).join('')}
-    `;
-
-    document.getElementById('filtroGrupo').innerHTML = `
-        <option value="">Todos</option>
-        ${grupos.map(g => `<option value="${g}">${g}</option>`).join('')}
-    `;
+// Função para filtrar por grupo muscular
+function filtrarPorGrupo(grupo) {
+    const filtrados = dadosTreinos.filter(item => 
+        item.grupo.toLowerCase().includes(grupo.toLowerCase())
+    );
+    listarTreinos(filtrados);
 }
