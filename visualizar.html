@@ -61,6 +61,44 @@
       color: white;
     }
 
+    /* Botão hamburguer */
+    .hamburguer {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+      width: 25px;
+      height: 22px;
+      justify-content: center;
+    }
+
+    .hamburguer span {
+      display: block;
+      height: 3px;
+      background: #ecf0f1;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    /* Quando o menu está ativo (aberto) */
+    .navbar-links.active {
+      display: flex;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      right: 30px;
+      background: #2c3e50;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      width: max-content;
+      z-index: 999;
+    }
+
+    .navbar-links.active a {
+      padding: 10px 0;
+    }
+
     .main-content {
       padding: 80px 30px 40px;
       flex: 1;
@@ -160,35 +198,21 @@
 
     @media (max-width: 768px) {
       .navbar {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
+        position: fixed;
+        padding: 12px 20px;
       }
 
+      /* Esconder menu links inicialmente no mobile */
       .navbar-links {
-        flex-direction: column;
-        width: 100%;
-        gap: 10px;
-        margin-top: 10px;
+        display: none;
+        width: auto;
       }
 
-      .main-content {
-        padding: 80px 20px 30px;
-      }
-
-      .treino-card {
-        padding: 20px;
-      }
-
-      .grupo-item {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      button.delete-btn {
-        top: 15px;
-        right: 15px;
-        padding: 6px 10px;
-        font-size: 0.9rem;
+      /* Mostrar hamburguer no mobile */
+      .hamburguer {
+        display: flex;
       }
     }
 
@@ -215,7 +239,14 @@
 
 <nav class="navbar">
   <h2>Academia</h2>
-  <div class="navbar-links">
+
+  <div class="hamburguer" id="hamburguer">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+
+  <div class="navbar-links" id="navbar-links">
     <a href="index.html">Cadastro</a>
     <a href="visualizar.html" class="active">Visualizar</a>
     <a href="treino.html">Treino</a>
@@ -305,6 +336,14 @@
   }
 
   carregarTreinos();
+
+  // Código para controlar o menu hamburguer
+  const hamburguer = document.getElementById('hamburguer');
+  const navbarLinks = document.getElementById('navbar-links');
+
+  hamburguer.addEventListener('click', () => {
+    navbarLinks.classList.toggle('active');
+  });
 </script>
 
 </body>
