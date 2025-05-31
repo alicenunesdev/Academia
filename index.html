@@ -1,8 +1,72 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" >
 <head>
   <meta charset="UTF-8" />
-  <title>Salvar Treino no Firebase</title>
+  <title>Cadastro de Treinos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+    h1 {
+      margin-bottom: 1.5rem;
+      color: #333;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+      color: #555;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      background: #4CAF50;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: none;
+      padding: 0.7rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .link-consulta {
+      margin-top: 1rem;
+      display: block;
+      text-align: center;
+      color: #007bff;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .link-consulta:hover {
+      text-decoration: underline;
+    }
+  </style>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -20,31 +84,46 @@
     const db = getFirestore(app);
 
     async function salvarTreino() {
-      try {
-        const treino = document.getElementById("treino").value;
-        const serie = parseInt(document.getElementById("serie").value);
-        const repeticao = parseInt(document.getElementById("repeticao").value);
+      const treino = document.getElementById("treino").value.trim();
+      const serie = parseInt(document.getElementById("serie").value);
+      const repeticao = parseInt(document.getElementById("repeticao").value);
 
+      if (!treino || isNaN(serie) || isNaN(repeticao)) {
+        alert("Por favor, preencha todos os campos corretamente.");
+        return;
+      }
+
+      try {
         await addDoc(collection(db, "academia"), {
           treino: treino,
           serie: serie,
           repeticao: repeticao,
+          criadoEm: new Date()
         });
-
         alert("✅ Treino salvo com sucesso!");
+        document.getElementById("treino").value = "";
+        document.getElementById("serie").value = "";
+        document.getElementById("repeticao").value = "";
       } catch (e) {
         console.error("❌ Erro ao adicionar documento: ", e);
+        alert("Erro ao salvar treino.");
       }
     }
 
-    window.salvarTreino = salvarTreino; // Torna a função acessível no HTML
+    window.salvarTreino = salvarTreino;
   </script>
 </head>
 <body>
-  <h1>Cadastro de Treino</h1>
-  <label>Treino: <input type="text" id="treino" /></label><br />
-  <label>Série: <input type="number" id="serie" /></label><br />
-  <label>Repetição: <input type="number" id="repeticao" /></label><br />
-  <button onclick="salvarTreino()">Salvar Treino</button>
+  <div class="container">
+    <h1>Cadastrar Treino</h1>
+    <label for="treino">Treino</label>
+    <input type="text" id="treino" placeholder="Nome do treino" />
+    <label for="serie">Série</label>
+    <input type="number" id="serie" placeholder="Número de séries" />
+    <label for="repeticao">Repetição</label>
+    <input type="number" id="repeticao" placeholder="Número de repetições" />
+    <button onclick="salvarTreino()">Salvar Treino</button>
+    <a class="link-consulta" href="consulta.html">Ver treinos cadastrados</a>
+  </div>
 </body>
 </html>
