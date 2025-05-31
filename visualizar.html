@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" >
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <title>Visualizar Treinos</title>
@@ -8,6 +8,7 @@
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     body {
       margin: 0;
       background: #f7f9fc;
@@ -15,18 +16,21 @@
       display: flex;
       min-height: 100vh;
     }
+
     .main-content {
       margin-left: 220px;
       padding: 40px 30px;
       flex: 1;
       max-width: 100%;
     }
+
     h1 {
       text-align: center;
       margin-bottom: 30px;
       font-weight: 700;
       color: #2c3e50;
     }
+
     .treino-card {
       background: white;
       padding: 25px 30px;
@@ -38,31 +42,39 @@
       margin-right: auto;
       position: relative;
     }
+
     .treino-card h2 {
       margin: 0 0 15px;
       color: #2980b9;
       font-weight: 700;
     }
+
     .treino-info {
       margin-bottom: 15px;
       font-size: 1.1rem;
       color: #34495e;
     }
+
     .grupos-list {
       border-top: 1px solid #ddd;
       padding-top: 15px;
     }
+
     .grupo-item {
       display: flex;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
       padding: 6px 0;
       font-size: 1rem;
       border-bottom: 1px solid #eee;
       color: #2c3e50;
     }
+
     .grupo-item:last-child {
       border-bottom: none;
     }
+
     button.delete-btn {
       position: absolute;
       top: 20px;
@@ -76,19 +88,58 @@
       font-weight: 700;
       transition: background 0.3s;
     }
+
     button.delete-btn:hover {
       background: #c0392b;
     }
+
     #loading {
       text-align: center;
       font-size: 1.3rem;
       color: #555;
       margin-top: 100px;
     }
-    @media(max-width: 768px) {
+
+    @media (max-width: 768px) {
       .main-content {
         margin-left: 60px;
         padding: 20px 15px;
+      }
+
+      .treino-card {
+        padding: 20px;
+        margin: 20px 10px;
+      }
+
+      .grupo-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      button.delete-btn {
+        top: 15px;
+        right: 15px;
+        padding: 6px 10px;
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        margin-left: 0;
+        padding: 15px 10px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      .treino-card {
+        margin: 15px 5px;
+      }
+
+      .grupo-item span {
+        font-size: 0.95rem;
       }
     }
   </style>
@@ -183,21 +234,21 @@
 </script>
 
 <script>
-async function loadNavbar() {
-  const response = await fetch('navbar.html');
-  const navbarHTML = await response.text();
-  document.getElementById('navbar-container').innerHTML = navbarHTML;
+  async function loadNavbar() {
+    const response = await fetch('navbar.html');
+    const navbarHTML = await response.text();
+    document.getElementById('navbar-container').innerHTML = navbarHTML;
 
-  // Setar link ativo conforme página atual
-  const path = window.location.pathname.split('/').pop();
-  const links = document.querySelectorAll('.navbar a');
-  links.forEach(link => {
-    if (link.getAttribute('href') === path) {
-      link.classList.add('active');
-    }
-  });
-}
-loadNavbar();
+    // Marcar o link ativo
+    const path = window.location.pathname.split('/').pop();
+    const links = document.querySelectorAll('.navbar a');
+    links.forEach(link => {
+      if (link.getAttribute('href') === path) {
+        link.classList.add('active');
+      }
+    });
+  }
+  loadNavbar();
 </script>
 
 </body>
