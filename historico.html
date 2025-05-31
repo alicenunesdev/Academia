@@ -207,7 +207,7 @@
 
       const dadosOrdenados = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => b.data - a.data); // Mais recentes primeiro
+        .sort((a, b) => b.data - a.data); // Ordena do mais novo para o mais antigo
 
       dadosOrdenados.forEach(data => {
         const div = document.createElement("div");
