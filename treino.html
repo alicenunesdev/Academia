@@ -40,6 +40,23 @@
       font-size: 1.6rem;
     }
 
+    /* Botão hamburguer */
+    .hamburguer {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      width: 25px;
+      height: 20px;
+      justify-content: space-between;
+    }
+
+    .hamburguer span {
+      display: block;
+      height: 3px;
+      background: #ecf0f1;
+      border-radius: 2px;
+    }
+
     .navbar-links {
       display: flex;
       gap: 20px;
@@ -174,18 +191,39 @@
       background: #2471a3;
     }
 
+    /* RESPONSIVO */
+
     @media (max-width: 768px) {
       .navbar {
-        flex-direction: column;
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center;
         padding: 10px 20px;
       }
 
+      .hamburguer {
+        display: flex;
+      }
+
       .navbar-links {
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: #2c3e50;
         flex-direction: column;
         width: 100%;
-        gap: 10px;
-        margin-top: 10px;
+        gap: 0;
+        display: none;
+        border-top: 1px solid #34495e;
+      }
+
+      .navbar-links.open {
+        display: flex;
+      }
+
+      .navbar-links a {
+        padding: 15px 20px;
+        border-bottom: 1px solid #34495e;
       }
 
       .main-content {
@@ -208,7 +246,14 @@
 
   <nav class="navbar">
     <h2>Academia</h2>
-    <div class="navbar-links">
+
+    <div class="hamburguer" id="hamburguer">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+    <div class="navbar-links" id="navbarLinks">
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
       <a href="treino.html" class="active">Treino</a>
@@ -229,6 +274,15 @@
 
     <div id="treinoContainer"></div>
   </main>
+
+  <script>
+    const hamburguer = document.getElementById("hamburguer");
+    const navbarLinks = document.getElementById("navbarLinks");
+
+    hamburguer.addEventListener("click", () => {
+      navbarLinks.classList.toggle("open");
+    });
+  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -412,7 +466,6 @@
     }
 
     async function finalizarTreino() {
-      // Salvar dados no Firestore na coleção 'historico'
       try {
         await setDoc(doc(db, "historico", Date.now().toString()), {
           data: new Date().toISOString(),
