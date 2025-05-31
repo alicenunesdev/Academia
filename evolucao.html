@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Evolução dos Treinos</title>
+  <style>
+    body {
+      background: #ecf0f1;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      color: #34495e;
+    }
+    .card {
+      background: white;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      box-shadow: 1px 1px 5px rgba(0,0,0,0.2);
+    }
+    button {
+      padding: 8px 16px;
+      background: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #1c5d87;
+    }
+  </style>
+</head>
+<body>
+  <h1>Histórico de Evolução</h1>
+  <p>Usuário: <span id="usuario"></span></p>
+  <div id="historico"></div>
+  <button onclick="logout()">Sair</button>
+
+  <script>
+    const usuario = localStorage.getItem("usuarioLogado");
+    if (!usuario) {
+      alert("Faça login primeiro.");
+      window.location.href = "login.html";
+    }
+    document.getElementById("usuario").innerText = usuario;
+
+    const historico = JSON.parse(localStorage.getItem(`historico_${usuario}`)) || [];
+    const div = document.getElementById("historico");
+
+    if (historico.length === 0) {
+      div.innerHTML = "<p>Sem treinos realizados.</p>";
+    } else {
+      historico.forEach((h, i) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>Treino ${i + 1}</h3>
+          <p><b>Data:</b> ${h.data}</p>
+          <p><b>Exercícios:</b> ${h.exercicios}</p>
+          <p><b>Observações:</b> ${h.observacoes}</p>
+        `;
+        div.appendChild(card);
+      });
+    }
+
+    function logout() {
+      localStorage.removeItem("usuarioLogado");
+      window.location.href = "login.html";
+    }
+  </script>
+</body>
+</html>
