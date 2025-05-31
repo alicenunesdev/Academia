@@ -250,22 +250,12 @@
         const data = docSnap.data();
         const option = document.createElement("option");
         option.value = docSnap.id;
-        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+        option.textContent = ${data.usuario} - ${data.tipoTreino};
         treinoSelect.appendChild(option);
       });
     }
 
     carregarTreinos();
-
-    // Função para pegar nome do exercício pelo ID do exercício
-    async function pegarNomeExercicio(id) {
-      if (!id) return null;
-      const docSnap = await getDoc(doc(db, "exercicios", id));
-      if (docSnap.exists()) {
-        return docSnap.data().nome || null;
-      }
-      return null;
-    }
 
     iniciarBtn.addEventListener("click", async () => {
       const treinoId = treinoSelect.value;
@@ -281,72 +271,75 @@
       }
 
       const data = docSnap.data();
-      grupos = data.grupos || [];
-      if (grupos.length === 0) {
-        alert("Este treino não possui grupos cadastrados.");
-        return;
-      }
-
+      grupos = data.grupos;
       atual = 0;
+
       treinoSelect.disabled = true;
       iniciarBtn.disabled = true;
       encerrarBtn.classList.remove("hidden");
-      await exibirExercicio(atual);
+
+      exibirExercicio(atual);
     });
 
-    encerrarBtn.addEventListener("click", () => {
-      if (confirm("Deseja realmente encerrar o treino?")) {
-        treinoContainer.innerHTML = "<div class='card'><h2>⚡ Treino encerrado.</h2></div>";
-        treinoSelect.disabled = false;
-        iniciarBtn.disabled = false;
-        encerrarBtn.classList.add("hidden");
-        grupos = [];
-        atual = 0;
-      }
-    });
-
-    async function exibirExercicio(index) {
+    function exibirExercicio(index) {
       const grupo = grupos[index];
       treinoContainer.innerHTML = "";
 
-      // Busca o nome do exercício pelo ID, se não estiver definido diretamente
-      let nomeExercicio = grupo.exercicioNome || null;
-      if (!nomeExercicio && grupo.exercicioId) {
-        nomeExercicio = await pegarNomeExercicio(grupo.exercicioId);
-      }
-
       const div = document.createElement("div");
       div.className = "card";
-      div.innerHTML = `
+      div.innerHTML = 
         <div class="atividade-header">
-          <span>Atividade ${index + 1}</span>
-          <h2>${grupo.titulo || "Sem nome definido"}</h2>
-          <p><strong>Exercício:</strong> ${nomeExercicio || "Nome não disponível"}</p>
-          <p>${grupo.descricao || "Sem descrição"}</p>
+          <span>${grupo.grupo}</span>
+          <h2>${grupo.nome}</h2>
+          <p>${grupo.descricao}</p>
         </div>
 
         <div class="series">
-          ${Array.from({ length: grupo.serie || 1 }).map((_, i) => `
+          ${Array.from({ length: grupo.serie }).map((_, i) => 
             <div>
-              <label>Série ${i + 1}</label>
-              <input type="number" placeholder="Reps" value="${grupo.repeticao || ''}" />
-              <input type="number" placeholder="Carga (kg)" />
-              <input type="checkbox" class="check-serie" />
-              <span class="cronometro-serie hidden">⏱ 00:00</span>
+              <label>Série ${i + 1}</label><br/>
+              <input type="number" placeholder="Reps" value="${grupo.repeticao}">
+              <input type="number" placeholder="Carga (kg)">
+              <input type="checkbox" class="check-serie"> ✔
+              <span class="cronometro-serie hidden">00:00</span>
             </div>
-          `).join('')}
+          ).join('')}
         </div>
 
         <div class="botoes-controle">
           <button id="pularBtn" class="botao-pular">❌ Pular</button>
           <button id="completarBtn" class="botao-completar">✅ Completar</button>
         </div>
-      `;
+      ;
 
       treinoContainer.appendChild(div);
 
+      document.querySelectorAll(".check-serie").forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) {
+            const timerEl = checkbox.nextElementSibling;
+            timerEl.classList.remove("hidden");
+            iniciarCronometro(timerEl);
+          }
+        });
+      });
+
       document.getElementById("pularBtn").onclick = () => proximoExercicio();
       document.getElementById("completarBtn").onclick = () => proximoExercicio();
+    }
+
+    function iniciarCronometro(el) {
+      let segundos = 0;
+      const timer = setInterval(() => {
+        if (!document.body.contains(el)) {
+          clearInterval(timer);
+          return;
+        }
+        segundos++;
+        const min = String(Math.floor(segundos / 60)).padStart(2, "0");
+        const sec = String(segundos % 60).padStart(2, "0");
+        el.textContent = ${min}:${sec};
+      }, 1000);
     }
 
     function proximoExercicio() {
@@ -355,13 +348,21 @@
         exibirExercicio(atual);
       } else {
         treinoContainer.innerHTML = "<div class='card'><h2>✅ Parabéns! Treino completo 💪</h2></div>";
+        encerrarBtn.classList.add("hidden");
         treinoSelect.disabled = false;
         iniciarBtn.disabled = false;
-        encerrarBtn.classList.add("hidden");
-        grupos = [];
-        atual = 0;
       }
     }
+
+    encerrarBtn.addEventListener("click", () => {
+      if (confirm("Deseja realmente encerrar o treino?")) {
+        treinoContainer.innerHTML = "<div class='card'><h2>⚡ Treino encerrado.</h2></div>";
+        encerrarBtn.classList.add("hidden");
+        treinoSelect.disabled = false;
+        iniciarBtn.disabled = false;
+      }
+    });
+
   </script>
 </body>
 </html>
