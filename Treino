@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="pt-br" >
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Treino com Salvar e Cronômetro Pausável</title>
+  <title>Iniciar Treino</title>
   <style>
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     body {
       margin: 0;
       background: #f7f9fc;
@@ -15,6 +16,7 @@
       display: flex;
       min-height: 100vh;
     }
+
     .navbar {
       background: #34495e;
       color: #ecf0f1;
@@ -25,12 +27,14 @@
       padding: 20px;
       position: fixed;
     }
+
     .navbar h2 {
       margin: 0 0 40px;
       font-weight: 700;
       font-size: 1.8rem;
       text-align: center;
     }
+
     .navbar a {
       color: #bdc3c7;
       text-decoration: none;
@@ -42,449 +46,287 @@
       display: block;
       position: relative;
     }
+
     .navbar a:hover,
     .navbar a.active {
       background: #2980b9;
       color: white;
     }
+
     .main-content {
       margin-left: 220px;
       padding: 40px 30px;
       flex: 1;
       max-width: 100%;
     }
+
     h1 {
       text-align: center;
       margin-bottom: 30px;
       font-weight: 700;
       color: #2c3e50;
     }
-    button, select, input[type="number"] {
-      font-family: inherit;
-      font-size: 1rem;
-      padding: 8px 12px;
+
+    .card {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.07);
+      max-width: 600px;
+      margin: auto;
+      margin-bottom: 25px;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      transition: border-color 0.3s;
+      font-size: 1rem;
     }
+
     button {
-      cursor: pointer;
-      background-color: #2980b9;
+      background: #2980b9;
       color: white;
       font-weight: 700;
-      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
     }
+
     button:hover {
-      background-color: #1c5980;
+      background: #2471a3;
     }
-    select {
-      width: 100%;
-      max-width: 350px;
-      margin: 0 auto 30px auto;
-      display: block;
+
+    .exercise-box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
     }
-    #startBtn {
-      display: block;
-      margin: 0 auto 30px auto;
+
+    .exercise-box h3 {
+      margin: 0 0 10px;
+      color: #2980b9;
     }
-    .treino-area {
-      max-width: 600px;
-      background: white;
-      margin: 0 auto;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.07);
-      padding: 30px;
-    }
-    .grupo-title {
-      font-weight: 700;
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-      color: #34495e;
-      text-align: center;
-    }
-    .serie-container {
+
+    .series {
       display: flex;
-      justify-content: center;
       gap: 10px;
-      margin-bottom: 25px;
+      margin-top: 10px;
       flex-wrap: wrap;
     }
-    .serie-quadrado {
-      width: 35px;
-      height: 35px;
-      border: 2px solid #2980b9;
-      border-radius: 8px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: 700;
-      cursor: default;
-      color: #2980b9;
-      user-select: none;
-    }
-    .serie-quadrado.active {
-      background-color: #2980b9;
-      color: white;
-    }
-    .inputs-serie {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-    .inputs-serie label {
-      display: flex;
-      flex-direction: column;
-      font-weight: 600;
-      color: #34495e;
-    }
-    .inputs-serie input {
-      width: 120px;
-      margin-top: 6px;
-      padding: 6px 8px;
-      font-size: 1rem;
-    }
-    .check-btn {
-      background-color: #27ae60;
-      margin: 0 auto 20px auto;
-      display: block;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      border: none;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    .check-btn:hover {
-      background-color: #1f8c4a;
-    }
-    #cronometro {
-      text-align: center;
-      font-size: 2.2rem;
-      font-weight: 700;
-      margin-bottom: 10px;
-      color: #2980b9;
-      font-family: 'Courier New', Courier, monospace;
-      user-select: none;
-    }
-    #cronometro-controls {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-    #cronometro-controls button {
-      background-color: #2980b9;
-      color: white;
+
+    .series input {
+      width: 80px;
+      padding: 6px;
+      border: 1px solid #ccc;
       border-radius: 6px;
-      border: none;
-      padding: 6px 15px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    #cronometro-controls button:hover {
-      background-color: #1c5980;
-    }
-    #proximo-grupo-btn {
-      background-color: #e67e22;
-      display: none;
-      margin: 20px auto 0 auto;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-size: 1.1rem;
-      border: none;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-    #proximo-grupo-btn:hover {
-      background-color: #c76e1b;
-    }
-    #finalizado-msg {
       text-align: center;
-      font-size: 1.5rem;
-      color: #27ae60;
-      margin-top: 30px;
-      font-weight: 700;
     }
+
+    .cronometro {
+      font-size: 1.1rem;
+      color: #e67e22;
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .cronometro span {
+      font-weight: bold;
+    }
+
   </style>
 </head>
 <body>
+
   <nav class="navbar">
     <h2>Academia</h2>
     <a href="index.html" data-tooltip="Cadastro">Cadastro</a>
-    <a href="visualizar.html" data-tooltip="Visualizar Treinos">Visualizar</a>
-    <a href="#" class="active" data-tooltip="Treino">Treino</a>
+    <a href="visualizar.html" data-tooltip="Visualizar">Visualizar</a>
+    <a href="Treino.html" class="active" data-tooltip="Iniciar Treino">Treino</a>
   </nav>
 
   <main class="main-content">
-    <h1>Treino</h1>
-    <button id="startBtn">Iniciar Treino</button>
+    <h1>Iniciar Treino</h1>
 
-    <select id="selectTreino" style="display:none;">
-      <option value="">Selecione o treino</option>
-    </select>
+    <div class="card">
+      <label for="treinoSelect">Selecione um treino:</label>
+      <select id="treinoSelect">
+        <option value="">Carregando...</option>
+      </select>
+      <button id="iniciarBtn">Iniciar Treino</button>
+    </div>
 
-    <div class="treino-area" style="display:none;">
-      <div class="grupo-title" id="grupoNome"></div>
-
-      <div class="serie-container" id="serieContainer"></div>
-
-      <div class="inputs-serie">
-        <label>
-          Repetições feitas:
-          <input type="number" id="inputRepeticao" min="1" />
-        </label>
-        <label>
-          Carga (kg):
-          <input type="number" id="inputCarga" min="0" step="0.1" />
-        </label>
-      </div>
-
-      <button class="check-btn" id="checkBtn">Confirmar Série</button>
-
-      <div id="cronometro" style="display:none;">01:00</div>
-      <div id="cronometro-controls" style="display:none;">
-        <button id="pauseBtn">Pausar</button>
-        <button id="resumeBtn" style="display:none;">Continuar</button>
-      </div>
-
-      <button id="proximo-grupo-btn">Próximo Grupo</button>
-
-      <div id="finalizado-msg" style="display:none;">Treino finalizado! Parabéns!</div>
+    <div id="treinoContainer"></div>
+    <div style="text-align:center;">
+      <button id="salvarBtn" style="max-width: 300px;">Salvar Treino Realizado</button>
     </div>
   </main>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDoc, getDocs, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-    authDomain: "academia-bd-9d4da.firebaseapp.com",
-    projectId: "academia-bd-9d4da",
-    storageBucket: "academia-bd-9d4da.appspot.com",
-    messagingSenderId: "201289997890",
-    appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  const startBtn = document.getElementById("startBtn");
-  const selectTreino = document.getElementById("selectTreino");
-  const treinoArea = document.querySelector(".treino-area");
-  const grupoNome = document.getElementById("grupoNome");
-  const serieContainer = document.getElementById("serieContainer");
-  const inputRepeticao = document.getElementById("inputRepeticao");
-  const inputCarga = document.getElementById("inputCarga");
-  const checkBtn = document.getElementById("checkBtn");
-  const cronometroDisplay = document.getElementById("cronometro");
-  const pauseBtn = document.getElementById("pauseBtn");
-  const resumeBtn = document.getElementById("resumeBtn");
-  const proximoGrupoBtn = document.getElementById("proximo-grupo-btn");
-  const finalizadoMsg = document.getElementById("finalizado-msg");
-
-  let treinos = [];
-  let treinoAtual = null;
-  let grupoIndex = 0;
-  let serieIndex = 0;
-
-  let tempoRestante = 60;
-  let cronometroInterval = null;
-  let pausado = false;
-  let tempoInicioCronometro = 0;
-  let tempoPausado = 0;
-
-  // Carregar treinos do Firestore
-  async function carregarTreinos() {
-    const querySnapshot = await getDocs(collection(db, "academia"));
-    treinos = [];
-    querySnapshot.forEach(doc => {
-      let data = doc.data();
-      data.id = doc.id;
-      treinos.push(data);
-    });
-    popularDropdown();
-  }
-
-  // Popular dropdown de treinos
-  function popularDropdown() {
-    selectTreino.innerHTML = `<option value="">Selecione o treino</option>`;
-    treinos.forEach((t, i) => {
-      selectTreino.innerHTML += `<option value="${i}">${t.tipoTreino} - ${t.usuario}</option>`;
-    });
-  }
-
-  // Mostrar grupo atual
-  function mostrarGrupoAtual() {
-    const grupo = treinoAtual.grupos[grupoIndex];
-    grupoNome.textContent = `Grupo: ${grupo.grupo}`;
-    mostrarSeries(grupo.serie);
-    inputRepeticao.value = "";
-    inputCarga.value = "";
-  }
-
-  // Mostrar as séries como quadrados
-  function mostrarSeries(qtd) {
-    serieContainer.innerHTML = "";
-    for (let i = 0; i < qtd; i++) {
-      const div = document.createElement("div");
-      div.classList.add("serie-quadrado");
-      if (i === serieIndex) div.classList.add("active");
-      div.textContent = i + 1;
-      serieContainer.appendChild(div);
-    }
-  }
-
-  // Salvar progresso no Firestore
-  async function salvarProgresso() {
-    if (!treinoAtual.progresso) treinoAtual.progresso = {};
-    if (!treinoAtual.progresso[grupoIndex]) treinoAtual.progresso[grupoIndex] = {};
-    treinoAtual.progresso[grupoIndex][serieIndex] = {
-      repeticoes: Number(inputRepeticao.value) || 0,
-      carga: Number(inputCarga.value) || 0,
-      tempoDescanso: 60 - tempoRestante,
-      pausadoTempo: tempoPausado,
-      confirmado: true,
-      timestamp: serverTimestamp()
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
     };
 
-    // Atualiza o documento
-    const docRef = doc(db, "academia", treinoAtual.id);
-    await updateDoc(docRef, { progresso: treinoAtual.progresso });
-  }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  // Cronômetro
-  function iniciarCronometro() {
-    tempoRestante = 60;
-    pausado = false;
-    tempoPausado = 0;
-    cronometroDisplay.style.display = "block";
-    pauseBtn.style.display = "inline-block";
-    resumeBtn.style.display = "none";
-    atualizarCronometroDisplay();
+    const treinoSelect = document.getElementById("treinoSelect");
+    const iniciarBtn = document.getElementById("iniciarBtn");
+    const treinoContainer = document.getElementById("treinoContainer");
+    const salvarBtn = document.getElementById("salvarBtn");
 
-    if (cronometroInterval) clearInterval(cronometroInterval);
-    tempoInicioCronometro = Date.now();
+    const cronometros = {};
 
-    cronometroInterval = setInterval(() => {
-      if (!pausado) {
-        const tempoDecorrido = Math.floor((Date.now() - tempoInicioCronometro - tempoPausado) / 1000);
-        tempoRestante = 60 - tempoDecorrido;
-        if (tempoRestante <= 0) {
-          tempoRestante = 0;
-          clearInterval(cronometroInterval);
-          cronometroDisplay.textContent = "Tempo esgotado!";
-          proximoSerieOuGrupo();
-        }
-        atualizarCronometroDisplay();
+    async function carregarTreinos() {
+      const snapshot = await getDocs(collection(db, "treinos"));
+      treinoSelect.innerHTML = '<option value="">Selecione</option>';
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+        treinoSelect.appendChild(option);
+      });
+    }
+
+    carregarTreinos();
+
+    iniciarBtn.addEventListener("click", async () => {
+      const treinoId = treinoSelect.value;
+      if (!treinoId) {
+        alert("Selecione um treino");
+        return;
       }
-    }, 250);
-  }
 
-  function atualizarCronometroDisplay() {
-    const min = Math.floor(tempoRestante / 60).toString().padStart(2, "0");
-    const seg = (tempoRestante % 60).toString().padStart(2, "0");
-    cronometroDisplay.textContent = `${min}:${seg}`;
-  }
+      const docSnap = await getDoc(doc(db, "treinos", treinoId));
+      if (!docSnap.exists()) {
+        alert("Treino não encontrado");
+        return;
+      }
 
-  pauseBtn.addEventListener("click", () => {
-    pausado = true;
-    pauseBtn.style.display = "none";
-    resumeBtn.style.display = "inline-block";
-    tempoPausado += Date.now() - tempoInicioCronometro - (60 - tempoRestante) * 1000;
-  });
+      const data = docSnap.data();
+      treinoContainer.innerHTML = "";
+      cronometros = {};
 
-  resumeBtn.addEventListener("click", () => {
-    pausado = false;
-    pauseBtn.style.display = "inline-block";
-    resumeBtn.style.display = "none";
-    tempoInicioCronometro = Date.now() - (60 - tempoRestante) * 1000 - tempoPausado;
-  });
+      data.grupos.forEach((grupo, idx) => {
+        const div = document.createElement("div");
+        div.className = "exercise-box";
 
-  // Confirmar série
-  checkBtn.addEventListener("click", async () => {
-    // Validação simples
-    if (inputRepeticao.value === "" || inputCarga.value === "") {
-      alert("Preencha repetições e carga.");
-      return;
-    }
-    await salvarProgresso();
+        const cronometroId = `cron-${idx}`;
+        cronometros[cronometroId] = { tempo: 0, intervalo: null };
 
-    // Atualiza UI e lógica
-    serieIndex++;
-    if (serieIndex < treinoAtual.grupos[grupoIndex].serie) {
-      mostrarSeries(treinoAtual.grupos[grupoIndex].serie);
-      inputRepeticao.value = "";
-      inputCarga.value = "";
-      mostrarSeries(treinoAtual.grupos[grupoIndex].serie);
-      cronometroDisplay.textContent = "01:00";
-      iniciarCronometro();
-      atualizarQuadradoAtivo();
-    } else {
-      // Terminou séries do grupo
-      checkBtn.style.display = "none";
-      cronometroDisplay.style.display = "none";
-      pauseBtn.style.display = "none";
-      resumeBtn.style.display = "none";
-      proximoGrupoBtn.style.display = "block";
-    }
-  });
+        div.innerHTML = `
+          <h3>${grupo.grupo}</h3>
+          <div>Séries: ${grupo.serie} - Repetições alvo: ${grupo.repeticao}</div>
+          <div class="series">
+            ${Array.from({ length: grupo.serie }).map((_, i) => `
+              <div>
+                <div>Série ${i + 1}</div>
+                <input placeholder="Reps">
+                <input placeholder="Carga (kg)">
+              </div>
+            `).join('')}
+          </div>
+          <div class="cronometro">
+            <span id="${cronometroId}">00:00</span>
+            <button onclick="iniciarCronometro('${cronometroId}')">Iniciar</button>
+            <button onclick="pausarCronometro('${cronometroId}')">Pausar</button>
+            <button onclick="zerarCronometro('${cronometroId}')">Zerar</button>
+          </div>
+        `;
 
-  function atualizarQuadradoAtivo() {
-    const quadrados = document.querySelectorAll(".serie-quadrado");
-    quadrados.forEach((q, idx) => {
-      q.classList.toggle("active", idx === serieIndex);
+        treinoContainer.appendChild(div);
+      });
     });
-  }
 
-  // Próximo grupo
-  proximoGrupoBtn.addEventListener("click", () => {
-    grupoIndex++;
-    serieIndex = 0;
-    proximoGrupoBtn.style.display = "none";
-    checkBtn.style.display = "block";
-    cronometroDisplay.style.display = "block";
-    pauseBtn.style.display = "inline-block";
+    window.iniciarCronometro = (id) => {
+      if (cronometros[id].intervalo) return;
 
-    if (grupoIndex < treinoAtual.grupos.length) {
-      mostrarGrupoAtual();
-      iniciarCronometro();
-    } else {
-      treinoArea.style.display = "none";
-      finalizadoMsg.style.display = "block";
-    }
-  });
+      cronometros[id].intervalo = setInterval(() => {
+        cronometros[id].tempo++;
+        const minutos = String(Math.floor(cronometros[id].tempo / 60)).padStart(2, '0');
+        const segundos = String(cronometros[id].tempo % 60).padStart(2, '0');
+        document.getElementById(id).textContent = `${minutos}:${segundos}`;
+      }, 1000);
+    };
 
-  // Iniciar treino selecionado
-  function iniciarTreino(index) {
-    treinoAtual = treinos[index];
-    grupoIndex = 0;
-    serieIndex = 0;
-    finalizadoMsg.style.display = "none";
-    treinoArea.style.display = "block";
-    mostrarGrupoAtual();
-    iniciarCronometro();
-  }
+    window.pausarCronometro = (id) => {
+      clearInterval(cronometros[id].intervalo);
+      cronometros[id].intervalo = null;
+    };
 
-  // Botão iniciar treino
-  startBtn.addEventListener("click", async () => {
-    await carregarTreinos();
-    selectTreino.style.display = "block";
-    startBtn.style.display = "none";
-  });
+    window.zerarCronometro = (id) => {
+      clearInterval(cronometros[id].intervalo);
+      cronometros[id].intervalo = null;
+      cronometros[id].tempo = 0;
+      document.getElementById(id).textContent = '00:00';
+    };
 
-  // Ao escolher treino
-  selectTreino.addEventListener("change", () => {
-    const idx = selectTreino.value;
-    if (idx === "") return;
-    iniciarTreino(idx);
-  });
-</script>
+    salvarBtn.addEventListener("click", async () => {
+      const treinoId = treinoSelect.value;
+      if (!treinoId) {
+        alert("Selecione um treino");
+        return;
+      }
 
+      const docSnap = await getDoc(doc(db, "treinos", treinoId));
+      if (!docSnap.exists()) {
+        alert("Treino não encontrado");
+        return;
+      }
+
+      const data = docSnap.data();
+
+      const resultado = {
+        usuario: data.usuario,
+        tipoTreino: data.tipoTreino,
+        data: new Date().toISOString(),
+        grupos: [],
+      };
+
+      const exercicios = treinoContainer.querySelectorAll(".exercise-box");
+
+      exercicios.forEach((box, idx) => {
+        const inputs = box.querySelectorAll("input");
+        const series = [];
+
+        for (let i = 0; i < inputs.length; i += 2) {
+          const reps = inputs[i].value;
+          const carga = inputs[i + 1].value;
+          series.push({ reps, carga });
+        }
+
+        const cronId = `cron-${idx}`;
+        const tempo = cronometros[cronId] ? cronometros[cronId].tempo : 0;
+
+        resultado.grupos.push({
+          grupo: data.grupos[idx].grupo,
+          series: series,
+          tempoSegundos: tempo,
+        });
+      });
+
+      try {
+        await addDoc(collection(db, "treinosRealizados"), resultado);
+        alert("Treino realizado salvo com sucesso!");
+      } catch (error) {
+        alert("Erro ao salvar treino: " + error.message);
+      }
+    });
+
+  </script>
 </body>
 </html>
