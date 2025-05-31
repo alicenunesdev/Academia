@@ -126,6 +126,15 @@
 
     carregarTreinos();
 
+    async function pegarNomeExercicio(id) {
+      if (!id) return null;
+      const docSnap = await getDoc(doc(db, "exercicios", id));
+      if (docSnap.exists()) {
+        return docSnap.data().nome || null;
+      }
+      return null;
+    }
+
     iniciarBtn.addEventListener("click", async () => {
       const treinoId = treinoSelect.value;
       if (!treinoId) {
@@ -149,12 +158,18 @@
       atual = 0;
       treinoSelect.disabled = true;
       iniciarBtn.disabled = true;
-      exibirExercicio(atual);
+      await exibirExercicio(atual);
     });
 
-    function exibirExercicio(index) {
+    async function exibirExercicio(index) {
       const grupo = grupos[index];
       treinoContainer.innerHTML = "";
+
+      // Busca o nome do exercício pelo ID
+      let nomeExercicio = grupo.exercicioNome || null;
+      if (!nomeExercicio && grupo.exercicioId) {
+        nomeExercicio = await pegarNomeExercicio(grupo.exercicioId);
+      }
 
       const div = document.createElement("div");
       div.className = "card";
@@ -162,6 +177,7 @@
         <div class="atividade-header">
           <span>Atividade ${index + 1}</span>
           <h2>${grupo.titulo || "Sem nome definido"}</h2>
+          <p><strong>Exercício:</strong> ${nomeExercicio || "Nome não disponível"}</p>
           <p>${grupo.descricao || "Sem descrição"}</p>
         </div>
 
