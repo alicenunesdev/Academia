@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Histórico de Treinos</title>
   <style>
-    /* --- CSS Mantido --- */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -286,8 +285,7 @@
         <h2 id="modalTitle">Detalhes do Treino</h2>
         <span class="close" id="closeModal">&times;</span>
       </div>
-      <div class="modal-body" id="modalBody">
-      </div>
+      <div class="modal-body" id="modalBody"></div>
     </div>
   </div>
 
@@ -393,19 +391,19 @@
     function gerarHTMLDetalhes(resultados) {
       let html = "";
       for (const grupo in resultados) {
-        resultados[grupo].forEach(() => {
-          html += `<div class="grupo">
-            <h4>${grupo}</h4>
-            <ul>
-              <li>
-                Série: ${resultados[grupo][0].serie}<br>
-                Carga: ${resultados[grupo][0].carga || '-'}<br>
-                Tempo: ${resultados[grupo][0].tempo || '-'}<br>
-                Concluído: ${resultados[grupo][0].check ? '✅' : '❌'}
-              </li>
-            </ul>
-          </div>`;
+        html += `<div class="grupo">
+          <h4>${grupo}</h4>
+          <ul>`;
+        resultados[grupo].forEach(item => {
+          html += `<li>
+            <strong>${item.nome}</strong><br>
+            Série: ${item.serie}<br>
+            Carga: ${item.carga || '-'}<br>
+            Tempo: ${item.tempo || '-'}<br>
+            Concluído: ${item.check ? '✅' : '❌'}
+          </li>`;
         });
+        html += `</ul></div>`;
       }
       return html;
     }
