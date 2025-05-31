@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Histórico de Treinos</title>
-
   <style>
     * {
       box-sizing: border-box;
@@ -20,7 +19,6 @@
       flex-direction: column;
     }
 
-    /* Navbar */
     .navbar {
       position: fixed;
       top: 0;
@@ -62,7 +60,6 @@
       color: white;
     }
 
-    /* Conteúdo */
     .main-content {
       padding: 100px 30px 40px;
       flex: 1;
@@ -150,7 +147,6 @@
       border-bottom: 1px solid #ddd;
     }
 
-    /* Responsivo */
     @media (max-width: 768px) {
       .navbar {
         flex-direction: column;
@@ -181,21 +177,18 @@
     }
   </style>
 </head>
-
 <body>
 
-  <!-- Navbar -->
   <nav class="navbar">
     <h2>Academia</h2>
     <div class="navbar-links">
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
-      <a href="treino.html">Treino</a>
+      <a href="Treino.html">Treino</a>
       <a href="historico.html" class="active">Histórico</a>
     </div>
   </nav>
 
-  <!-- Conteúdo Principal -->
   <main class="main-content">
     <h1>Histórico de Treinos</h1>
     <div id="historicoContainer"></div>
@@ -209,10 +202,9 @@
     </div>
   </div>
 
-  <!-- Firebase e Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
@@ -231,17 +223,25 @@
     const modalBody = document.getElementById("modalBody");
     const closeBtn = document.querySelector(".close");
 
-    async function carregarHistorico() {
-      const snapshot = await getDocs(collection(db, "treinos"));
+    async function carregarUltimoTreino() {
+      const treinosRef = collection(db, "treinos");
+      // Ordenar pelo campo dataHora (timestamp) desc e pegar o último
+      const q = query(treinosRef, orderBy("dataHora", "desc"), limit(1));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.empty) {
+        historicoContainer.innerHTML = "<p>Nenhum treino finalizado encontrado.</p>";
+        return;
+      }
 
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const div = document.createElement("div");
         div.className = "card";
 
-        const dataAtual = new Date();
-        const dataFormatada = `${dataAtual.getDate().toString().padStart(2,'0')}/${(dataAtual.getMonth()+1).toString().padStart(2,'0')}/${dataAtual.getFullYear()}`;
-        const horaFormatada = `${dataAtual.getHours().toString().padStart(2,'0')}:${dataAtual.getMinutes().toString().padStart(2,'0')}`;
+        const dataHora = data.dataHora?.toDate ? data.dataHora.toDate() : new Date();
+        const dataFormatada = `${dataHora.getDate().toString().padStart(2,'0')}/${(dataHora.getMonth()+1).toString().padStart(2,'0')}/${dataHora.getFullYear()}`;
+        const horaFormatada = `${dataHora.getHours().toString().padStart(2,'0')}:${dataHora.getMinutes().toString().padStart(2,'0')}`;
 
         div.innerHTML = `
           <h3>${data.tipoTreino}</h3>
@@ -257,7 +257,7 @@
       });
     }
 
-    carregarHistorico();
+    carregarUltimoTreino();
 
     function abrirModal(data) {
       modalBody.innerHTML = `
