@@ -5,12 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Histórico de Treinos</title>
   <style>
-    /* --- seu CSS original --- */
+    /* --- CSS Mantido --- */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body {
       margin: 0;
       background: #f7f9fc;
@@ -19,7 +18,6 @@
       min-height: 100vh;
       flex-direction: column;
     }
-
     .navbar {
       position: fixed;
       top: 0;
@@ -34,18 +32,15 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
     }
-
     .navbar h2 {
       margin: 0;
       font-weight: 700;
       font-size: 1.6rem;
     }
-
     .navbar-links {
       display: flex;
       gap: 20px;
     }
-
     .navbar a {
       color: #bdc3c7;
       text-decoration: none;
@@ -54,26 +49,22 @@
       transition: background 0.3s, color 0.3s;
       font-weight: 600;
     }
-
     .navbar a:hover,
     .navbar a.active {
       background: #2980b9;
       color: white;
     }
-
     main {
       padding: 100px 30px 40px;
       flex: 1;
       max-width: 100%;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 30px;
       font-weight: 700;
       color: #2c3e50;
     }
-
     .historico-lista {
       max-width: 600px;
       margin: 0 auto;
@@ -82,7 +73,6 @@
       padding: 20px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
-
     .item-historico {
       border-bottom: 1px solid #ddd;
       padding: 10px 0;
@@ -91,24 +81,20 @@
       align-items: center;
       gap: 10px;
     }
-
     .item-historico:last-child {
       border-bottom: none;
     }
-
     .item-historico h3 {
       margin: 0 0 8px 0;
       color: #34495e;
       flex: 1 1 auto;
     }
-
     .info-data {
       font-size: 0.9rem;
       color: #555;
       margin-bottom: 8px;
       flex: 1 1 150px;
     }
-
     .btn-vermais,
     .btn-excluir {
       padding: 6px 12px;
@@ -119,25 +105,20 @@
       transition: background 0.3s;
       flex-shrink: 0;
     }
-
     .btn-vermais {
       background: #2980b9;
       color: white;
     }
-
     .btn-vermais:hover {
       background: #2471a3;
     }
-
     .btn-excluir {
       background: #e74c3c;
       color: white;
     }
-
     .btn-excluir:hover {
       background: #c0392b;
     }
-
     .btn-voltar {
       display: block;
       width: 120px;
@@ -152,12 +133,9 @@
       text-decoration: none;
       transition: background 0.3s;
     }
-
     .btn-voltar:hover {
       background: #2471a3;
     }
-
-    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -169,7 +147,6 @@
       overflow: auto;
       background-color: rgba(0,0,0,0.6);
     }
-
     .modal-content {
       background-color: #fff;
       margin: 8% auto;
@@ -180,52 +157,42 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       animation: fadeIn 0.3s;
     }
-
     @keyframes fadeIn {
       from {opacity: 0; transform: translateY(-20px);}
       to {opacity: 1; transform: translateY(0);}
     }
-
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
     .modal-header h2 {
       margin: 0;
       color: #34495e;
     }
-
     .close {
       color: #aaa;
       font-size: 28px;
       font-weight: bold;
       cursor: pointer;
     }
-
     .close:hover {
       color: #333;
     }
-
     .modal-body {
       margin-top: 10px;
     }
-
     .grupo {
       margin-bottom: 15px;
     }
-
     .grupo h4 {
       margin: 5px 0;
       color: #2c3e50;
     }
-
     .grupo ul {
       list-style: none;
       padding-left: 0;
     }
-
     .grupo li {
       background: #f2f2f2;
       padding: 6px 10px;
@@ -233,8 +200,6 @@
       margin-bottom: 6px;
       font-size: 0.9rem;
     }
-
-    /* Hamburger */
     .menu-toggle {
       display: none;
       flex-direction: column;
@@ -243,7 +208,6 @@
       height: 20px;
       justify-content: space-between;
     }
-
     .menu-toggle span {
       display: block;
       height: 3px;
@@ -251,7 +215,6 @@
       border-radius: 3px;
       transition: 0.3s;
     }
-
     @media (max-width: 768px) {
       main {
         padding: 120px 20px 40px;
@@ -262,7 +225,6 @@
         box-shadow: none;
         border-radius: 0;
       }
-
       .navbar-links {
         display: none;
         flex-direction: column;
@@ -274,21 +236,17 @@
         padding: 10px 0;
         border-radius: 0 0 8px 8px;
       }
-
       .navbar-links.show {
         display: flex;
       }
-
       .navbar-links a {
         padding: 12px 20px;
         border-radius: 0;
         border-bottom: 1px solid #2c3e50;
       }
-
       .navbar-links a:last-child {
         border-bottom: none;
       }
-
       .menu-toggle {
         display: flex;
       }
@@ -336,12 +294,10 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
       authDomain: "academia-bd-9d4da.firebaseapp.com",
-      databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
       projectId: "academia-bd-9d4da",
       storageBucket: "academia-bd-9d4da.appspot.com",
       messagingSenderId: "201289997890",
@@ -350,7 +306,6 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
     const historicoLista = document.getElementById("historicoLista");
@@ -362,15 +317,11 @@
     closeModal.onclick = () => modal.style.display = "none";
     window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 
-    // Menu toggle logic
     const menuToggle = document.getElementById("menuToggle");
     const navbarLinks = document.getElementById("navbarLinks");
-
     menuToggle.addEventListener("click", () => {
       navbarLinks.classList.toggle("show");
     });
-
-    // Accessibility: toggle menu with Enter or Space keys
     menuToggle.addEventListener("keydown", (e) => {
       if(e.key === "Enter" || e.key === " ") {
         e.preventDefault();
@@ -394,7 +345,6 @@
         lista.push({ id: docSnap.id, ...data });
       });
 
-      // Ordenar do mais recente para o mais antigo
       lista.sort((a, b) => new Date(b.data) - new Date(a.data));
 
       lista.forEach(data => {
@@ -412,19 +362,17 @@
             <p class="info-data"><strong>Data:</strong> ${dataFormatada}</p>
           </div>
           <div>
-            <button class="btn-vermais" aria-label="Ver detalhes do treino ${data.treino}">Ver Mais</button>
-            <button class="btn-excluir" aria-label="Excluir treino ${data.treino}">Excluir</button>
+            <button class="btn-vermais">Ver Mais</button>
+            <button class="btn-excluir">Excluir</button>
           </div>
         `;
 
-        // Ver mais
         div.querySelector(".btn-vermais").addEventListener("click", () => {
           modalTitle.textContent = data.treino;
           modalBody.innerHTML = gerarHTMLDetalhes(data.resultados);
           modal.style.display = "block";
         });
 
-        // Excluir
         div.querySelector(".btn-excluir").addEventListener("click", async () => {
           const confirmacao = confirm(`Tem certeza que deseja excluir o treino "${data.treino}"? Esta ação não pode ser desfeita.`);
           if (!confirmacao) return;
@@ -432,7 +380,7 @@
           try {
             await deleteDoc(doc(db, "historico", data.id));
             alert("Treino excluído com sucesso.");
-            carregarHistorico(); // recarrega a lista após exclusão
+            carregarHistorico();
           } catch (error) {
             alert("Erro ao excluir treino: " + error.message);
           }
@@ -445,20 +393,19 @@
     function gerarHTMLDetalhes(resultados) {
       let html = "";
       for (const grupo in resultados) {
-        html += `<div class="grupo">
-          <h4>${grupo}</h4>
-          <ul>`;
-        resultados[grupo].forEach((item, idx) => {
-          html += `<li>
-            <strong>Exercício ${idx + 1}</strong><br>
-            Série: ${item.serie}<br>
-            Repetições: ${item.repeticao}<br>
-            Carga: ${item.carga || '-'}<br>
-            Tempo: ${item.tempo || '-'}<br>
-            Concluído: ${item.check ? '✅' : '❌'}
-          </li>`;
+        resultados[grupo].forEach(() => {
+          html += `<div class="grupo">
+            <h4>${grupo}</h4>
+            <ul>
+              <li>
+                Série: ${resultados[grupo][0].serie}<br>
+                Carga: ${resultados[grupo][0].carga || '-'}<br>
+                Tempo: ${resultados[grupo][0].tempo || '-'}<br>
+                Concluído: ${resultados[grupo][0].check ? '✅' : '❌'}
+              </li>
+            </ul>
+          </div>`;
         });
-        html += `</ul></div>`;
       }
       return html;
     }
