@@ -1,148 +1,196 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Histórico de Treinos</title>
   <style>
-    /* Layout padrão - cores, navbar */
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
-      background-color: #f5f5f5;
+      background: #f7f9fc;
       color: #333;
-    }
-
-    nav {
-      background-color: #005f73;
-      color: white;
-      padding: 15px 20px;
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #2c3e50;
+      color: #ecf0f1;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      font-size: 20px;
-      font-weight: bold;
+      padding: 15px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
     }
 
-    nav a {
-      color: white;
+    .navbar h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.6rem;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
       text-decoration: none;
-      margin-left: 20px;
-      font-weight: normal;
-      font-size: 16px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
     }
 
-    nav a:hover {
-      text-decoration: underline;
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
     }
 
     main {
+      padding: 100px 30px 40px;
+      flex: 1;
       max-width: 900px;
-      margin: 30px auto;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin: 0 auto;
     }
 
     h1 {
-      color: #0a9396;
-      margin-bottom: 25px;
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
     }
 
     .card {
-      background: #e0fbfc;
-      border-radius: 10px;
-      padding: 15px 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       margin-bottom: 20px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.1);
     }
 
-    h2 {
-      margin-bottom: 8px;
-      color: #005f73;
+    .card h2 {
+      margin-top: 0;
+      color: #2c3e50;
+      font-size: 1.4rem;
+      margin-bottom: 10px;
     }
 
-    h3 {
-      margin: 10px 0 5px 0;
-      color: #0a9396;
+    .card p {
+      margin: 6px 0;
+      color: #555;
     }
 
-    p {
-      margin: 3px 0;
-      font-size: 15px;
+    @media (max-width: 768px) {
+      main {
+        padding: 120px 20px 40px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px;
+      }
+
+      .navbar-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar h2 {
+        font-size: 1.4rem;
+      }
+
+      .navbar a {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
 <body>
 
-<nav>
-  Meu Treinador
-  <a href="treino.html">Treino</a>
-  <a href="historico.html">Histórico</a>
-</nav>
+  <nav class="navbar">
+    <h2>Academia</h2>
+    <div class="navbar-links">
+      <a href="index.html">Cadastro</a>
+      <a href="visualizar.html">Visualizar</a>
+      <a href="treino.html">Treino</a>
+      <a href="historico.html" class="active">Histórico</a>
+    </div>
+  </nav>
 
-<main>
-  <h1>Histórico de Treinos</h1>
-  <div id="historicoContainer">Carregando histórico...</div>
-</main>
+  <main>
+    <h1>Histórico de Treinos</h1>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <div id="historicoContainer">
+      <p>Carregando histórico...</p>
+    </div>
+  </main>
 
-  const firebaseConfig = {
-    // Substitua pelas suas credenciais do Firebase
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_AUTH_DOMAIN",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_BUCKET",
-    messagingSenderId: "SEU_MESSAGING_ID",
-    appId: "SEU_APP_ID"
-  };
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
 
-  const historicoContainer = document.getElementById("historicoContainer");
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-  async function carregarHistorico() {
-    try {
-      const snapshot = await getDocs(collection(db, "treinos-finalizados"));
-      historicoContainer.innerHTML = "";
+    const historicoContainer = document.getElementById('historicoContainer');
+
+    async function carregarHistorico() {
+      historicoContainer.innerHTML = "<p>Carregando histórico...</p>";
+      const snapshot = await getDocs(collection(db, "treinos"));
 
       if (snapshot.empty) {
-        historicoContainer.textContent = "Nenhum treino finalizado encontrado.";
+        historicoContainer.innerHTML = "<p>Nenhum treino encontrado.</p>";
         return;
       }
 
+      historicoContainer.innerHTML = "";
+
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
-
-        const card = document.createElement("div");
+        const card = document.createElement('div');
         card.className = "card";
 
-        let html = `<h2>${data.tipoTreino}</h2>`;
-        html += `<p><strong>Usuário:</strong> ${data.usuario}</p>`;
-        html += `<p><strong>Data:</strong> ${new Date(data.dataFinalizacao).toLocaleString('pt-BR')}</p>`;
+        card.innerHTML = `
+          <h2>${data.usuario} - ${data.tipoTreino}</h2>
+          <p><strong>Data:</strong> ${data.dataTreino || "Não informado"}</p>
+          <p><strong>Grupos:</strong> ${data.grupos ? data.grupos.length : 0}</p>
+          <p><strong>Observações:</strong> ${data.observacoes || "-"}</p>
+        `;
 
-        data.grupos.forEach(grupo => {
-          html += `<h3>${grupo.grupo}</h3>`;
-          grupo.series.forEach((serie, i) => {
-            html += `<p>Série ${i + 1}: Reps: ${serie.repeticoes}, Carga: ${serie.carga} kg, Tempo: ${serie.tempo}</p>`;
-          });
-        });
-
-        card.innerHTML = html;
         historicoContainer.appendChild(card);
       });
-    } catch (error) {
-      historicoContainer.textContent = "Erro ao carregar histórico.";
-      console.error(error);
     }
-  }
 
-  carregarHistorico();
-</script>
+    carregarHistorico();
+  </script>
 
 </body>
 </html>
