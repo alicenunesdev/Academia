@@ -16,41 +16,43 @@
       color: #333;
       display: flex;
       min-height: 100vh;
+      flex-direction: column;
     }
 
-    /* Navbar estilizada igual à index.html */
+    /* Navbar fixa no topo */
     .navbar {
-      background: #2c3e50; /* cor escura um pouco diferente para index */
-      color: #ecf0f1;
-      width: 180px; /* largura mais fina que treino */
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 15px 20px;
       position: fixed;
       top: 0;
       left: 0;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.15);
+      width: 100%;
+      background: #2c3e50;
+      color: #ecf0f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
     }
 
     .navbar h2 {
-      margin: 0 0 35px;
+      margin: 0;
       font-weight: 700;
       font-size: 1.6rem;
-      text-align: center;
-      letter-spacing: 1px;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 20px;
     }
 
     .navbar a {
       color: #bdc3c7;
       text-decoration: none;
-      padding: 10px 18px;
-      margin-bottom: 14px;
+      padding: 8px 14px;
       border-radius: 6px;
       transition: background 0.3s, color 0.3s;
       font-weight: 600;
-      display: block;
     }
 
     .navbar a:hover,
@@ -60,8 +62,7 @@
     }
 
     .main-content {
-      margin-left: 180px; /* espaço menor para navbar mais fina */
-      padding: 40px 30px;
+      padding: 100px 30px 40px;
       flex: 1;
       max-width: 100%;
     }
@@ -177,33 +178,30 @@
     /* Responsivo */
     @media (max-width: 768px) {
       .navbar {
-        position: fixed;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-around;
+        flex-direction: column;
+        align-items: flex-start;
         padding: 10px 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        z-index: 1000;
       }
 
+      .navbar-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .main-content {
+        padding: 120px 20px 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
       .navbar h2 {
-        margin: 0;
         font-size: 1.4rem;
       }
 
       .navbar a {
-        padding: 10px 15px;
-        margin: 0 6px;
-        border-radius: 4px;
         font-size: 0.9rem;
-      }
-
-      .main-content {
-        margin-left: 0;
-        margin-top: 70px;
-        padding: 20px;
       }
     }
   </style>
@@ -212,9 +210,11 @@
 
   <nav class="navbar">
     <h2>Academia</h2>
-    <a href="index.html">Cadastro</a>
-    <a href="visualizar.html">Visualizar</a>
-    <a href="Treino.html" class="active">Treino</a>
+    <div class="navbar-links">
+      <a href="index.html">Cadastro</a>
+      <a href="visualizar.html">Visualizar</a>
+      <a href="Treino.html" class="active">Treino</a>
+    </div>
   </nav>
 
   <main class="main-content">
@@ -335,42 +335,48 @@
         });
       });
 
-      document.getElementById("pularBtn").onclick = () => proximoExercicio();
-      document.getElementById("completarBtn").onclick = () => proximoExercicio();
-      document.getElementById("encerrarBtn").onclick = () => encerrarTreino();
+      document.getElementById("pularBtn").addEventListener("click", () => {
+        if (atual + 1 < grupos.length) {
+          atual++;
+          exibirExercicio(atual);
+        } else {
+          encerrarTreino();
+        }
+      });
+
+      document.getElementById("completarBtn").addEventListener("click", () => {
+        if (atual + 1 < grupos.length) {
+          atual++;
+          exibirExercicio(atual);
+        } else {
+          encerrarTreino();
+        }
+      });
+
+      document.getElementById("encerrarBtn").addEventListener("click", () => {
+        encerrarTreino();
+      });
+    }
+
+    function encerrarTreino() {
+      treinoContainer.innerHTML = "<h2 style='text-align:center'>🏆 Treino finalizado!</h2>";
+      treinoSelect.disabled = false;
+      iniciarBtn.disabled = false;
     }
 
     function iniciarCronometro(el) {
       let segundos = 0;
-      const timer = setInterval(() => {
-        if (!document.body.contains(el)) {
-          clearInterval(timer);
-          return;
-        }
+      const interval = setInterval(() => {
         segundos++;
-        const min = String(Math.floor(segundos / 60)).padStart(2, "0");
-        const sec = String(segundos % 60).padStart(2, "0");
+        const min = Math.floor(segundos / 60).toString().padStart(2, '0');
+        const sec = (segundos % 60).toString().padStart(2, '0');
         el.textContent = `${min}:${sec}`;
       }, 1000);
-    }
 
-    function proximoExercicio() {
-      atual++;
-      if (atual < grupos.length) {
-        exibirExercicio(atual);
-      } else {
-        treinoContainer.innerHTML = "<div class='card'><h2>✅ Parabéns! Treino completo 💪</h2></div>";
-        treinoSelect.disabled = false;
-        iniciarBtn.disabled = false;
-      }
-    }
-
-    function encerrarTreino() {
-      if (confirm("Deseja realmente encerrar o treino?")) {
-        treinoContainer.innerHTML = "<div class='card'><h2>⚡ Treino encerrado.</h2></div>";
-        treinoSelect.disabled = false;
-        iniciarBtn.disabled = false;
-      }
+      el.addEventListener('dblclick', () => {
+        clearInterval(interval);
+        el.classList.add("hidden");
+      });
     }
   </script>
 </body>
