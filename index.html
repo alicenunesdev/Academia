@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Cadastrar Treino</title>
   <style>
     * {
@@ -15,11 +15,12 @@
       color: #333;
       display: flex;
       min-height: 100vh;
+      flex-direction: column;
     }
 
+    /* Ajuste para dar espaço no topo para navbar fixa */
     .main-content {
-      margin-left: 220px;
-      padding: 40px 30px;
+      padding: 80px 30px 40px;
       flex: 1;
       max-width: 100%;
     }
@@ -95,15 +96,13 @@
 
     @media (max-width: 768px) {
       .main-content {
-        margin-left: 60px;
-        padding: 20px 15px;
+        padding: 80px 20px 20px;
       }
     }
 
     @media (max-width: 480px) {
       .main-content {
-        margin-left: 0;
-        padding: 15px 10px;
+        padding: 80px 15px 15px;
       }
 
       h1 {
@@ -114,6 +113,7 @@
 </head>
 <body>
 
+<!-- Navbar será carregada aqui -->
 <div id="navbar-container"></div>
 
 <main class="main-content">
@@ -127,7 +127,7 @@
     </select>
 
     <label for="tipoTreino">Tipo de Treino</label>
-    <input type="text" id="tipoTreino" required>
+    <input type="text" id="tipoTreino" required />
 
     <div id="grupos-container"></div>
 
@@ -163,11 +163,11 @@
     grupoDiv.innerHTML = `
       <h3>Grupo Muscular</h3>
       <label>Nome do Grupo</label>
-      <input type="text" class="grupo-nome" required>
+      <input type="text" class="grupo-nome" required />
       <label>Séries</label>
-      <input type="number" class="grupo-serie" required>
+      <input type="number" class="grupo-serie" required />
       <label>Repetições</label>
-      <input type="number" class="grupo-repeticao" required>
+      <input type="number" class="grupo-repeticao" required />
       <button type="button" onclick="this.parentElement.remove()">Remover</button>
     `;
 
@@ -204,12 +204,14 @@
   });
 </script>
 
+<!-- Script para carregar a navbar fixa e responsiva -->
 <script>
   async function loadNavbar() {
     const response = await fetch('navbar.html');
     const navbarHTML = await response.text();
     document.getElementById('navbar-container').innerHTML = navbarHTML;
 
+    // Marca o link ativo conforme página atual
     const path = window.location.pathname.split('/').pop();
     const links = document.querySelectorAll('.navbar a');
     links.forEach(link => {
