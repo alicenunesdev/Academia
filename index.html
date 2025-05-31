@@ -25,17 +25,17 @@
           <label for="tipo-treino">Tipo de Treino</label>
           <select id="tipo-treino" required>
             <option value="" disabled selected>Selecione o tipo</option>
-            <option value="Força">Força</option>
-            <option value="Hipertrofia">Hipertrofia</option>
-            <option value="Resistência">Resistência</option>
-            <option value="Funcional">Funcional</option>
+            <option value="Peito">Peito</option>
+            <option value="Costas">Costas</option>
+            <option value="Pernas">Pernas</option>
+            <option value="Braços">Braços</option>
+            <option value="Inferior">Inferior</option>
           </select>
         </div>
       </div>
 
       <div id="grupos-container" class="group-container">
         <h3>Grupos de Exercícios</h3>
-        <!-- Linha de grupo será adicionada aqui -->
       </div>
 
       <button type="button" class="add-group" aria-label="Adicionar grupo">+</button>
@@ -68,7 +68,6 @@
     const addGroupBtn = document.querySelector("button.add-group");
     const cancelBtn = document.querySelector("button.cancel");
 
-    // Função para criar uma linha de grupo com inputs
     function criarGrupo() {
       const div = document.createElement("div");
       div.classList.add("group-row");
@@ -91,7 +90,6 @@
         ">×</button>
       `;
 
-      // Botão para remover grupo
       div.querySelector(".remove-group").addEventListener("click", () => {
         div.remove();
       });
@@ -99,7 +97,6 @@
       gruposContainer.appendChild(div);
     }
 
-    // Adiciona a primeira linha automaticamente
     criarGrupo();
 
     addGroupBtn.addEventListener("click", () => {
@@ -139,7 +136,6 @@
         return;
       }
 
-      // Salvar no Firestore
       try {
         await addDoc(collection(db, "treinos"), {
           usuario,
