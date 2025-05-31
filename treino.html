@@ -101,40 +101,76 @@
       font-style: italic;
     }
 
+    /* Centralizar as séries e inputs */
+    .series {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
     .series div {
-      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
     .series input[type="number"] {
-      width: 60px;
-      padding: 5px;
-      margin-right: 5px;
+      width: 70px;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      text-align: center;
     }
 
-    .check-serie {
-      margin-left: 5px;
-    }
-
+    /* Cronômetro estilizado */
     .cronometro-serie {
-      font-size: 0.9rem;
+      font-size: 1.1rem;
+      font-weight: 700;
       color: #e67e22;
       margin-left: 10px;
+      min-width: 65px;
+      text-align: center;
+      font-family: 'Courier New', Courier, monospace;
     }
 
-    .hidden {
-      display: none;
+    /* Botões para controle do cronômetro */
+    .cronometro-controles button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #2980b9;
+      font-size: 1rem;
+      margin-left: 5px;
+      padding: 3px 6px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+    .cronometro-controles button:hover {
+      background-color: #d0e7ff;
     }
 
+    /* Ajustar os botões de controle do exercício */
     .botoes-controle {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
       margin-top: 30px;
     }
 
-    .botao-pular, .botao-completar {
+    .botoes-controle > div {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 350px;
+      justify-content: center;
+    }
+
+    .botao-pular, .botao-completar, .botao-encerrar {
       flex: 1;
-      margin: 0 5px;
-      padding: 12px;
+      margin: 0;
+      padding: 12px 0;
       font-size: 1rem;
       border-radius: 8px;
       border: none;
@@ -153,42 +189,11 @@
     }
 
     .botao-encerrar {
-      position: fixed;
-      top: 20px;
-      right: 20px;
       background: #c0392b;
       color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 100;
     }
-
     .botao-encerrar:hover {
       background: #922b21;
-    }
-
-    select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-
-    button {
-      background: #2980b9;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #2471a3;
     }
 
   </style>
@@ -213,8 +218,6 @@
       <button id="iniciarBtn">Iniciar Treino</button>
     </div>
 
-    <button id="encerrarBtn" class="botao-encerrar hidden">⚡ Encerrar Treino</button>
-
     <div id="treinoContainer"></div>
   </main>
 
@@ -237,7 +240,6 @@
     const treinoSelect = document.getElementById("treinoSelect");
     const iniciarBtn = document.getElementById("iniciarBtn");
     const treinoContainer = document.getElementById("treinoContainer");
-    const encerrarBtn = document.getElementById("encerrarBtn");
 
     let atual = 0;
     let grupos = [];
@@ -276,7 +278,6 @@
 
       treinoSelect.disabled = true;
       iniciarBtn.disabled = true;
-      encerrarBtn.classList.remove("hidden");
 
       exibirExercicio(atual);
     });
@@ -289,78 +290,139 @@
       div.className = "card";
       div.innerHTML = `
         <div class="atividade-header">
-          <h2>${grupo.grupo}</h2>
+          <span>${grupo.grupo}</span>
+          <h2>${grupo.nome}</h2>
+          <p>${grupo.descricao}</p>
         </div>
 
         <div class="series">
           ${Array.from({ length: grupo.serie }).map((_, i) => `
             <div>
-              <label>Série ${i + 1}</label><br/>
+              <label>Série ${i + 1}</label>
               <input type="number" placeholder="Reps" value="${grupo.repeticao}">
               <input type="number" placeholder="Carga (kg)">
               <input type="checkbox" class="check-serie"> ✔
               <span class="cronometro-serie hidden">00:00</span>
+              <div class="cronometro-controles hidden">
+                <button class="btn-pausar" title="Pausar">⏸️</button>
+                <button class="btn-reiniciar" title="Reiniciar">🔄</button>
+              </div>
             </div>
           `).join('')}
         </div>
 
         <div class="botoes-controle">
-          <button id="pularBtn" class="botao-pular">❌ Pular</button>
-          <button id="completarBtn" class="botao-completar">✅ Completar</button>
+          <div>
+            <button id="pularBtn" class="botao-pular">❌ Pular</button>
+            <button id="completarBtn" class="botao-completar">✅ Completar</button>
+          </div>
+          <button id="encerrarBtn" class="botao-encerrar">⚡ Encerrar Treino</button>
         </div>
       `;
 
       treinoContainer.appendChild(div);
 
-      document.querySelectorAll(".check-serie").forEach((checkbox) => {
+      // Controlar cronômetros por série
+      document.querySelectorAll(".series div").forEach(divSerie => {
+        const checkbox = divSerie.querySelector(".check-serie");
+        const cronometroEl = divSerie.querySelector(".cronometro-serie");
+        const controlesEl = divSerie.querySelector(".cronometro-controles");
+        const btnPausar = divSerie.querySelector(".btn-pausar");
+        const btnReiniciar = divSerie.querySelector(".btn-reiniciar");
+
+        let segundos = 0;
+        let timer = null;
+        let pausado = false;
+
+        function atualizarCronometro() {
+          const min = String(Math.floor(segundos / 60)).padStart(2, "0");
+          const sec = String(segundos % 60).padStart(2, "0");
+          cronometroEl.textContent = `${min}:${sec}`;
+        }
+
+        function iniciarTimer() {
+          if (timer) return; // já está rodando
+          pausado = false;
+          timer = setInterval(() => {
+            segundos++;
+            atualizarCronometro();
+          }, 1000);
+        }
+
+        function pausarTimer() {
+          pausado = true;
+          clearInterval(timer);
+          timer = null;
+        }
+
+        function reiniciarTimer() {
+          pausado = false;
+          segundos = 0;
+          atualizarCronometro();
+          clearInterval(timer);
+          timer = null;
+          iniciarTimer();
+        }
+
         checkbox.addEventListener("change", () => {
           if (checkbox.checked) {
-            const timerEl = checkbox.nextElementSibling;
-            timerEl.classList.remove("hidden");
-            iniciarCronometro(timerEl);
+            cronometroEl.classList.remove("hidden");
+            controlesEl.classList.remove("hidden");
+            iniciarTimer();
+          } else {
+            cronometroEl.classList.add("hidden");
+            controlesEl.classList.add("hidden");
+            pausarTimer();
+            segundos = 0;
+            atualizarCronometro();
+            checkbox.checked = false;
           }
+        });
+
+        btnPausar.addEventListener("click", () => {
+          if (!pausado) {
+            pausarTimer();
+            btnPausar.textContent = "▶️";
+            btnPausar.title = "Continuar";
+          } else {
+            iniciarTimer();
+            btnPausar.textContent = "⏸️";
+            btnPausar.title = "Pausar";
+          }
+        });
+
+        btnReiniciar.addEventListener("click", () => {
+          reiniciarTimer();
+          btnPausar.textContent = "⏸️";
+          btnPausar.title = "Pausar";
         });
       });
 
+      // Botões pular e completar
       document.getElementById("pularBtn").onclick = () => proximoExercicio();
       document.getElementById("completarBtn").onclick = () => proximoExercicio();
-    }
 
-    function iniciarCronometro(el) {
-      let segundos = 0;
-      const timer = setInterval(() => {
-        if (!document.body.contains(el)) {
-          clearInterval(timer);
-          return;
+      // Botão encerrar dentro da tela do exercício
+      document.getElementById("encerrarBtn").onclick = () => {
+        if (confirm("Deseja realmente encerrar o treino?")) {
+          treinoContainer.innerHTML = "<div class='card'><h2>⚡ Treino encerrado.</h2></div>";
+          treinoSelect.disabled = false;
+          iniciarBtn.disabled = false;
         }
-        segundos++;
-        const min = String(Math.floor(segundos / 60)).padStart(2, "0");
-        const sec = String(segundos % 60).padStart(2, "0");
-        el.textContent = `${min}:${sec}`;
-      }, 1000);
+      };
     }
 
     function proximoExercicio() {
       atual++;
-      if (atual < grupos.length) {
-        exibirExercicio(atual);
-      } else {
-        treinoContainer.innerHTML = "<div class='card'><h2>✅ Parabéns! Treino completo 💪</h2></div>";
-        encerrarBtn.classList.add("hidden");
+      if (atual >= grupos.length) {
+        treinoContainer.innerHTML = "<div class='card'><h2>✔️ Treino finalizado!</h2></div>";
         treinoSelect.disabled = false;
         iniciarBtn.disabled = false;
+      } else {
+        exibirExercicio(atual);
       }
     }
-
-    encerrarBtn.addEventListener("click", () => {
-      if (confirm("Deseja realmente encerrar o treino?")) {
-        treinoContainer.innerHTML = "<div class='card'><h2>⚡ Treino encerrado.</h2></div>";
-        encerrarBtn.classList.add("hidden");
-        treinoSelect.disabled = false;
-        iniciarBtn.disabled = false;
-      }
-    });
-
   </script>
+
 </body>
 </html>
