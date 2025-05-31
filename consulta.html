@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br" >
+<head>
+  <meta charset="UTF-8" />
+  <title>Consulta de Treinos</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f2f5;
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .treino-lista {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .treino-item {
+      border-bottom: 1px solid #ddd;
+      padding: 1rem 0;
+    }
+    .treino-item:last-child {
+      border-bottom: none;
+    }
+    .titulo {
+      font-weight: 700;
+      font-size: 1.2rem;
+      margin-bottom: 0.3rem;
+    }
+    .info {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .voltar {
+      display: block;
+      max-width: 600px;
+      margin: 1rem auto 0;
+      text-align: center;
+      color: #007bff;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+    .voltar:hover {
+      text-decoration: underline;
+    }
+    .loading {
+      text-align: center;
+      font-style: italic;
+      color: #555;
+    }
+  </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function carregarTreinos() {
+      const lista = document.getElementById("lista-treinos");
+      lista.innerHTML = '<p class="loading">Carregando treinos...</p>';
+
+      try {
+        const q = query(collection(db, "academia"), orderBy("criadoEm", "desc"));
+        const querySnapshot = await getDocs(q);
+
+        if (querySnapshot.empty) {
+          lista.innerHTML = "<p>Nenhum treino cadastrado ainda.</p>";
+          return;
+        }
+
+        lista.innerHTML = "";
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          const treinoHTML = `
+            <div class="treino-item">
+              <div class="titulo">${data.treino}</div>
+              <div class="info">Séries: ${data.serie} | Repetições: ${data.repeticao}</div>
+              <div class="info" style="font-size:0.8rem; color:#999;">Cadastrado em: ${data.criadoEm?.toDate ? data.criadoEm.toDate().toLocaleString() : ''}</div>
+            </div>`;
+          lista.innerHTML += treinoHTML;
+        });
+      } catch (e) {
+        console.error("Erro ao carregar treinos:", e);
+        lista.innerHTML = "<p>Erro ao carregar os treinos.</p>";
+      }
+    }
+
+    window.onload = carregarTreinos;
+  </script>
+</head>
+<body>
+  <h1>Treinos Cadastrados</h1>
+  <div class="treino-lista" id="lista-treinos">
+    <!-- Lista de treinos carregada aqui -->
+  </div>
+  <a class="voltar" href="index.html">← Voltar para cadastro</a>
+</body>
+</html>
