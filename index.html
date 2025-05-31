@@ -32,7 +32,6 @@
       padding: 15px 30px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
-      flex-wrap: wrap;
     }
 
     .navbar h2 {
@@ -44,7 +43,6 @@
     .navbar-links {
       display: flex;
       gap: 20px;
-      flex-wrap: wrap;
     }
 
     .navbar a {
@@ -60,6 +58,21 @@
     .navbar a.active {
       background: #2980b9;
       color: white;
+    }
+
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+
+    .menu-toggle span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: white;
+      border-radius: 3px;
     }
 
     .main-content {
@@ -155,48 +168,24 @@
     }
 
     @media (max-width: 768px) {
-      .main-content {
-        padding: 90px 20px 20px;
-      }
-
-      .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px 20px;
-      }
-
-      .navbar h2 {
-        margin-bottom: 10px;
+      .menu-toggle {
+        display: flex;
       }
 
       .navbar-links {
+        display: none;
+        flex-direction: column;
         width: 100%;
+        background: #2c3e50;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        padding: 10px 20px;
         gap: 10px;
-        justify-content: flex-start;
-        flex-wrap: wrap;
       }
 
-      form {
-        padding: 20px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .navbar {
-        padding: 8px 15px;
-      }
-
-      .navbar h2 {
-        font-size: 1.4rem;
-      }
-
-      .navbar-links {
-        flex-direction: column;
-        gap: 8px;
+      .navbar-links.active {
+        display: flex;
       }
     }
   </style>
@@ -204,13 +193,18 @@
 <body>
 
 <nav class="navbar">
-    <h2>Academia</h2>
-    <div class="navbar-links">
-      <a href="index.html" class="active">Cadastro</a>
-      <a href="visualizar.html">Visualizar</a>
-      <a href="treino.html">Treino</a>
-      <a href="historico.html">Histórico</a>
-    </div>
+  <h2>Academia</h2>
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="navbar-links" id="navbar-links">
+    <a href="index.html" class="active">Cadastro</a>
+    <a href="visualizar.html">Visualizar</a>
+    <a href="treino.html">Treino</a>
+    <a href="historico.html">Histórico</a>
+  </div>
 </nav>
 
 <main class="main-content">
@@ -232,6 +226,13 @@
     <button type="submit">Salvar Treino</button>
   </form>
 </main>
+
+<script>
+  function toggleMenu() {
+    const navbarLinks = document.getElementById('navbar-links');
+    navbarLinks.classList.toggle('active');
+  }
+</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
