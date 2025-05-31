@@ -1,78 +1,50 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Academia Firebase</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Salvar Treino no Firebase</title>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function salvarTreino() {
+      try {
+        const treino = document.getElementById("treino").value;
+        const serie = parseInt(document.getElementById("serie").value);
+        const repeticao = parseInt(document.getElementById("repeticao").value);
+
+        await addDoc(collection(db, "academia"), {
+          treino: treino,
+          serie: serie,
+          repeticao: repeticao,
+        });
+
+        alert("✅ Treino salvo com sucesso!");
+      } catch (e) {
+        console.error("❌ Erro ao adicionar documento: ", e);
+      }
+    }
+
+    window.salvarTreino = salvarTreino; // Torna a função acessível no HTML
+  </script>
 </head>
 <body>
-
-    <div class="sidebar">
-        <h2>Academia App</h2>
-        <ul>
-            <li><a href="#" onclick="mostrarTela('home')">🏠 Painel</a></li>
-            <li><a href="#" onclick="mostrarTela('cadastrar')">📝 Cadastrar Treino</a></li>
-            <li><a href="#" onclick="mostrarTela('historico')">📜 Histórico</a></li>
-        </ul>
-    </div>
-
-    <div class="main">
-        <div id="home" class="tela">
-            <h1>Bem-vindo ao App de Academia!</h1>
-            <p>Escolha uma opção no menu.</p>
-        </div>
-
-        <div id="cadastrar" class="tela" style="display:none;">
-            <h1>Cadastrar Treino</h1>
-            <form id="formTreino">
-                <label>Pessoa:</label><br>
-                <input type="text" id="pessoa" required><br><br>
-
-                <label>Grupo Muscular:</label><br>
-                <input type="text" id="grupo" required><br><br>
-
-                <label>Exercício:</label><br>
-                <input type="text" id="exercicio" required><br><br>
-
-                <label>Séries:</label><br>
-                <input type="number" id="series" required><br><br>
-
-                <label>Repetições:</label><br>
-                <input type="number" id="repeticoes" required><br><br>
-
-                <button type="submit">Salvar</button>
-            </form>
-        </div>
-
-        <div id="historico" class="tela" style="display:none;">
-            <h1>Histórico de Treinos</h1>
-            <ul id="listaTreinos"></ul>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-
-    <!-- Firebase Config -->
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-        authDomain: "academia-bd-9d4da.firebaseapp.com",
-        databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
-        projectId: "academia-bd-9d4da",
-        storageBucket: "academia-bd-9d4da.appspot.com",
-        messagingSenderId: "201289997890",
-        appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
-        measurementId: "G-3J2FY1DEGW"
-      };
-
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.firestore();
-    </script>
-
-    <!-- Script -->
-    <script src="script.js"></script>
+  <h1>Cadastro de Treino</h1>
+  <label>Treino: <input type="text" id="treino" /></label><br />
+  <label>Série: <input type="number" id="serie" /></label><br />
+  <label>Repetição: <input type="number" id="repeticao" /></label><br />
+  <button onclick="salvarTreino()">Salvar Treino</button>
 </body>
 </html>
