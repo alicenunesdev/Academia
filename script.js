@@ -1,8 +1,9 @@
-// Alterna entre telas
-function mostrarTela(tela) {
-    const telas = document.querySelectorAll('.tela');
-    telas.forEach(t => t.style.display = 'none');
+// URL da sua API Google Apps Script
+const API_URL = "https://script.google.com/macros/s/AKfycbzKMk3WGjg5FUqfNDFOJIoNYbwEF30bEtkcsmmfllmZK4Df341lfnpIx2TxAptMjt20Uw/exec";
 
+// Função para trocar telas
+function mostrarTela(tela) {
+    document.querySelectorAll('.tela').forEach(el => el.style.display = 'none');
     document.getElementById(tela).style.display = 'block';
 
     if (tela === 'historico') {
@@ -10,86 +11,56 @@ function mostrarTela(tela) {
     }
 }
 
-// Salvar treino no LocalStorage
-document.getElementById('formTreino').addEventListener('submit', function(e) {
+// Função para enviar dados
+document.getElementById('formTreino').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const exercicio = document.getElementById('exercicio').value;
-    const series = document.getElementById('series').value;
-    const repeticoes = document.getElementById('repeticoes').value;
+    const dados = {
+        pessoa: document.getElementById('pessoa').value,
+        grupo: document.getElementById('grupo').value,
+        exercicio: document.getElementById('exercicio').value,
+        series: document.getElementById('series').value,
+        repeticoes: document.getElementById('repeticoes').value,
+        data: new Date().toLocaleDateString()
+    };
 
-    const treino = { exercicio, series, repeticoes };
-
-    let treinos = JSON.parse(localStorage.getItem('treinos')) || [];
-    treinos.push(treino);
-    localStorage.setItem('treinos', JSON.stringify(treinos));
-
-    alert('Treino salvo com sucesso!');
-
-    // Limpa formulário
-    this.reset();
+    fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(dados),
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(res => {
+        if (res.ok) {
+            alert('Treino salvo com sucesso!');
+            document.getElementById('formTreino').reset();
+        } else {
+            alert('Erro ao salvar treino.');
+        }
+    })
+    .catch(err => console.error('Erro:', err));
 });
 
-// Carregar histórico
+// Função para carregar histórico
 function carregarHistorico() {
-    const lista = document.getElementById('listaTreinos');
-    lista.innerHTML = '';
+    fetch(API_URL)
+        .then(res => res.json())
+        .then(data => {
+            const lista = document.getElementById('listaTreinos');
+            lista.innerHTML = '';
 
-    const treinos = JSON.parse(localStorage.getItem('treinos')) || [];
-
-    if (treinos.length === 0) {
-        lista.innerHTML = '<li>Nenhum treino cadastrado.</li>';
-        return;
-    }
-
-    treinos.forEach((t, index) => {
-        const item = document.createElement('li');
-        item.innerHTML = `${t.exercicio} - ${t.series} séries x ${t.repeticoes} repetições 
-        <button onclick="deletarTreino(${index})">Excluir</button>`;
-        lista.appendChild(item);
-    });
+            data.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <b>${item.pessoa}</b> — 
+                    <i>${item.grupo}</i> — 
+                    ${item.exercicio} 
+                    (${item.series} séries de ${item.repeticoes} repetições) 
+                    em ${item.data}
+                `;
+                lista.appendChild(li);
+            });
+        })
+        .catch(err => console.error('Erro:', err));
 }
-
-// Deletar treino
-function deletarTreino(index) {
-    let treinos = JSON.parse(localStorage.getItem('treinos')) || [];
-    treinos.splice(index, 1);
-    localStorage.setItem('treinos', JSON.stringify(treinos));
-    carregarHistorico();
-}
-// Configurações do seu projeto (pegue no console do Firebase)
-const firebaseConfig = {
-    apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-    authDomain: "academia-bd-9d4da.firebaseapp.com",
-    projectId: "academia-bd-9d4da",
-    storageBucket: "academia-bd-9d4da.firebasestorage.app",
-    messagingSenderId: "201289997890",
-    appId: "1:201289997890:web:19bece6aa0b3d52e3417db"
-};
-
-// Inicializar Firebase
-// Inicializa o Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore(app);
-
-// Função para listar treinos
-function listarTreinos() {
-    const lista = document.getElementById('lista-treinos');
-    lista.innerHTML = "";
-
-    db.collection("academia").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            const dados = doc.data();
-            const item = document.createElement('li');
-            item.innerHTML = `
-                <strong>Treino:</strong> ${dados.treino || '(sem nome)'}<br>
-                <strong>Séries:</strong> ${dados.serie}<br>
-                <strong>Repetições:</strong> ${dados.repetição}
-            `;
-            lista.appendChild(item);
-        });
-    });
-}
-
-// Chama a função ao carregar a página
-listarTreinos();
