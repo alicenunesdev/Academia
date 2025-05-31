@@ -2,13 +2,24 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cadastrar Treino</title>
   <style>
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-       .navbar {
+
+    body {
+      margin: 0;
+      background: #f7f9fc;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .navbar {
       position: fixed;
       top: 0;
       left: 0;
@@ -21,6 +32,7 @@
       padding: 15px 30px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
+      flex-wrap: wrap;
     }
 
     .navbar h2 {
@@ -32,6 +44,7 @@
     .navbar-links {
       display: flex;
       gap: 20px;
+      flex-wrap: wrap;
     }
 
     .navbar a {
@@ -48,20 +61,11 @@
       background: #2980b9;
       color: white;
     }
-    body {
-      margin: 0;
-      background: #f7f9fc;
-      color: #333;
-      display: flex;
-      min-height: 100vh;
-      flex-direction: column;
-    }
 
-    /* Ajuste para dar espaço no topo para navbar fixa */
     .main-content {
-      padding: 80px 30px 40px;
+      padding: 90px 30px 40px;
       flex: 1;
-      max-width: 100%;
+      width: 100%;
     }
 
     h1 {
@@ -108,6 +112,23 @@
       color: #2980b9;
     }
 
+    .grupo button {
+      background: #e74c3c;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+      margin-top: 10px;
+    }
+
+    .grupo button:hover {
+      background: #c0392b;
+    }
+
     button {
       background: #2980b9;
       color: white;
@@ -118,6 +139,7 @@
       cursor: pointer;
       font-weight: 700;
       transition: background 0.3s;
+      margin-right: 10px;
     }
 
     button:hover {
@@ -126,7 +148,6 @@
 
     #add-grupo {
       background: #27ae60;
-      margin-bottom: 20px;
     }
 
     #add-grupo:hover {
@@ -135,17 +156,47 @@
 
     @media (max-width: 768px) {
       .main-content {
-        padding: 80px 20px 20px;
+        padding: 90px 20px 20px;
+      }
+
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px;
+      }
+
+      .navbar h2 {
+        margin-bottom: 10px;
+      }
+
+      .navbar-links {
+        width: 100%;
+        gap: 10px;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      form {
+        padding: 20px;
       }
     }
 
     @media (max-width: 480px) {
-      .main-content {
-        padding: 80px 15px 15px;
-      }
-
       h1 {
         font-size: 1.5rem;
+      }
+
+      .navbar {
+        padding: 8px 15px;
+      }
+
+      .navbar h2 {
+        font-size: 1.4rem;
+      }
+
+      .navbar-links {
+        flex-direction: column;
+        gap: 8px;
       }
     }
   </style>
@@ -155,12 +206,12 @@
 <nav class="navbar">
     <h2>Academia</h2>
     <div class="navbar-links">
-      <a href="index.html" class="active" >Cadastro</a>
+      <a href="index.html" class="active">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
       <a href="treino.html">Treino</a>
       <a href="historico.html">Histórico</a>
     </div>
-  </nav>
+</nav>
 
 <main class="main-content">
   <h1>Cadastrar Treino</h1>
@@ -248,25 +299,6 @@
       alert('Erro ao cadastrar treino: ' + error.message);
     }
   });
-</script>
-
-<!-- Script para carregar a navbar fixa e responsiva -->
-<script>
-  async function loadNavbar() {
-    const response = await fetch('navbar.html');
-    const navbarHTML = await response.text();
-    document.getElementById('navbar-container').innerHTML = navbarHTML;
-
-    // Marca o link ativo conforme página atual
-    const path = window.location.pathname.split('/').pop();
-    const links = document.querySelectorAll('.navbar a');
-    links.forEach(link => {
-      if (link.getAttribute('href') === path) {
-        link.classList.add('active');
-      }
-    });
-  }
-  loadNavbar();
 </script>
 
 </body>
