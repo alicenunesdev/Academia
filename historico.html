@@ -102,6 +102,23 @@
       color: #555;
     }
 
+    .btn-vermais {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: #2980b9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .btn-vermais:hover {
+      background: #2471a3;
+    }
+
     .btn-voltar {
       display: block;
       width: 120px;
@@ -119,6 +136,83 @@
 
     .btn-voltar:hover {
       background: #2471a3;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 8% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h2 {
+      margin: 0;
+      color: #34495e;
+    }
+
+    .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #333;
+    }
+
+    .modal-body {
+      margin-top: 10px;
+    }
+
+    .grupo {
+      margin-bottom: 15px;
+    }
+
+    .grupo h4 {
+      margin: 5px 0;
+      color: #2c3e50;
+    }
+
+    .grupo ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .grupo li {
+      background: #f2f2f2;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
     }
 
     @media (max-width: 768px) {
@@ -156,6 +250,18 @@
     <a href="treino.html" class="btn-voltar">Voltar ao Treino</a>
   </main>
 
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Detalhes do Treino</h2>
+        <span class="close" id="closeModal">&times;</span>
+      </div>
+      <div class="modal-body" id="modalBody">
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -166,7 +272,7 @@
       authDomain: "academia-bd-9d4da.firebaseapp.com",
       databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
       projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.firebasestorage.app",
+      storageBucket: "academia-bd-9d4da.appspot.com",
       messagingSenderId: "201289997890",
       appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
       measurementId: "G-3J2FY1DEGW"
@@ -177,6 +283,13 @@
     const db = getFirestore(app);
 
     const historicoLista = document.getElementById("historicoLista");
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const closeModal = document.getElementById("closeModal");
+
+    closeModal.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 
     async function carregarHistorico() {
       const snapshot = await getDocs(collection(db, "historico"));
@@ -200,14 +313,38 @@
         div.innerHTML = `
           <h3>${data.treino}</h3>
           <p><strong>Data:</strong> ${dataFormatada}</p>
-          <details>
-            <summary>Resultados</summary>
-            <pre style="white-space: pre-wrap;">${JSON.stringify(data.resultados, null, 2)}</pre>
-          </details>
+          <button class="btn-vermais">Ver Mais</button>
         `;
+
+        div.querySelector(".btn-vermais").addEventListener("click", () => {
+          modalTitle.textContent = data.treino;
+          modalBody.innerHTML = gerarHTMLDetalhes(data.resultados);
+          modal.style.display = "block";
+        });
 
         historicoLista.appendChild(div);
       });
+    }
+
+    function gerarHTMLDetalhes(resultados) {
+      let html = "";
+      for (const grupo in resultados) {
+        html += `<div class="grupo">
+          <h4>${grupo}</h4>
+          <ul>`;
+        resultados[grupo].forEach((item, idx) => {
+          html += `<li>
+            <strong>Exercício ${idx + 1}</strong><br>
+            Série: ${item.serie}<br>
+            Repetições: ${item.repeticao}<br>
+            Carga: ${item.carga || '-'}<br>
+            Tempo: ${item.tempo || '-'}<br>
+            Concluído: ${item.check ? '✅' : '❌'}
+          </li>`;
+        });
+        html += `</ul></div>`;
+      }
+      return html;
     }
 
     carregarHistorico();
