@@ -1,29 +1,80 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Treino</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Iniciar Treino</title>
   <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #2c2c2c;
-      color: #fff;
       margin: 0;
-      padding: 0;
+      background: #f7f9fc;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: #34495e;
+      color: #ecf0f1;
+      width: 220px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: fixed;
+    }
+
+    .navbar h2 {
+      margin: 0 0 40px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 12px 20px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+      display: block;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px 30px;
+      flex: 1;
+      max-width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
     }
 
     .card {
-      background: #fff;
+      background: white;
       color: #333;
-      margin: 80px auto 20px;
+      margin: 20px auto;
       padding: 20px;
-      max-width: 400px;
+      max-width: 600px;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     .atividade-header {
@@ -34,7 +85,7 @@
     .atividade-header span {
       font-size: 1rem;
       font-weight: bold;
-      color: #8e44ad;
+      color: #2980b9;
     }
 
     .atividade-header h2 {
@@ -51,36 +102,32 @@
     .series {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      width: 100%;
+      gap: 15px;
+      align-items: center;
     }
 
     .series div {
-      background-color: #f7f7f7;
-      padding: 10px;
-      border-radius: 8px;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 8px;
     }
 
     .series input[type="number"] {
       width: 60px;
       padding: 5px;
-      margin-right: 5px;
     }
 
     .check-serie {
-      margin-left: 5px;
+      transform: scale(1.2);
+      cursor: pointer;
     }
 
-    .cronometro-serie {
-      font-size: 0.9rem;
-      color: #e67e22;
-      margin-left: 10px;
+    .cronometro-container {
       display: flex;
       align-items: center;
       gap: 5px;
+      color: #e67e22;
+      font-size: 0.9rem;
     }
 
     .hidden {
@@ -91,7 +138,6 @@
       display: flex;
       justify-content: space-between;
       margin-top: 30px;
-      width: 100%;
     }
 
     .botao-pular, .botao-completar {
@@ -133,53 +179,120 @@
       background: #922b21;
     }
 
-    button.crono-control {
-      background: none;
-      border: none;
-      color: #e67e22;
-      cursor: pointer;
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
       font-size: 1rem;
     }
+
+    button {
+      background: #2980b9;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2471a3;
+    }
+
   </style>
 </head>
 <body>
 
-  <button id="encerrarBtn" class="botao-encerrar">⚡ Encerrar Treino</button>
+  <nav class="navbar">
+    <h2>Academia</h2>
+    <a href="index.html">Cadastro</a>
+    <a href="visualizar.html">Visualizar</a>
+    <a href="Treino.html" class="active">Treino</a>
+  </nav>
 
-  <div id="treinoContainer"></div>
+  <main class="main-content">
+    <h1>Iniciar Treino</h1>
 
-  <script>
+    <div class="card">
+      <label for="treinoSelect">Selecione um treino:</label>
+      <select id="treinoSelect">
+        <option value="">Carregando...</option>
+      </select>
+      <button id="iniciarBtn">Iniciar Treino</button>
+    </div>
+
+    <button id="encerrarBtn" class="botao-encerrar hidden">⚡ Encerrar Treino</button>
+
+    <div id="treinoContainer"></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const treinoSelect = document.getElementById("treinoSelect");
+    const iniciarBtn = document.getElementById("iniciarBtn");
     const treinoContainer = document.getElementById("treinoContainer");
-
-    const exercicios = [
-      {
-        grupo: "Abdominal",
-        nome: "Canivete",
-        descricao: "Com remador (sem encostar os pés no chão)",
-        serie: 3,
-        repeticao: 20
-      },
-      {
-        grupo: "Peito",
-        nome: "Supino reto",
-        descricao: "Com barra",
-        serie: 3,
-        repeticao: 12
-      },
-      {
-        grupo: "Costas",
-        nome: "Puxada alta",
-        descricao: "Na barra guiada",
-        serie: 3,
-        repeticao: 10
-      }
-    ];
+    const encerrarBtn = document.getElementById("encerrarBtn");
 
     let atual = 0;
-    const timers = new Map();
+    let grupos = [];
+    let timers = new Map();
+
+    async function carregarTreinos() {
+      const snapshot = await getDocs(collection(db, "treinos"));
+      treinoSelect.innerHTML = '<option value="">Selecione</option>';
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+        treinoSelect.appendChild(option);
+      });
+    }
+
+    carregarTreinos();
+
+    iniciarBtn.addEventListener("click", async () => {
+      const treinoId = treinoSelect.value;
+      if (!treinoId) {
+        alert("Selecione um treino");
+        return;
+      }
+
+      const docSnap = await getDoc(doc(db, "treinos", treinoId));
+      if (!docSnap.exists()) {
+        alert("Treino não encontrado");
+        return;
+      }
+
+      const data = docSnap.data();
+      grupos = data.grupos;
+      atual = 0;
+
+      treinoSelect.disabled = true;
+      iniciarBtn.disabled = true;
+      encerrarBtn.classList.remove("hidden");
+
+      exibirExercicio(atual);
+    });
 
     function exibirExercicio(index) {
-      const grupo = exercicios[index];
+      const grupo = grupos[index];
       treinoContainer.innerHTML = "";
 
       const div = document.createElement("div");
@@ -194,16 +307,14 @@
         <div class="series">
           ${Array.from({ length: grupo.serie }).map((_, i) => `
             <div>
-              <div>
-                <label>Série ${i + 1}</label><br/>
-                <input type="number" placeholder="Reps" value="${grupo.repeticao}">
-                <input type="number" placeholder="Carga (kg)">
-                <input type="checkbox" class="check-serie"> ✔
-              </div>
-              <div class="cronometro-serie hidden">
+              <label>Série ${i + 1}</label>
+              <input type="number" placeholder="Reps" value="${grupo.repeticao}">
+              <input type="number" placeholder="Carga (kg)">
+              <input type="checkbox" class="check-serie">
+              <div class="cronometro-container hidden">
                 ⏱ <span class="tempo">00:00</span>
-                <button class="crono-control pause">⏸️</button>
-                <button class="crono-control reset">🔄</button>
+                <button class="pauseBtn">⏸️</button>
+                <button class="resetBtn">🔄</button>
               </div>
             </div>
           `).join('')}
@@ -211,105 +322,91 @@
 
         <div class="botoes-controle">
           <button id="pularBtn" class="botao-pular">❌ Pular</button>
-          <button id="completarBtn" class="botao-completar">✅ Completar atividade</button>
+          <button id="completarBtn" class="botao-completar">✅ Completar</button>
         </div>
       `;
 
       treinoContainer.appendChild(div);
 
-      const checkboxes = div.querySelectorAll(".check-serie");
-      checkboxes.forEach((checkbox, idx) => {
+      document.querySelectorAll(".check-serie").forEach((checkbox) => {
+        const container = checkbox.nextElementSibling;
+        const tempoEl = container.querySelector(".tempo");
+        const pauseBtn = container.querySelector(".pauseBtn");
+        const resetBtn = container.querySelector(".resetBtn");
+
+        let cronometro = { segundos: 0, ativo: true, intervalo: null };
+
         checkbox.addEventListener("change", () => {
-          const cronometroDiv = checkbox.parentElement.nextElementSibling;
           if (checkbox.checked) {
-            cronometroDiv.classList.remove("hidden");
-            iniciarCronometro(cronometroDiv.querySelector(".tempo"), idx);
-          } else {
-            cronometroDiv.classList.add("hidden");
-            pararCronometro(idx);
+            container.classList.remove("hidden");
+            cronometro.ativo = true;
+            iniciarCronometro(tempoEl, cronometro);
+            timers.set(tempoEl, cronometro);
           }
         });
-      });
 
-      const pauseBtns = div.querySelectorAll(".pause");
-      const resetBtns = div.querySelectorAll(".reset");
+        pauseBtn.addEventListener("click", () => {
+          cronometro.ativo = !cronometro.ativo;
+          pauseBtn.textContent = cronometro.ativo ? "⏸️" : "▶️";
+        });
 
-      pauseBtns.forEach((btn, idx) => {
-        btn.addEventListener("click", () => pausarOuContinuar(idx, btn));
-      });
-
-      resetBtns.forEach((btn, idx) => {
-        btn.addEventListener("click", () => resetarCronometro(idx, btn));
+        resetBtn.addEventListener("click", () => {
+          cronometro.segundos = 0;
+          atualizarTempo(tempoEl, cronometro.segundos);
+        });
       });
 
       document.getElementById("pularBtn").onclick = () => proximoExercicio();
       document.getElementById("completarBtn").onclick = () => proximoExercicio();
     }
 
-    function iniciarCronometro(el, id) {
-      let segundos = 0;
-      timers.set(id, {intervalo: null, segundos});
+    function iniciarCronometro(el, cronometro) {
+      if (cronometro.intervalo) return;
 
-      const atualizarTempo = () => {
-        segundos = timers.get(id).segundos + 1;
-        timers.set(id, {...timers.get(id), segundos});
-        const min = String(Math.floor(segundos / 60)).padStart(2, "0");
-        const sec = String(segundos % 60).padStart(2, "0");
-        el.textContent = `${min}:${sec}`;
-      };
-
-      const intervalo = setInterval(atualizarTempo, 1000);
-      timers.set(id, {...timers.get(id), intervalo});
+      cronometro.intervalo = setInterval(() => {
+        if (!document.body.contains(el)) {
+          clearInterval(cronometro.intervalo);
+          return;
+        }
+        if (cronometro.ativo) {
+          cronometro.segundos++;
+          atualizarTempo(el, cronometro.segundos);
+        }
+      }, 1000);
     }
 
-    function pausarOuContinuar(id, btn) {
-      const timer = timers.get(id);
-      if (timer && timer.intervalo) {
-        clearInterval(timer.intervalo);
-        timers.set(id, {...timer, intervalo: null});
-        btn.textContent = "▶️";
-      } else {
-        const el = btn.parentElement.querySelector(".tempo");
-        iniciarCronometro(el, id);
-        btn.textContent = "⏸️";
-      }
-    }
-
-    function resetarCronometro(id) {
-      const timer = timers.get(id);
-      if (timer && timer.intervalo) {
-        clearInterval(timer.intervalo);
-      }
-      timers.set(id, {intervalo: null, segundos: 0});
-      const el = document.querySelectorAll(".tempo")[id];
-      if (el) el.textContent = "00:00";
-    }
-
-    function pararCronometro(id) {
-      const timer = timers.get(id);
-      if (timer && timer.intervalo) {
-        clearInterval(timer.intervalo);
-      }
-      timers.delete(id);
+    function atualizarTempo(el, segundos) {
+      const min = String(Math.floor(segundos / 60)).padStart(2, "0");
+      const sec = String(segundos % 60).padStart(2, "0");
+      el.textContent = `${min}:${sec}`;
     }
 
     function proximoExercicio() {
+      timers.forEach(c => clearInterval(c.intervalo));
+      timers.clear();
+
       atual++;
-      if (atual < exercicios.length) {
+      if (atual < grupos.length) {
         exibirExercicio(atual);
       } else {
         treinoContainer.innerHTML = "<div class='card'><h2>✅ Parabéns! Treino completo 💪</h2></div>";
+        encerrarBtn.classList.add("hidden");
+        treinoSelect.disabled = false;
+        iniciarBtn.disabled = false;
       }
     }
 
-    document.getElementById("encerrarBtn").addEventListener("click", () => {
+    encerrarBtn.addEventListener("click", () => {
       if (confirm("Deseja realmente encerrar o treino?")) {
+        timers.forEach(c => clearInterval(c.intervalo));
+        timers.clear();
         treinoContainer.innerHTML = "<div class='card'><h2>⚡ Treino encerrado.</h2></div>";
+        encerrarBtn.classList.add("hidden");
+        treinoSelect.disabled = false;
+        iniciarBtn.disabled = false;
       }
     });
 
-    // Inicializa primeiro exercício
-    exibirExercicio(atual);
   </script>
 </body>
 </html>
