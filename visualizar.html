@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-br" >
+<head>
+  <meta charset="UTF-8" />
+  <title>Visualizar Treinos</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <h2>Academia</h2>
+    <a href="index.html" data-tooltip="Cadastro">Cadastro</a>
+    <a href="visualizar.html" class="active" data-tooltip="Visualizar Treinos">Visualizar</a>
+  </nav>
+
+  <main class="main-content">
+    <div class="treino-lista" id="lista-treinos">
+      <h1>Treinos Cadastrados</h1>
+      <p>Carregando treinos...</p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const listaTreinos = document.getElementById("lista-treinos");
+
+    async function carregarTreinos() {
+      listaTreinos.innerHTML = "<h1>Treinos Cadastrados</h1>";
+      try {
+        const querySnapshot = await getDocs(collection(db, "treinos"));
+        if (querySnapshot.empty) {
+          listaTreinos.innerHTML += "<p>Nenhum treino cadastrado.</p>";
+          return;
+        }
+
+        querySnapshot.forEach(docSnap => {
+          const treino = docSnap.data();
+          const id = docSnap.id;
+
+          const treinoDiv = document.createElement("div");
+          treinoDiv.classList.add("treino-item");
+
+          // Info do treino
+          const infoDiv = document.createElement("div");
+          infoDiv.classList.add("treino-info");
+
+          const titulo = document.createElement("strong");
+          titulo.textContent = `${treino.usuario} — ${treino.tipoTreino}`;
+          infoDiv.appendChild(titulo);
+
+          const gruposSpan = document.createElement("div");
+          gruposSpan.classList.add("groupos-lista");
+          treino.grupos.forEach(g => {
+            const span = document.createElement("span");
+            span.textContent = `${g.grupo}: Série ${g.serie} x ${g.repeticao}`;
+            gruposSpan.appendChild(span);
+          });
+          infoDiv.appendChild(gruposSpan);
+
+          // Botões de ação
+          const actionsDiv = document.createElement("div");
+          actionsDiv.classList.add("action-buttons");
+
+          // Botão excluir
+          const btnExcluir = document.createElement("button");
+          btnExcluir.classList.add("delete");
+          btnExcluir.textContent = "Excluir";
+          btnExcluir.addEventListener("click", async () => {
+            if (confirm(`Deseja realmente excluir o treino de ${treino.usuario}?`)) {
+              try {
+                await deleteDoc(doc(db, "treinos", id));
+                alert("Treino excluído com sucesso!");
+                carregarTreinos();
+              } catch (error) {
+                alert("Erro ao excluir treino: " + error.message);
+              }
+            }
+          });
+
+          actionsDiv.appendChild(btnExcluir);
+
+          treinoDiv.appendChild(infoDiv);
+          treinoDiv.appendChild(actionsDiv);
+
+          listaTreinos.appendChild(treinoDiv);
+        });
+      } catch (error) {
+        listaTreinos.innerHTML = `<p>Erro ao carregar treinos: ${error.message}</p>`;
+      }
+    }
+
+    carregarTreinos();
+  </script>
+</body>
+</html>
