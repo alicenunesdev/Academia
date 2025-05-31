@@ -2,8 +2,9 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Treino</title>
+  <title>Iniciar Treino</title>
   <style>
+    /* === Mantém o mesmo estilo da página Visualizar === */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,6 +18,7 @@
       min-height: 100vh;
     }
 
+    /* Navbar lateral */
     .navbar {
       background: #34495e;
       color: #ecf0f1;
@@ -44,6 +46,7 @@
       transition: background 0.3s, color 0.3s;
       font-weight: 600;
       display: block;
+      position: relative;
     }
 
     .navbar a:hover,
@@ -52,6 +55,7 @@
       color: white;
     }
 
+    /* Conteúdo principal */
     .main-content {
       margin-left: 220px;
       padding: 40px 30px;
@@ -59,139 +63,110 @@
       max-width: 100%;
     }
 
-    .exercise-card {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.05);
-      max-width: 600px;
-      margin: 0 auto;
+    h1 {
       text-align: center;
-    }
-
-    .exercise-card h2 {
-      font-size: 1.8rem;
-      margin-bottom: 10px;
+      margin-bottom: 30px;
+      font-weight: 700;
       color: #2c3e50;
     }
 
-    .exercise-card p {
-      font-size: 1.1rem;
-      margin: 8px 0;
+    .card {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.07);
+      max-width: 600px;
+      margin: auto;
+      margin-bottom: 25px;
     }
 
-    .exercise-card input {
+    select, button {
+      width: 100%;
+      padding: 10px;
       margin-top: 10px;
-      padding: 8px 12px;
-      font-size: 1rem;
-      border: 1.5px solid #ccc;
       border-radius: 6px;
-      width: 80px;
-      text-align: center;
-    }
-
-    .buttons {
-      margin-top: 30px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-
-    .buttons button {
-      padding: 12px 24px;
-      font-weight: 600;
+      border: 1px solid #ccc;
       font-size: 1rem;
-      border: none;
-      border-radius: 8px;
+    }
+
+    button {
+      background: #2980b9;
+      color: white;
+      font-weight: 700;
       cursor: pointer;
       transition: background 0.3s;
     }
 
-    .complete {
-      background: #27ae60;
-      color: white;
+    button:hover {
+      background: #2471a3;
     }
 
-    .complete:hover {
-      background: #1f8b4d;
+    .exercise-box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
     }
 
-    .skip {
-      background: #f39c12;
-      color: white;
+    .exercise-box h3 {
+      margin: 0 0 10px;
+      color: #2980b9;
     }
 
-    .skip:hover {
-      background: #d78b0e;
+    .series {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
     }
 
-    .end {
-      background: #e74c3c;
-      color: white;
+    .series input {
+      width: 80px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
     }
 
-    .end:hover {
-      background: #c0392b;
+    .hidden {
+      display: none;
     }
 
-    @media(max-width: 768px) {
-      .navbar {
-        width: 60px;
-        padding: 20px 5px;
-      }
-
-      .navbar h2 {
-        display: none;
-      }
-
-      .navbar a {
-        padding: 12px 8px;
-        font-size: 0;
-      }
-
-      .main-content {
-        margin-left: 60px;
-        padding: 20px;
-      }
-
-      .exercise-card {
-        padding: 20px;
-      }
+    .cronometro {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e67e22;
+      margin-top: 10px;
     }
+
   </style>
 </head>
 <body>
+
   <nav class="navbar">
     <h2>Academia</h2>
-    <a href="index.html">Cadastro</a>
-    <a href="visualizar.html">Visualizar</a>
-    <a href="treino.html" class="active">Treino</a>
+    <a href="index.html" data-tooltip="Cadastro">Cadastro</a>
+    <a href="visualizar.html" data-tooltip="Visualizar">Visualizar</a>
+    <a href="Treino.html" class="active" data-tooltip="Iniciar Treino">Treino</a>
   </nav>
 
   <main class="main-content">
-    <div class="exercise-card" id="exerciseCard" style="display:none;">
-      <h2 id="exerciseName"></h2>
-      <p><strong>Séries:</strong> <span id="seriesCount"></span></p>
-      <p><strong>Repetições:</strong> <span id="repetitionsCount"></span></p>
+    <h1>Iniciar Treino</h1>
 
-      <div style="margin-top: 20px;">
-        <label for="carga"><strong>Carga (kg):</strong></label><br>
-        <input type="number" id="carga" placeholder="Kg" min="0" />
-      </div>
-
-      <div class="buttons">
-        <button class="complete" id="btnComplete">Completar</button>
-        <button class="skip" id="btnSkip">Pular</button>
-        <button class="end" id="btnEnd">Encerrar</button>
-      </div>
-
-      <div id="cronometro" style="margin-top:20px; font-weight:600; font-size:1.2rem; color:#e67e22;"></div>
+    <div class="card">
+      <label for="treinoSelect">Selecione um treino:</label>
+      <select id="treinoSelect">
+        <option value="">Carregando...</option>
+      </select>
+      <button id="iniciarBtn">Iniciar Treino</button>
     </div>
+
+    <div id="treinoContainer"></div>
   </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
@@ -205,112 +180,61 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const exerciseCard = document.getElementById("exerciseCard");
-    const exerciseName = document.getElementById("exerciseName");
-    const seriesCount = document.getElementById("seriesCount");
-    const repetitionsCount = document.getElementById("repetitionsCount");
-    const cargaInput = document.getElementById("carga");
-    const btnComplete = document.getElementById("btnComplete");
-    const btnSkip = document.getElementById("btnSkip");
-    const btnEnd = document.getElementById("btnEnd");
-    const cronometroDisplay = document.getElementById("cronometro");
+    const treinoSelect = document.getElementById("treinoSelect");
+    const iniciarBtn = document.getElementById("iniciarBtn");
+    const treinoContainer = document.getElementById("treinoContainer");
 
-    let treinoExercicios = [];
-    let currentIndex = 0;
-    let timerInterval = null;
-    let timerSeconds = 0;
+    async function carregarTreinos() {
+      const snapshot = await getDocs(collection(db, "treinos"));
+      treinoSelect.innerHTML = '<option value="">Selecione</option>';
 
-    async function carregarExercicios() {
-      try {
-        const snapshot = await getDocs(collection(db, "treinos"));
-        treinoExercicios = [];
-
-        snapshot.forEach(docSnap => {
-          const data = docSnap.data();
-          if(data.grupos && Array.isArray(data.grupos)) {
-            data.grupos.forEach(grupo => {
-              if(grupo.exercicios && Array.isArray(grupo.exercicios)) {
-                grupo.exercicios.forEach(exercicio => {
-                  treinoExercicios.push({
-                    nome: exercicio.nome || grupo.grupo || "Exercício",
-                    serie: exercicio.serie || grupo.serie || "-",
-                    repeticao: exercicio.repeticao || grupo.repeticao || "-",
-                  });
-                });
-              }
-            });
-          }
-        });
-
-        if(treinoExercicios.length > 0) {
-          mostrarExercicio(0);
-        } else {
-          exerciseCard.style.display = "none";
-          alert("Nenhum exercício encontrado.");
-        }
-      } catch(e) {
-        console.error("Erro ao carregar exercícios:", e);
-        alert("Erro ao carregar exercícios. Veja o console.");
-      }
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+        treinoSelect.appendChild(option);
+      });
     }
 
-    function mostrarExercicio(index) {
-      if (index < 0 || index >= treinoExercicios.length) {
-        alert("Fim do treino!");
-        exerciseCard.style.display = "none";
-        pararCronometro();
+    carregarTreinos();
+
+    iniciarBtn.addEventListener("click", async () => {
+      const treinoId = treinoSelect.value;
+      if (!treinoId) {
+        alert("Selecione um treino");
         return;
       }
-      currentIndex = index;
-      const exercicio = treinoExercicios[index];
-      exerciseName.textContent = exercicio.nome;
-      seriesCount.textContent = exercicio.serie;
-      repetitionsCount.textContent = exercicio.repeticao;
-      cargaInput.value = "";
-      exerciseCard.style.display = "block";
-      iniciarCronometro();
-    }
 
-    function iniciarCronometro() {
-      pararCronometro();
-      timerSeconds = 0;
-      cronometroDisplay.textContent = formatarTempo(timerSeconds);
-      timerInterval = setInterval(() => {
-        timerSeconds++;
-        cronometroDisplay.textContent = formatarTempo(timerSeconds);
-      }, 1000);
-    }
-
-    function pararCronometro() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
+      const docSnap = await getDoc(doc(db, "treinos", treinoId));
+      if (!docSnap.exists()) {
+        alert("Treino não encontrado");
+        return;
       }
-    }
 
-    function formatarTempo(segundos) {
-      const min = Math.floor(segundos / 60);
-      const seg = segundos % 60;
-      return `${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
-    }
+      const data = docSnap.data();
+      treinoContainer.innerHTML = "";
 
-    btnComplete.addEventListener("click", () => {
-      alert(`Exercício "${treinoExercicios[currentIndex].nome}" completo!`);
-      mostrarExercicio(currentIndex + 1);
+      data.grupos.forEach((grupo, idx) => {
+        const div = document.createElement("div");
+        div.className = "exercise-box";
+        div.innerHTML = `
+          <h3>${grupo.grupo}</h3>
+          <div>Séries: ${grupo.serie} - Repetições alvo: ${grupo.repeticao}</div>
+          <div class="series">
+            ${Array.from({ length: grupo.serie }).map((_, i) => `
+              <div>
+                <div>Série ${i + 1}</div>
+                <input placeholder="Reps" type="number" min="0">
+                <input placeholder="Carga (kg)" type="number" min="0" step="0.1">
+              </div>
+            `).join('')}
+          </div>
+        `;
+        treinoContainer.appendChild(div);
+      });
     });
 
-    btnSkip.addEventListener("click", () => {
-      alert(`Exercício "${treinoExercicios[currentIndex].nome}" pulado!`);
-      mostrarExercicio(currentIndex + 1);
-    });
-
-    btnEnd.addEventListener("click", () => {
-      pararCronometro();
-      exerciseCard.style.display = "none";
-      alert("Treino encerrado!");
-    });
-
-    carregarExercicios();
   </script>
 </body>
 </html>
