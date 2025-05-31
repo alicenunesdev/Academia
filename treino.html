@@ -19,7 +19,6 @@
       flex-direction: column;
     }
 
-    /* Navbar fixa no topo */
     .navbar {
       position: fixed;
       top: 0;
@@ -175,7 +174,6 @@
       background: #2471a3;
     }
 
-    /* Responsivo */
     @media (max-width: 768px) {
       .navbar {
         flex-direction: column;
@@ -253,6 +251,7 @@
 
     let atual = 0;
     let grupos = [];
+    let dadosPreenchidos = {};
 
     async function carregarTreinos() {
       const snapshot = await getDocs(collection(db, "treinos"));
@@ -285,6 +284,7 @@
       const data = docSnap.data();
       grupos = data.grupos;
       atual = 0;
+      dadosPreenchidos = {};
 
       treinoSelect.disabled = true;
       iniciarBtn.disabled = true;
@@ -296,28 +296,39 @@
       const grupo = grupos[index];
       treinoContainer.innerHTML = "";
 
+      const chaveGrupo = `grupo${index}`;
+      if (!dadosPreenchidos[chaveGrupo]) {
+        dadosPreenchidos[chaveGrupo] = Array.from({ length: grupo.serie }).map(() => ({
+          repeticoes: grupo.repeticao || '',
+          carga: '',
+          check: false,
+          tempo: "00:00"
+        }));
+      }
+
       const div = document.createElement("div");
       div.className = "card";
+
       div.innerHTML = `
         <div class="atividade-header">
           <h2>${grupo.grupo}</h2>
         </div>
 
         <div class="series">
-          ${Array.from({ length: grupo.serie }).map((_, i) => `
+          ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
             <div>
               <label>Série ${i + 1}</label><br/>
-              <input type="number" placeholder="Reps" value="${grupo.repeticao}">
-              <input type="number" placeholder="Carga (kg)">
-              <input type="checkbox" class="check-serie"> ✔
-              <span class="cronometro-serie hidden">00:00</span>
+              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps">
+              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga">
+              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''}> ✔
+              <span class="cronometro-serie ${serie.check ? '' : 'hidden'}">${serie.tempo}</span>
             </div>
           `).join('')}
         </div>
 
         <div class="botoes-controle">
-          <button id="pularBtn" class="botao-pular">❌ Pular</button>
-          <button id="completarBtn" class="botao-completar">✅ Completar</button>
+          <button id="anteriorBtn" class="botao-pular">⬅️ Anterior</button>
+          <button id="proximoBtn" class="botao-completar">➡️ Próximo</button>
         </div>
 
         <button id="encerrarBtn" class="botao-encerrar" style="margin-top:20px;">⚡ Encerrar Treino</button>
@@ -325,26 +336,45 @@
 
       treinoContainer.appendChild(div);
 
+      document.querySelectorAll(".input-reps").forEach(input => {
+        input.addEventListener("input", (e) => {
+          const idx = e.target.dataset.serie;
+          dadosPreenchidos[chaveGrupo][idx].repeticoes = e.target.value;
+        });
+      });
+
+      document.querySelectorAll(".input-carga").forEach(input => {
+        input.addEventListener("input", (e) => {
+          const idx = e.target.dataset.serie;
+          dadosPreenchidos[chaveGrupo][idx].carga = e.target.value;
+        });
+      });
+
       document.querySelectorAll(".check-serie").forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked) {
-            const timerEl = checkbox.nextElementSibling;
+        checkbox.addEventListener("change", (e) => {
+          const idx = e.target.dataset.serie;
+          const timerEl = e.target.nextElementSibling;
+          if (e.target.checked) {
             timerEl.classList.remove("hidden");
-            iniciarCronometro(timerEl);
+            iniciarCronometro(timerEl, chaveGrupo, idx);
+            dadosPreenchidos[chaveGrupo][idx].check = true;
+          } else {
+            timerEl.classList.add("hidden");
+            dadosPreenchidos[chaveGrupo][idx].check = false;
+            dadosPreenchidos[chaveGrupo][idx].tempo = "00:00";
+            timerEl.textContent = "00:00";
           }
         });
       });
 
-      document.getElementById("pularBtn").addEventListener("click", () => {
-        if (atual + 1 < grupos.length) {
-          atual++;
+      document.getElementById("anteriorBtn").addEventListener("click", () => {
+        if (atual > 0) {
+          atual--;
           exibirExercicio(atual);
-        } else {
-          encerrarTreino();
         }
       });
 
-      document.getElementById("completarBtn").addEventListener("click", () => {
+      document.getElementById("proximoBtn").addEventListener("click", () => {
         if (atual + 1 < grupos.length) {
           atual++;
           exibirExercicio(atual);
@@ -364,13 +394,16 @@
       iniciarBtn.disabled = false;
     }
 
-    function iniciarCronometro(el) {
-      let segundos = 0;
+    function iniciarCronometro(el, chave, idx) {
+      let [min, sec] = el.textContent.split(":").map(Number);
+      let segundos = min * 60 + sec;
+
       const interval = setInterval(() => {
         segundos++;
-        const min = Math.floor(segundos / 60).toString().padStart(2, '0');
-        const sec = (segundos % 60).toString().padStart(2, '0');
-        el.textContent = `${min}:${sec}`;
+        const minStr = Math.floor(segundos / 60).toString().padStart(2, '0');
+        const secStr = (segundos % 60).toString().padStart(2, '0');
+        el.textContent = `${minStr}:${secStr}`;
+        dadosPreenchidos[chave][idx].tempo = `${minStr}:${secStr}`;
       }, 1000);
 
       el.addEventListener('dblclick', () => {
