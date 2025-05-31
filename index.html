@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cadastro de Treinos</title>
+  <meta charset="UTF-8">
+  <title>Cadastrar Treino</title>
   <style>
     * {
       box-sizing: border-box;
@@ -16,43 +15,6 @@
       color: #333;
       display: flex;
       min-height: 100vh;
-      flex-direction: column;
-    }
-
-    .navbar {
-      background: #34495e;
-      color: #ecf0f1;
-      width: 220px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      position: fixed;
-    }
-
-    .navbar h2 {
-      margin: 0 0 40px;
-      font-weight: 700;
-      font-size: 1.8rem;
-      text-align: center;
-    }
-
-    .navbar a {
-      color: #bdc3c7;
-      text-decoration: none;
-      padding: 12px 20px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      transition: background 0.3s, color 0.3s;
-      font-weight: 600;
-      display: block;
-      position: relative;
-    }
-
-    .navbar a:hover,
-    .navbar a.active {
-      background: #2980b9;
-      color: white;
     }
 
     .main-content {
@@ -62,388 +24,205 @@
       max-width: 100%;
     }
 
-    form {
-      background: white;
-      padding: 30px 40px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.08);
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
-    form h1 {
+    h1 {
+      text-align: center;
       margin-bottom: 30px;
       font-weight: 700;
       color: #2c3e50;
-      text-align: center;
     }
 
-    .form-row {
-      display: flex;
-      gap: 20px;
-      margin-bottom: 25px;
-    }
-
-    .form-row > div {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+    form {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.07);
+      max-width: 600px;
+      margin: 0 auto;
     }
 
     label {
-      font-weight: 600;
+      display: block;
       margin-bottom: 8px;
+      font-weight: 600;
       color: #34495e;
     }
 
-    input[type="text"],
-    input[type="number"],
-    select {
-      padding: 10px 14px;
-      border: 1.8px solid #ccc;
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
       border-radius: 6px;
       font-size: 1rem;
-      transition: border-color 0.3s;
     }
 
-    input:focus,
-    select:focus {
-      border-color: #2980b9;
-      outline: none;
-    }
-
-    .group-container {
+    .grupo {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
       margin-bottom: 20px;
     }
 
-    .group-container h3 {
-      margin-bottom: 15px;
-      font-weight: 700;
-      color: #34495e;
-      border-bottom: 2px solid #2980b9;
-      padding-bottom: 6px;
+    .grupo h3 {
+      margin-top: 0;
+      color: #2980b9;
     }
 
-    .group-row {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      background: #f0f4f7;
-      padding: 12px 15px;
-      border-radius: 8px;
-    }
-
-    .group-row > div {
-      flex: 1 1 150px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .group-row button.remove-group {
-      background: #e74c3c;
+    button {
+      background: #2980b9;
       color: white;
       border: none;
-      padding: 4px 10px;
+      padding: 10px 18px;
       border-radius: 6px;
+      font-size: 1rem;
       cursor: pointer;
-      height: 32px;
-      align-self: flex-start;
-      font-size: 1.2rem;
-      line-height: 1;
-      transition: background 0.3s;
-    }
-
-    .group-row button.remove-group:hover {
-      background: #c0392b;
-    }
-
-    button.add-group {
-      background: #27ae60;
-      color: white;
-      border: none;
-      font-size: 1.5rem;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-bottom: 25px;
-      transition: background 0.3s;
-      display: block;
-      margin-left: auto;
-      width: 50px;
-      height: 50px;
       font-weight: 700;
+      transition: background 0.3s;
     }
 
-    button.add-group:hover {
+    button:hover {
+      background: #1f6391;
+    }
+
+    #add-grupo {
+      background: #27ae60;
+      margin-bottom: 20px;
+    }
+
+    #add-grupo:hover {
       background: #219150;
     }
 
-    .buttons {
-      display: flex;
-      gap: 20px;
-      justify-content: center;
-    }
-
-    button.save,
-    button.cancel {
-      padding: 12px 30px;
-      font-weight: 700;
-      font-size: 1.1rem;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: background 0.3s;
-      width: 140px;
-    }
-
-    button.save {
-      background: #2980b9;
-      color: white;
-    }
-
-    button.save:hover {
-      background: #216ba0;
-    }
-
-    button.cancel {
-      background: #bdc3c7;
-      color: #2c3e50;
-    }
-
-    button.cancel:hover {
-      background: #a6aeb8;
-    }
-
-    /* Responsivo */
     @media (max-width: 768px) {
-      .navbar {
-        width: 60px;
-        padding: 20px 5px;
-      }
-
-      .navbar h2 {
-        display: none;
-      }
-
-      .navbar a {
-        padding: 12px 8px;
-        font-size: 0;
-      }
-
       .main-content {
         margin-left: 60px;
         padding: 20px 15px;
       }
-
-      form {
-        padding: 20px 25px;
-      }
-
-      .form-row {
-        flex-direction: column;
-      }
-
-      .group-row {
-        flex-direction: column;
-      }
-
-      .group-row > div {
-        width: 100%;
-      }
-
-      .group-row button.remove-group {
-        align-self: flex-end;
-        margin-top: 10px;
-      }
-
-      .buttons {
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      button.save,
-      button.cancel {
-        width: 100%;
-      }
     }
 
     @media (max-width: 480px) {
-      .navbar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 10px 0;
-      }
-
       .main-content {
         margin-left: 0;
         padding: 15px 10px;
       }
 
-      form {
-        padding: 15px;
-      }
-
       h1 {
-        font-size: 1.4rem;
-      }
-
-      .group-container h3 {
-        font-size: 1.1rem;
-      }
-
-      input,
-      select {
-        font-size: 0.95rem;
-      }
-
-      .navbar a {
-        font-size: 0.85rem;
-        padding: 10px;
+        font-size: 1.5rem;
       }
     }
   </style>
 </head>
 <body>
-  <nav class="navbar">
-    <h2>Academia</h2>
-    <a href="index.html" class="active" data-tooltip="Cadastro">Cadastro</a>
-    <a href="visualizar.html" data-tooltip="Visualizar Treinos">Visualizar</a>
-    <a href="treino.html" data-tooltip="Treino">Treino</a>
-  </nav>
 
-  <main class="main-content">
-    <form id="form-treino">
-      <h1>Cadastro de Treinos</h1>
+<div id="navbar-container"></div>
 
-      <div class="form-row">
-        <div>
-          <label for="usuario">Usuário</label>
-          <input type="text" id="usuario" placeholder="Nome do usuário" required />
-        </div>
-        <div>
-          <label for="tipo-treino">Tipo de Treino</label>
-          <select id="tipo-treino" required>
-            <option value="" disabled selected>Selecione o tipo</option>
-            <option value="Peito">Peito</option>
-            <option value="Costas">Costas</option>
-            <option value="Pernas">Pernas</option>
-            <option value="Braços">Braços</option>
-            <option value="Inferior">Inferior</option>
-          </select>
-        </div>
-      </div>
+<main class="main-content">
+  <h1>Cadastrar Treino</h1>
+  <form id="treino-form">
+    <label for="usuario">Usuário</label>
+    <select id="usuario" required>
+      <option value="">Selecione um usuário</option>
+      <option value="Ana">Ana</option>
+      <option value="Bruno">Bruno</option>
+      <option value="Carlos">Carlos</option>
+      <option value="Mariana">Mariana</option>
+      <option value="Outro">Outro</option>
+    </select>
 
-      <div id="grupos-container" class="group-container">
-        <h3>Grupos de Exercícios</h3>
-      </div>
+    <label for="tipoTreino">Tipo de Treino</label>
+    <input type="text" id="tipoTreino" required>
 
-      <button type="button" class="add-group" aria-label="Adicionar grupo">+</button>
+    <div id="grupos-container"></div>
 
-      <div class="buttons">
-        <button type="submit" class="save">Salvar Treino</button>
-        <button type="button" class="cancel">Cancelar</button>
-      </div>
-    </form>
-  </main>
+    <button type="button" id="add-grupo">Adicionar Grupo Muscular</button>
+    <button type="submit">Salvar Treino</button>
+  </form>
+</main>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-      authDomain: "academia-bd-9d4da.firebaseapp.com",
-      projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.appspot.com",
-      messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+    authDomain: "academia-bd-9d4da.firebaseapp.com",
+    projectId: "academia-bd-9d4da",
+    storageBucket: "academia-bd-9d4da.appspot.com",
+    messagingSenderId: "201289997890",
+    appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    const form = document.getElementById("form-treino");
-    const gruposContainer = document.getElementById("grupos-container");
-    const addGroupBtn = document.querySelector(".add-group");
-    const cancelBtn = document.querySelector(".cancel");
+  const form = document.getElementById('treino-form');
+  const gruposContainer = document.getElementById('grupos-container');
+  const addGrupoBtn = document.getElementById('add-grupo');
 
-    function criarGrupo() {
-      const div = document.createElement("div");
-      div.classList.add("group-row");
+  function criarGrupo() {
+    const grupoDiv = document.createElement('div');
+    grupoDiv.classList.add('grupo');
 
-      div.innerHTML = `
-        <div>
-          <label>Grupo Específico</label>
-          <input type="text" name="grupo" placeholder="Nome do grupo" required />
-        </div>
-        <div>
-          <label>Série</label>
-          <input type="number" name="serie" min="1" placeholder="Série" required />
-        </div>
-        <div>
-          <label>Repetição</label>
-          <input type="number" name="repeticao" min="1" placeholder="Repetição" required />
-        </div>
-        <button type="button" class="remove-group" title="Remover grupo">×</button>
-      `;
+    grupoDiv.innerHTML = `
+      <h3>Grupo Muscular</h3>
+      <label>Nome do Grupo</label>
+      <input type="text" class="grupo-nome" required>
+      <label>Séries</label>
+      <input type="number" class="grupo-serie" required>
+      <label>Repetições</label>
+      <input type="number" class="grupo-repeticao" required>
+      <button type="button" onclick="this.parentElement.remove()">Remover</button>
+    `;
 
-      div.querySelector(".remove-group").addEventListener("click", () => div.remove());
-      gruposContainer.appendChild(div);
-    }
+    gruposContainer.appendChild(grupoDiv);
+  }
 
-    criarGrupo();
+  addGrupoBtn.addEventListener('click', criarGrupo);
 
-    addGroupBtn.addEventListener("click", criarGrupo);
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    cancelBtn.addEventListener("click", () => {
+    const usuario = document.getElementById('usuario').value;
+    const tipoTreino = document.getElementById('tipoTreino').value;
+
+    const grupos = Array.from(document.querySelectorAll('.grupo')).map(grupo => ({
+      grupo: grupo.querySelector('.grupo-nome').value,
+      serie: grupo.querySelector('.grupo-serie').value,
+      repeticao: grupo.querySelector('.grupo-repeticao').value,
+    }));
+
+    try {
+      await addDoc(collection(db, "treinos"), {
+        usuario,
+        tipoTreino,
+        grupos
+      });
+
+      alert('Treino cadastrado com sucesso!');
       form.reset();
-      gruposContainer.innerHTML = "";
-      criarGrupo();
-    });
+      gruposContainer.innerHTML = '';
+    } catch (error) {
+      alert('Erro ao cadastrar treino: ' + error.message);
+    }
+  });
+</script>
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const usuario = form.usuario.value.trim();
-      const tipoTreino = form["tipo-treino"].value;
-      const grupos = [];
-      const gruposRows = gruposContainer.querySelectorAll(".group-row");
+<script>
+  async function loadNavbar() {
+    const response = await fetch('navbar.html');
+    const navbarHTML = await response.text();
+    document.getElementById('navbar-container').innerHTML = navbarHTML;
 
-      for (const row of gruposRows) {
-        const grupo = row.querySelector('input[name="grupo"]').value.trim();
-        const serie = row.querySelector('input[name="serie"]').value.trim();
-        const repeticao = row.querySelector('input[name="repeticao"]').value.trim();
-        if (!grupo || !serie || !repeticao) {
-          alert("Preencha todos os campos dos grupos!");
-          return;
-        }
-        grupos.push({ grupo, serie: Number(serie), repeticao: Number(repeticao) });
-      }
-
-      if (!usuario || !tipoTreino) {
-        alert("Preencha usuário e tipo de treino!");
-        return;
-      }
-
-      try {
-        await addDoc(collection(db, "treinos"), {
-          usuario,
-          tipoTreino,
-          grupos,
-          criadoEm: new Date()
-        });
-        alert("Treino salvo com sucesso!");
-        form.reset();
-        gruposContainer.innerHTML = "";
-        criarGrupo();
-      } catch (error) {
-        alert("Erro ao salvar treino: " + error.message);
+    const path = window.location.pathname.split('/').pop();
+    const links = document.querySelectorAll('.navbar a');
+    links.forEach(link => {
+      if (link.getAttribute('href') === path) {
+        link.classList.add('active');
       }
     });
-  </script>
+  }
+  loadNavbar();
+</script>
+
 </body>
 </html>
