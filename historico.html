@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Histórico de Treinos</title>
   <style>
     * {
@@ -14,8 +14,8 @@
       margin: 0;
       background: #f7f9fc;
       color: #333;
-      display: flex;
       min-height: 100vh;
+      display: flex;
       flex-direction: column;
     }
 
@@ -60,10 +60,11 @@
       color: white;
     }
 
-    .main-content {
+    main {
       padding: 100px 30px 40px;
       flex: 1;
-      max-width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     h1 {
@@ -75,79 +76,29 @@
 
     .card {
       background: white;
-      color: #333;
-      margin: 20px auto;
       padding: 20px;
-      max-width: 600px;
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
     }
 
-    .card h3 {
+    .card h2 {
       margin-top: 0;
-    }
-
-    .btn-ver {
-      background: #2980b9;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.3s;
-      font-weight: 600;
-    }
-
-    .btn-ver:hover {
-      background: #2471a3;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.6);
-    }
-
-    .modal-content {
-      background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 90%;
-      max-width: 600px;
-      border-radius: 16px;
-      position: relative;
-    }
-
-    .close {
-      color: #aaa;
-      position: absolute;
-      top: 10px;
-      right: 20px;
-      font-size: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .close:hover {
-      color: #000;
-    }
-
-    .exercicio {
+      color: #2c3e50;
+      font-size: 1.4rem;
       margin-bottom: 10px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #ddd;
+    }
+
+    .card p {
+      margin: 6px 0;
+      color: #555;
     }
 
     @media (max-width: 768px) {
+      main {
+        padding: 120px 20px 40px;
+      }
+
       .navbar {
         flex-direction: column;
         align-items: flex-start;
@@ -159,10 +110,6 @@
         width: 100%;
         gap: 10px;
         margin-top: 10px;
-      }
-
-      .main-content {
-        padding: 120px 20px 40px;
       }
     }
 
@@ -189,22 +136,17 @@
     </div>
   </nav>
 
-  <main class="main-content">
+  <main>
     <h1>Histórico de Treinos</h1>
-    <div id="historicoContainer"></div>
-  </main>
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <div id="modalBody"></div>
+    <div id="historicoContainer">
+      <p>Carregando histórico...</p>
     </div>
-  </div>
+  </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
@@ -212,80 +154,42 @@
       projectId: "academia-bd-9d4da",
       storageBucket: "academia-bd-9d4da.appspot.com",
       messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:19bece6aa0b3d52e3417db"
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const historicoContainer = document.getElementById("historicoContainer");
-    const modal = document.getElementById("modal");
-    const modalBody = document.getElementById("modalBody");
-    const closeBtn = document.querySelector(".close");
+    const historicoContainer = document.getElementById('historicoContainer');
 
-    async function carregarUltimoTreino() {
-      const treinosRef = collection(db, "treinos");
-      // Ordenar pelo campo dataHora (timestamp) desc e pegar o último
-      const q = query(treinosRef, orderBy("dataHora", "desc"), limit(1));
-      const snapshot = await getDocs(q);
+    async function carregarHistorico() {
+      historicoContainer.innerHTML = "<p>Carregando histórico...</p>";
+      const snapshot = await getDocs(collection(db, "treinos"));
 
       if (snapshot.empty) {
-        historicoContainer.innerHTML = "<p>Nenhum treino finalizado encontrado.</p>";
+        historicoContainer.innerHTML = "<p>Nenhum treino encontrado.</p>";
         return;
       }
 
+      historicoContainer.innerHTML = "";
+
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
-        const div = document.createElement("div");
-        div.className = "card";
+        const card = document.createElement('div');
+        card.className = "card";
 
-        const dataHora = data.dataHora?.toDate ? data.dataHora.toDate() : new Date();
-        const dataFormatada = `${dataHora.getDate().toString().padStart(2,'0')}/${(dataHora.getMonth()+1).toString().padStart(2,'0')}/${dataHora.getFullYear()}`;
-        const horaFormatada = `${dataHora.getHours().toString().padStart(2,'0')}:${dataHora.getMinutes().toString().padStart(2,'0')}`;
-
-        div.innerHTML = `
-          <h3>${data.tipoTreino}</h3>
-          <p><strong>Usuário:</strong> ${data.usuario}</p>
-          <p><strong>Data:</strong> ${dataFormatada} - <strong>Hora:</strong> ${horaFormatada}</p>
-          <button class="btn-ver">Ver treino completo</button>
+        card.innerHTML = `
+          <h2>${data.usuario} - ${data.tipoTreino}</h2>
+          <p><strong>Data:</strong> ${data.dataTreino || "Não informado"}</p>
+          <p><strong>Grupos:</strong> ${data.grupos ? data.grupos.length : 0}</p>
+          <p><strong>Observações:</strong> ${data.observacoes || "-"}</p>
         `;
 
-        const btnVer = div.querySelector(".btn-ver");
-        btnVer.addEventListener("click", () => abrirModal(data));
-
-        historicoContainer.appendChild(div);
+        historicoContainer.appendChild(card);
       });
     }
 
-    carregarUltimoTreino();
-
-    function abrirModal(data) {
-      modalBody.innerHTML = `
-        <h2>${data.tipoTreino}</h2>
-        <p><strong>Usuário:</strong> ${data.usuario}</p>
-        ${data.grupos.map(grupo => `
-          <div class="exercicio">
-            <h4>Exercício: ${grupo.grupo}</h4>
-            <p>
-              <strong>Séries:</strong> ${grupo.serie} |
-              <strong>Repetições:</strong> ${grupo.repeticao} |
-              <strong>Carga:</strong> ${grupo.carga ?? 'Não informado'} kg
-            </p>
-          </div>
-        `).join('')}
-      `;
-      modal.style.display = "block";
-    }
-
-    closeBtn.onclick = function() {
-      modal.style.display = "none";
-    }
-
-    window.onclick = function(event) {
-      if (event.target == modal) {
-        modal.style.display = "none";
-      }
-    }
+    carregarHistorico();
   </script>
 
 </body>
