@@ -1,222 +1,190 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Treino</title>
   <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #2c2c2c;
-      color: #fff;
       margin: 0;
-      padding: 0;
-    }
-
-    .card {
-      background: #fff;
+      background: #f7f9fc;
       color: #333;
-      margin: 80px auto 20px;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background: #34495e;
+      color: #ecf0f1;
+      width: 220px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
       padding: 20px;
-      max-width: 400px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      position: fixed;
     }
 
-    .atividade-header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .atividade-header span {
-      font-size: 1rem;
-      font-weight: bold;
-      color: #8e44ad;
-    }
-
-    .atividade-header h2 {
+    .navbar h2 {
+      margin: 0 0 40px;
+      font-weight: 700;
       font-size: 1.8rem;
-      margin: 5px 0;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 12px 20px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+      display: block;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px 30px;
+      flex: 1;
+      max-width: 100%;
+    }
+
+    .exercise-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .exercise-card h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
       color: #2c3e50;
     }
 
-    .atividade-header p {
-      color: #7f8c8d;
-      font-style: italic;
+    .exercise-card p {
+      font-size: 1.1rem;
+      margin: 8px 0;
     }
 
-    .series div {
-      margin-bottom: 15px;
-    }
-
-    .series input[type="number"] {
-      width: 60px;
-      padding: 5px;
-      margin-right: 5px;
-    }
-
-    .check-serie {
-      margin-left: 5px;
-    }
-
-    .cronometro-serie {
-      font-size: 0.9rem;
-      color: #e67e22;
-      margin-left: 10px;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .botoes-controle {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 30px;
-    }
-
-    .botao-pular, .botao-completar {
-      flex: 1;
-      margin: 0 5px;
-      padding: 12px;
+    .exercise-card input {
+      margin-top: 10px;
+      padding: 8px 12px;
       font-size: 1rem;
-      border-radius: 8px;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      width: 80px;
+      text-align: center;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .buttons button {
+      padding: 12px 24px;
+      font-weight: 600;
+      font-size: 1rem;
       border: none;
-      font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background 0.3s;
     }
 
-    .botao-pular {
-      background: #8e44ad;
+    .complete {
+      background: #27ae60;
       color: white;
     }
 
-    .botao-completar {
-      background: #2ecc71;
+    .complete:hover {
+      background: #1f8b4d;
+    }
+
+    .skip {
+      background: #f39c12;
       color: white;
     }
 
-    .botao-encerrar {
-      position: fixed;
-      top: 20px;
-      right: 20px;
+    .skip:hover {
+      background: #d78b0e;
+    }
+
+    .end {
+      background: #e74c3c;
+      color: white;
+    }
+
+    .end:hover {
       background: #c0392b;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      z-index: 100;
     }
 
-    .botao-encerrar:hover {
-      background: #922b21;
+    @media(max-width: 768px) {
+      .navbar {
+        width: 60px;
+        padding: 20px 5px;
+      }
+
+      .navbar h2 {
+        display: none;
+      }
+
+      .navbar a {
+        padding: 12px 8px;
+        font-size: 0;
+      }
+
+      .main-content {
+        margin-left: 60px;
+        padding: 20px;
+      }
+
+      .exercise-card {
+        padding: 20px;
+      }
     }
   </style>
 </head>
 <body>
+  <nav class="navbar">
+    <h2>Academia</h2>
+    <a href="index.html">Cadastro</a>
+    <a href="visualizar.html">Visualizar</a>
+    <a href="treino.html" class="active">Treino</a>
+  </nav>
 
-  <button id="encerrarBtn" class="botao-encerrar">⚡ Encerrar Treino</button>
+  <main class="main-content">
+    <div class="exercise-card">
+      <h2>Agachamento</h2>
+      <p><strong>Série:</strong> 3</p>
+      <p><strong>Repetições:</strong> 12</p>
 
-  <div id="treinoContainer"></div>
+      <div style="margin-top: 20px;">
+        <label for="carga"><strong>Carga (kg):</strong></label><br>
+        <input type="number" id="carga" placeholder="Kg" />
+      </div>
 
-  <script>
-    const treinoContainer = document.getElementById("treinoContainer");
-
-    const exercicios = [
-      {
-        grupo: "Abdominal",
-        nome: "Canivete",
-        descricao: "Com remador (sem encostar os pés no chão)",
-        serie: 3,
-        repeticao: 20
-      },
-      {
-        grupo: "Peito",
-        nome: "Supino reto",
-        descricao: "Com barra",
-        serie: 3,
-        repeticao: 12
-      }
-    ];
-
-    let atual = 0;
-
-    function exibirExercicio(index) {
-      const grupo = exercicios[index];
-      treinoContainer.innerHTML = "";
-
-      const div = document.createElement("div");
-      div.className = "card";
-      div.innerHTML = `
-        <div class="atividade-header">
-          <span>${grupo.grupo}</span>
-          <h2>${grupo.nome}</h2>
-          <p>${grupo.descricao}</p>
-        </div>
-
-        <div class="series">
-          ${Array.from({ length: grupo.serie }).map((_, i) => `
-            <div>
-              <label>Série ${i + 1}</label><br/>
-              <input type="number" placeholder="Reps" value="${grupo.repeticao}">
-              <input type="number" placeholder="Carga (kg)">
-              <input type="checkbox" class="check-serie"> ✔
-              <span class="cronometro-serie hidden">00:00</span>
-            </div>
-          `).join('')}
-        </div>
-
-        <div class="botoes-controle">
-          <button id="pularBtn" class="botao-pular">❌ Pular</button>
-          <button id="completarBtn" class="botao-completar">✅ Completar atividade</button>
-        </div>
-      `;
-
-      treinoContainer.appendChild(div);
-
-      document.querySelectorAll(".check-serie").forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked) {
-            const timerEl = checkbox.nextElementSibling;
-            timerEl.classList.remove("hidden");
-            iniciarCronometro(timerEl);
-          }
-        });
-      });
-
-      document.getElementById("pularBtn").onclick = () => proximoExercicio();
-      document.getElementById("completarBtn").onclick = () => proximoExercicio();
-    }
-
-    function iniciarCronometro(el) {
-      let segundos = 0;
-      const timer = setInterval(() => {
-        segundos++;
-        const min = String(Math.floor(segundos / 60)).padStart(2, "0");
-        const sec = String(segundos % 60).padStart(2, "0");
-        el.textContent = `${min}:${sec}`;
-      }, 1000);
-    }
-
-    function proximoExercicio() {
-      atual++;
-      if (atual < exercicios.length) {
-        exibirExercicio(atual);
-      } else {
-        treinoContainer.innerHTML = "<div class='card'><h2>✅ Parabéns! Treino completo 💪</h2></div>";
-      }
-    }
-
-    document.getElementById("encerrarBtn").addEventListener("click", () => {
-      if (confirm("Deseja realmente encerrar o treino?")) {
-        treinoContainer.innerHTML = "<div class='card'><h2>⚡ Treino encerrado.</h2></div>";
-      }
-    });
-
-    // Inicializa primeiro exercício
-    exibirExercicio(atual);
-  </script>
+      <div class="buttons">
+        <button class="complete">Completar</button>
+        <button class="skip">Pular</button>
+        <button class="end">Encerrar</button>
+      </div>
+    </div>
+  </main>
 </body>
 </html>
