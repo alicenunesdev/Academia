@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Histórico de Treinos</title>
+  <title>Iniciar Treino</title>
   <style>
-    /* --- seu CSS original --- */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -41,6 +40,23 @@
       font-size: 1.6rem;
     }
 
+    /* Botão hamburguer */
+    .hamburguer {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      width: 25px;
+      height: 20px;
+      justify-content: space-between;
+    }
+
+    .hamburguer span {
+      display: block;
+      height: 3px;
+      background: #ecf0f1;
+      border-radius: 2px;
+    }
+
     .navbar-links {
       display: flex;
       gap: 20px;
@@ -61,7 +77,7 @@
       color: white;
     }
 
-    main {
+    .main-content {
       padding: 100px 30px 40px;
       flex: 1;
       max-width: 100%;
@@ -74,223 +90,154 @@
       color: #2c3e50;
     }
 
-    .historico-lista {
-      max-width: 600px;
-      margin: 0 auto;
+    .card {
       background: white;
-      border-radius: 12px;
+      color: #333;
+      margin: 20px auto;
       padding: 20px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-    }
-
-    .item-historico {
-      border-bottom: 1px solid #ddd;
-      padding: 10px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .item-historico:last-child {
-      border-bottom: none;
-    }
-
-    .item-historico h3 {
-      margin: 0 0 8px 0;
-      color: #34495e;
-      flex: 1 1 auto;
-    }
-
-    .info-data {
-      font-size: 0.9rem;
-      color: #555;
-      margin-bottom: 8px;
-      flex: 1 1 150px;
-    }
-
-    .btn-vermais,
-    .btn-excluir {
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s;
-      flex-shrink: 0;
-    }
-
-    .btn-vermais {
-      background: #2980b9;
-      color: white;
-    }
-
-    .btn-vermais:hover {
-      background: #2471a3;
-    }
-
-    .btn-excluir {
-      background: #e74c3c;
-      color: white;
-    }
-
-    .btn-excluir:hover {
-      background: #c0392b;
-    }
-
-    .btn-voltar {
-      display: block;
-      width: 120px;
-      margin: 30px auto 0;
-      padding: 10px;
-      background: #2980b9;
-      color: white;
-      text-align: center;
-      font-weight: 600;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: background 0.3s;
-    }
-
-    .btn-voltar:hover {
-      background: #2471a3;
-    }
-
-    /* Modal */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 2000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.6);
-    }
-
-    .modal-content {
-      background-color: #fff;
-      margin: 8% auto;
-      padding: 20px;
-      border-radius: 12px;
-      width: 90%;
       max-width: 500px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-      animation: fadeIn 0.3s;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(-20px);}
-      to {opacity: 1; transform: translateY(0);}
+    .atividade-header {
+      text-align: center;
+      margin-bottom: 20px;
     }
 
-    .modal-header {
+    .atividade-header h2 {
+      font-size: 1.8rem;
+      color: #2c3e50;
+    }
+
+    .series div {
+      margin-bottom: 15px;
+    }
+
+    .series input[type="number"] {
+      width: 60px;
+      padding: 5px;
+      margin-right: 5px;
+    }
+
+    .check-serie {
+      margin-left: 5px;
+    }
+
+    .cronometro-serie {
+      font-size: 0.9rem;
+      color: #e67e22;
+      margin-left: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .botoes-controle {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      margin-top: 30px;
     }
 
-    .modal-header h2 {
-      margin: 0;
-      color: #34495e;
-    }
-
-    .close {
-      color: #aaa;
-      font-size: 28px;
+    .botao-pular, .botao-completar, .botao-encerrar {
+      flex: 1;
+      margin: 0 5px;
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
       font-weight: bold;
       cursor: pointer;
     }
 
-    .close:hover {
-      color: #333;
+    .botao-pular {
+      background: #8e44ad;
+      color: white;
     }
 
-    .modal-body {
+    .botao-completar {
+      background: #2ecc71;
+      color: white;
+    }
+
+    .botao-encerrar {
+      background: #c0392b;
+      color: white;
+    }
+
+    .botao-encerrar:hover {
+      background: #922b21;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
       margin-top: 10px;
-    }
-
-    .grupo {
-      margin-bottom: 15px;
-    }
-
-    .grupo h4 {
-      margin: 5px 0;
-      color: #2c3e50;
-    }
-
-    .grupo ul {
-      list-style: none;
-      padding-left: 0;
-    }
-
-    .grupo li {
-      background: #f2f2f2;
-      padding: 6px 10px;
       border-radius: 6px;
-      margin-bottom: 6px;
-      font-size: 0.9rem;
+      border: 1px solid #ccc;
+      font-size: 1rem;
     }
 
-    /* Hamburger */
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
+    button {
+      background: #2980b9;
+      color: white;
+      font-weight: 700;
       cursor: pointer;
-      width: 25px;
-      height: 20px;
-      justify-content: space-between;
+      transition: background 0.3s;
     }
 
-    .menu-toggle span {
-      display: block;
-      height: 3px;
-      background: #ecf0f1;
-      border-radius: 3px;
-      transition: 0.3s;
+    button:hover {
+      background: #2471a3;
     }
+
+    /* RESPONSIVO */
 
     @media (max-width: 768px) {
-      main {
-        padding: 120px 20px 40px;
+      .navbar {
+        flex-direction: row;
+        align-items: center;
+        padding: 10px 20px;
       }
-      .historico-lista {
-        width: 100%;
-        padding: 15px;
-        box-shadow: none;
-        border-radius: 0;
+
+      .hamburguer {
+        display: flex;
       }
 
       .navbar-links {
-        display: none;
-        flex-direction: column;
-        width: 100%;
-        background: #34495e;
         position: absolute;
         top: 60px;
         left: 0;
-        padding: 10px 0;
-        border-radius: 0 0 8px 8px;
+        right: 0;
+        background: #2c3e50;
+        flex-direction: column;
+        width: 100%;
+        gap: 0;
+        display: none;
+        border-top: 1px solid #34495e;
       }
 
-      .navbar-links.show {
+      .navbar-links.open {
         display: flex;
       }
 
       .navbar-links a {
-        padding: 12px 20px;
-        border-radius: 0;
-        border-bottom: 1px solid #2c3e50;
+        padding: 15px 20px;
+        border-bottom: 1px solid #34495e;
       }
 
-      .navbar-links a:last-child {
-        border-bottom: none;
+      .main-content {
+        padding: 120px 20px 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar h2 {
+        font-size: 1.4rem;
       }
 
-      .menu-toggle {
-        display: flex;
+      .navbar a {
+        font-size: 0.9rem;
       }
     }
   </style>
@@ -299,43 +246,47 @@
 
   <nav class="navbar">
     <h2>Academia</h2>
-    <div class="menu-toggle" id="menuToggle" tabindex="0" aria-label="Abrir menu">
+
+    <div class="hamburguer" id="hamburguer">
       <span></span>
       <span></span>
       <span></span>
     </div>
+
     <div class="navbar-links" id="navbarLinks">
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
-      <a href="treino.html">Treino</a>
-      <a href="historico.html" class="active">Histórico</a>
+      <a href="treino.html" class="active">Treino</a>
+      <a href="historico.html">Historico</a>
     </div>
   </nav>
 
-  <main>
-    <h1>Histórico de Treinos</h1>
-    <div class="historico-lista" id="historicoLista">
-      Carregando histórico...
+  <main class="main-content">
+    <h1>Iniciar Treino</h1>
+
+    <div class="card">
+      <label for="treinoSelect">Selecione um treino:</label>
+      <select id="treinoSelect">
+        <option value="">Carregando...</option>
+      </select>
+      <button id="iniciarBtn">Iniciar Treino</button>
     </div>
 
-    <a href="treino.html" class="btn-voltar">Voltar ao Treino</a>
+    <div id="treinoContainer"></div>
   </main>
 
-  <!-- Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle">Detalhes do Treino</h2>
-        <span class="close" id="closeModal">&times;</span>
-      </div>
-      <div class="modal-body" id="modalBody">
-      </div>
-    </div>
-  </div>
+  <script>
+    const hamburguer = document.getElementById("hamburguer");
+    const navbarLinks = document.getElementById("navbarLinks");
+
+    hamburguer.addEventListener("click", () => {
+      navbarLinks.classList.toggle("open");
+    });
+  </script>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
@@ -343,7 +294,7 @@
       authDomain: "academia-bd-9d4da.firebaseapp.com",
       databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
       projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.appspot.com",
+      storageBucket: "academia-bd-9d4da.firebasestorage.app",
       messagingSenderId: "201289997890",
       appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
       measurementId: "G-3J2FY1DEGW"
@@ -353,117 +304,187 @@
     const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
-    const historicoLista = document.getElementById("historicoLista");
-    const modal = document.getElementById("modal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalBody = document.getElementById("modalBody");
-    const closeModal = document.getElementById("closeModal");
+    const treinoSelect = document.getElementById("treinoSelect");
+    const iniciarBtn = document.getElementById("iniciarBtn");
+    const treinoContainer = document.getElementById("treinoContainer");
 
-    closeModal.onclick = () => modal.style.display = "none";
-    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
+    let atual = 0;
+    let grupos = [];
+    let dadosPreenchidos = {};
 
-    // Menu toggle logic
-    const menuToggle = document.getElementById("menuToggle");
-    const navbarLinks = document.getElementById("navbarLinks");
-
-    menuToggle.addEventListener("click", () => {
-      navbarLinks.classList.toggle("show");
-    });
-
-    // Accessibility: toggle menu with Enter or Space keys
-    menuToggle.addEventListener("keydown", (e) => {
-      if(e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        navbarLinks.classList.toggle("show");
-      }
-    });
-
-    async function carregarHistorico() {
-      const snapshot = await getDocs(collection(db, "historico"));
-      historicoLista.innerHTML = "";
-
-      if (snapshot.empty) {
-        historicoLista.textContent = "Nenhum treino registrado ainda.";
-        return;
-      }
-
-      const lista = [];
+    async function carregarTreinos() {
+      const snapshot = await getDocs(collection(db, "treinos"));
+      treinoSelect.innerHTML = '<option value="">Selecione</option>';
 
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
-        lista.push({ id: docSnap.id, ...data });
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+        treinoSelect.appendChild(option);
+      });
+    }
+
+    carregarTreinos();
+
+    iniciarBtn.addEventListener("click", async () => {
+      const treinoId = treinoSelect.value;
+      if (!treinoId) {
+        alert("Selecione um treino");
+        return;
+      }
+
+      const docSnap = await getDoc(doc(db, "treinos", treinoId));
+      if (!docSnap.exists()) {
+        alert("Treino não encontrado");
+        return;
+      }
+
+      const data = docSnap.data();
+      grupos = data.grupos;
+      atual = 0;
+      dadosPreenchidos = {};
+
+      treinoSelect.disabled = true;
+      iniciarBtn.disabled = true;
+
+      exibirExercicio(atual);
+    });
+
+    function exibirExercicio(index) {
+      const grupo = grupos[index];
+      treinoContainer.innerHTML = "";
+
+      const chaveGrupo = `grupo${index}`;
+      if (!dadosPreenchidos[chaveGrupo]) {
+        dadosPreenchidos[chaveGrupo] = Array.from({ length: grupo.serie }).map(() => ({
+          repeticoes: grupo.repeticao || '',
+          carga: '',
+          check: false,
+          tempo: "00:00"
+        }));
+      }
+
+      const div = document.createElement("div");
+      div.className = "card";
+
+      div.innerHTML = `
+        <div class="atividade-header">
+          <h2>${grupo.grupo}</h2>
+        </div>
+
+        <div class="series">
+          ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
+            <div>
+              <label>Série ${i + 1}</label><br/>
+              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps">
+              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga">
+              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''}> ✔
+              <span class="cronometro-serie ${serie.check ? '' : 'hidden'}">${serie.tempo}</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="botoes-controle">
+          <button id="anteriorBtn" class="botao-pular">⬅️ Anterior</button>
+          <button id="proximoBtn" class="botao-completar">➡️ Próximo</button>
+        </div>
+
+        <button id="encerrarBtn" class="botao-encerrar" style="margin-top:20px;">⚡ Encerrar Treino</button>
+      `;
+
+      treinoContainer.appendChild(div);
+
+      document.querySelectorAll(".input-reps").forEach(input => {
+        input.addEventListener("input", (e) => {
+          const idx = e.target.dataset.serie;
+          dadosPreenchidos[chaveGrupo][idx].repeticoes = e.target.value;
+        });
       });
 
-      // Ordenar do mais recente para o mais antigo
-      lista.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-      lista.forEach(data => {
-        const div = document.createElement("div");
-        div.className = "item-historico";
-
-        const dataFormatada = new Date(data.data).toLocaleString("pt-BR", {
-          dateStyle: "short",
-          timeStyle: "short"
+      document.querySelectorAll(".input-carga").forEach(input => {
+        input.addEventListener("input", (e) => {
+          const idx = e.target.dataset.serie;
+          dadosPreenchidos[chaveGrupo][idx].carga = e.target.value;
         });
+      });
 
-        div.innerHTML = `
-          <div>
-            <h3>${data.treino}</h3>
-            <p class="info-data"><strong>Data:</strong> ${dataFormatada}</p>
-          </div>
-          <div>
-            <button class="btn-vermais" aria-label="Ver detalhes do treino ${data.treino}">Ver Mais</button>
-            <button class="btn-excluir" aria-label="Excluir treino ${data.treino}">Excluir</button>
-          </div>
-        `;
-
-        // Ver mais
-        div.querySelector(".btn-vermais").addEventListener("click", () => {
-          modalTitle.textContent = data.treino;
-          modalBody.innerHTML = gerarHTMLDetalhes(data.resultados);
-          modal.style.display = "block";
-        });
-
-        // Excluir
-        div.querySelector(".btn-excluir").addEventListener("click", async () => {
-          const confirmacao = confirm(`Tem certeza que deseja excluir o treino "${data.treino}"? Esta ação não pode ser desfeita.`);
-          if (!confirmacao) return;
-
-          try {
-            await deleteDoc(doc(db, "historico", data.id));
-            alert("Treino excluído com sucesso.");
-            carregarHistorico(); // recarrega a lista após exclusão
-          } catch (error) {
-            alert("Erro ao excluir treino: " + error.message);
+      document.querySelectorAll(".check-serie").forEach(checkbox => {
+        checkbox.addEventListener("change", (e) => {
+          const idx = e.target.dataset.serie;
+          const spanTempo = e.target.nextElementSibling;
+          if (e.target.checked) {
+            dadosPreenchidos[chaveGrupo][idx].check = true;
+            spanTempo.classList.remove("hidden");
+            startCronometro(spanTempo, idx, chaveGrupo);
+          } else {
+            dadosPreenchidos[chaveGrupo][idx].check = false;
+            spanTempo.classList.add("hidden");
+            stopCronometro(idx, chaveGrupo);
           }
         });
-
-        historicoLista.appendChild(div);
       });
+
+      document.getElementById("anteriorBtn").addEventListener("click", () => {
+        if (atual > 0) {
+          atual--;
+          exibirExercicio(atual);
+        }
+      });
+
+      document.getElementById("proximoBtn").addEventListener("click", () => {
+        if (atual < grupos.length - 1) {
+          atual++;
+          exibirExercicio(atual);
+        }
+      });
+
+      document.getElementById("encerrarBtn").addEventListener("click", finalizarTreino);
     }
 
-    function gerarHTMLDetalhes(resultados) {
-      let html = "";
-      for (const grupo in resultados) {
-        html += `<div class="grupo">
-          <h4>${grupo}</h4>
-          <ul>`;
-        resultados[grupo].forEach((item, idx) => {
-          html += `<li>
-            <strong>Exercício ${idx + 1}</strong><br>
-            Série: ${item.serie}<br>
-            Repetições: ${item.repeticao}<br>
-            Carga: ${item.carga || '-'}<br>
-            Tempo: ${item.tempo || '-'}<br>
-            Concluído: ${item.check ? '✅' : '❌'}
-          </li>`;
-        });
-        html += `</ul></div>`;
+    const cronometros = {};
+
+    function startCronometro(element, serieIndex, chaveGrupo) {
+      let seconds = 0;
+      stopCronometro(serieIndex, chaveGrupo); // Para evitar múltiplos timers
+
+      cronometros[`${chaveGrupo}-${serieIndex}`] = setInterval(() => {
+        seconds++;
+        const min = Math.floor(seconds / 60).toString().padStart(2, "0");
+        const seg = (seconds % 60).toString().padStart(2, "0");
+        element.textContent = `${min}:${seg}`;
+        dadosPreenchidos[chaveGrupo][serieIndex].tempo = element.textContent;
+      }, 1000);
+    }
+
+    function stopCronometro(serieIndex, chaveGrupo) {
+      const key = `${chaveGrupo}-${serieIndex}`;
+      if (cronometros[key]) {
+        clearInterval(cronometros[key]);
+        delete cronometros[key];
       }
-      return html;
     }
 
-    carregarHistorico();
+    async function finalizarTreino() {
+      try {
+        await setDoc(doc(db, "historico", Date.now().toString()), {
+          data: new Date().toISOString(),
+          treino: treinoSelect.options[treinoSelect.selectedIndex].text,
+          resultados: dadosPreenchidos
+        });
+
+        alert("Treino finalizado e salvo no histórico!");
+        treinoContainer.innerHTML = "";
+        treinoSelect.disabled = false;
+        iniciarBtn.disabled = false;
+        treinoSelect.value = "";
+        dadosPreenchidos = {};
+        atual = 0;
+        grupos = [];
+      } catch (error) {
+        alert("Erro ao salvar treino: " + error.message);
+      }
+    }
   </script>
 </body>
 </html>
