@@ -232,18 +232,22 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
       authDomain: "academia-bd-9d4da.firebaseapp.com",
+      databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
       projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.appspot.com",
+      storageBucket: "academia-bd-9d4da.firebasestorage.app",
       messagingSenderId: "201289997890",
       appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+      measurementId: "G-3J2FY1DEGW"
     };
 
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
     const treinoSelect = document.getElementById("treinoSelect");
@@ -319,9 +323,9 @@
           ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
             <div>
               <label>Série ${i + 1}</label><br/>
-              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps" />
-              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga" />
-              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''} /> ✔
+              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps">
+              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga">
+              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''}> ✔
               <span class="cronometro-serie ${serie.check ? '' : 'hidden'}">${serie.tempo}</span>
             </div>
           `).join('')}
@@ -337,7 +341,6 @@
 
       treinoContainer.appendChild(div);
 
-      // Eventos inputs reps
       document.querySelectorAll(".input-reps").forEach(input => {
         input.addEventListener("input", (e) => {
           const idx = e.target.dataset.serie;
@@ -345,7 +348,6 @@
         });
       });
 
-      // Eventos inputs carga
       document.querySelectorAll(".input-carga").forEach(input => {
         input.addEventListener("input", (e) => {
           const idx = e.target.dataset.serie;
@@ -353,25 +355,22 @@
         });
       });
 
-      // Eventos checkbox série e cronômetro
-      document.querySelectorAll(".check-serie").forEach((checkbox) => {
+      document.querySelectorAll(".check-serie").forEach(checkbox => {
         checkbox.addEventListener("change", (e) => {
           const idx = e.target.dataset.serie;
-          const timerEl = e.target.nextElementSibling;
+          const spanTempo = e.target.nextElementSibling;
           if (e.target.checked) {
-            timerEl.classList.remove("hidden");
-            iniciarCronometro(timerEl, chaveGrupo, idx);
             dadosPreenchidos[chaveGrupo][idx].check = true;
+            spanTempo.classList.remove("hidden");
+            startCronometro(spanTempo, idx, chaveGrupo);
           } else {
-            timerEl.classList.add("hidden");
             dadosPreenchidos[chaveGrupo][idx].check = false;
-            dadosPreenchidos[chaveGrupo][idx].tempo = "00:00";
-            timerEl.textContent = "00:00";
+            spanTempo.classList.add("hidden");
+            stopCronometro(idx, chaveGrupo);
           }
         });
       });
 
-      // Botão anterior
       document.getElementById("anteriorBtn").addEventListener("click", () => {
         if (atual > 0) {
           atual--;
@@ -379,44 +378,59 @@
         }
       });
 
-      // Botão próximo
       document.getElementById("proximoBtn").addEventListener("click", () => {
-        if (atual + 1 < grupos.length) {
+        if (atual < grupos.length - 1) {
           atual++;
           exibirExercicio(atual);
-        } else {
-          encerrarTreino();
         }
       });
 
-      // Botão encerrar treino
-      document.getElementById("encerrarBtn").addEventListener("click", () => {
-        encerrarTreino();
-      });
+      document.getElementById("encerrarBtn").addEventListener("click", finalizarTreino);
     }
 
-    function encerrarTreino() {
-      treinoContainer.innerHTML = "<h2 style='text-align:center'>🏆 Treino finalizado!</h2>";
-      treinoSelect.disabled = false;
-      iniciarBtn.disabled = false;
-    }
+    const cronometros = {};
 
-    function iniciarCronometro(el, chave, idx) {
-      let [min, sec] = el.textContent.split(":").map(Number);
-      let segundos = min * 60 + sec;
+    function startCronometro(element, serieIndex, chaveGrupo) {
+      let seconds = 0;
+      stopCronometro(serieIndex, chaveGrupo); // Para evitar múltiplos timers
 
-      const interval = setInterval(() => {
-        segundos++;
-        const minStr = Math.floor(segundos / 60).toString().padStart(2, '0');
-        const secStr = (segundos % 60).toString().padStart(2, '0');
-        el.textContent = `${minStr}:${secStr}`;
-        dadosPreenchidos[chave][idx].tempo = `${minStr}:${secStr}`;
+      cronometros[`${chaveGrupo}-${serieIndex}`] = setInterval(() => {
+        seconds++;
+        const min = Math.floor(seconds / 60).toString().padStart(2, "0");
+        const seg = (seconds % 60).toString().padStart(2, "0");
+        element.textContent = `${min}:${seg}`;
+        dadosPreenchidos[chaveGrupo][serieIndex].tempo = element.textContent;
       }, 1000);
+    }
 
-      el.addEventListener('dblclick', () => {
-        clearInterval(interval);
-        el.classList.add("hidden");
-      });
+    function stopCronometro(serieIndex, chaveGrupo) {
+      const key = `${chaveGrupo}-${serieIndex}`;
+      if (cronometros[key]) {
+        clearInterval(cronometros[key]);
+        delete cronometros[key];
+      }
+    }
+
+    async function finalizarTreino() {
+      // Salvar dados no Firestore na coleção 'historico'
+      try {
+        await setDoc(doc(db, "historico", Date.now().toString()), {
+          data: new Date().toISOString(),
+          treino: treinoSelect.options[treinoSelect.selectedIndex].text,
+          resultados: dadosPreenchidos
+        });
+
+        alert("Treino finalizado e salvo no histórico!");
+        treinoContainer.innerHTML = "";
+        treinoSelect.disabled = false;
+        iniciarBtn.disabled = false;
+        treinoSelect.value = "";
+        dadosPreenchidos = {};
+        atual = 0;
+        grupos = [];
+      } catch (error) {
+        alert("Erro ao salvar treino: " + error.message);
+      }
     }
   </script>
 </body>
