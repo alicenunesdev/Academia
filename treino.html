@@ -9,7 +9,6 @@
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body {
       margin: 0;
       background: #f7f9fc;
@@ -18,7 +17,6 @@
       min-height: 100vh;
       flex-direction: column;
     }
-
     .navbar {
       position: fixed;
       top: 0;
@@ -33,14 +31,11 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
     }
-
     .navbar h2 {
       margin: 0;
       font-weight: 700;
       font-size: 1.6rem;
     }
-
-    /* Botão hamburguer */
     .hamburguer {
       display: none;
       flex-direction: column;
@@ -49,19 +44,16 @@
       height: 20px;
       justify-content: space-between;
     }
-
     .hamburguer span {
       display: block;
       height: 3px;
       background: #ecf0f1;
       border-radius: 2px;
     }
-
     .navbar-links {
       display: flex;
       gap: 20px;
     }
-
     .navbar a {
       color: #bdc3c7;
       text-decoration: none;
@@ -70,26 +62,22 @@
       transition: background 0.3s, color 0.3s;
       font-weight: 600;
     }
-
     .navbar a:hover,
     .navbar a.active {
       background: #2980b9;
       color: white;
     }
-
     .main-content {
       padding: 100px 30px 40px;
       flex: 1;
       max-width: 100%;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 30px;
       font-weight: 700;
       color: #2c3e50;
     }
-
     .card {
       background: white;
       color: #333;
@@ -99,47 +87,41 @@
       border-radius: 16px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-
     .atividade-header {
       text-align: center;
       margin-bottom: 20px;
     }
-
     .atividade-header h2 {
       font-size: 1.8rem;
       color: #2c3e50;
     }
-
     .series div {
       margin-bottom: 15px;
     }
-
     .series input[type="number"] {
       width: 60px;
       padding: 5px;
       margin-right: 5px;
     }
-
     .check-serie {
       margin-left: 5px;
     }
-
-    .cronometro-serie {
-      font-size: 0.9rem;
-      color: #e67e22;
-      margin-left: 10px;
+    .temporizador-container {
+      margin-top: 5px;
     }
-
+    .temporizador {
+      font-size: 1rem;
+      color: #e67e22;
+      margin-right: 5px;
+    }
     .hidden {
       display: none;
     }
-
     .botoes-controle {
       display: flex;
       justify-content: space-between;
       margin-top: 30px;
     }
-
     .botao-pular, .botao-completar, .botao-encerrar {
       flex: 1;
       margin: 0 5px;
@@ -150,26 +132,21 @@
       font-weight: bold;
       cursor: pointer;
     }
-
     .botao-pular {
       background: #8e44ad;
       color: white;
     }
-
     .botao-completar {
       background: #2ecc71;
       color: white;
     }
-
     .botao-encerrar {
       background: #c0392b;
       color: white;
     }
-
     .botao-encerrar:hover {
       background: #922b21;
     }
-
     select, button {
       width: 100%;
       padding: 10px;
@@ -178,7 +155,6 @@
       border: 1px solid #ccc;
       font-size: 1rem;
     }
-
     button {
       background: #2980b9;
       color: white;
@@ -186,24 +162,26 @@
       cursor: pointer;
       transition: background 0.3s;
     }
-
     button:hover {
       background: #2471a3;
     }
-
-    /* RESPONSIVO */
-
+    .temporizador-btn {
+      width: auto;
+      padding: 4px 8px;
+      margin-left: 5px;
+      font-size: 0.8rem;
+      background: #7f8c8d;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    .temporizador-btn:hover {
+      background: #626e70;
+    }
     @media (max-width: 768px) {
-      .navbar {
-        flex-direction: row;
-        align-items: center;
-        padding: 10px 20px;
-      }
-
       .hamburguer {
         display: flex;
       }
-
       .navbar-links {
         position: absolute;
         top: 60px;
@@ -216,275 +194,283 @@
         display: none;
         border-top: 1px solid #34495e;
       }
-
       .navbar-links.open {
         display: flex;
       }
-
       .navbar-links a {
         padding: 15px 20px;
         border-bottom: 1px solid #34495e;
       }
-
       .main-content {
         padding: 120px 20px 40px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .navbar h2 {
-        font-size: 1.4rem;
-      }
-
-      .navbar a {
-        font-size: 0.9rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <nav class="navbar">
-    <h2>Academia</h2>
+<nav class="navbar">
+  <h2>Academia</h2>
+  <div class="hamburguer" id="hamburguer">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="navbar-links" id="navbarLinks">
+    <a href="index.html">Cadastro</a>
+    <a href="visualizar.html">Visualizar</a>
+    <a href="treino.html" class="active">Treino</a>
+    <a href="historico.html">Histórico</a>
+  </div>
+</nav>
 
-    <div class="hamburguer" id="hamburguer">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
+<main class="main-content">
+  <h1>Iniciar Treino</h1>
+  <div class="card">
+    <label for="treinoSelect">Selecione um treino:</label>
+    <select id="treinoSelect">
+      <option value="">Carregando...</option>
+    </select>
+    <button id="iniciarBtn">Iniciar Treino</button>
+  </div>
+  <div id="treinoContainer"></div>
+</main>
 
-    <div class="navbar-links" id="navbarLinks">
-      <a href="index.html">Cadastro</a>
-      <a href="visualizar.html">Visualizar</a>
-      <a href="treino.html" class="active">Treino</a>
-      <a href="historico.html">Historico</a>
-    </div>
-  </nav>
+<script>
+  const hamburguer = document.getElementById("hamburguer");
+  const navbarLinks = document.getElementById("navbarLinks");
+  hamburguer.addEventListener("click", () => {
+    navbarLinks.classList.toggle("open");
+  });
+</script>
 
-  <main class="main-content">
-    <h1>Iniciar Treino</h1>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    <div class="card">
-      <label for="treinoSelect">Selecione um treino:</label>
-      <select id="treinoSelect">
-        <option value="">Carregando...</option>
-      </select>
-      <button id="iniciarBtn">Iniciar Treino</button>
-    </div>
+  const firebaseConfig = {
+    apiKey: "YOUR-API-KEY",
+    authDomain: "YOUR-DOMAIN",
+    projectId: "YOUR-PROJECT-ID",
+    storageBucket: "YOUR-STORAGE",
+    messagingSenderId: "YOUR-ID",
+    appId: "YOUR-APP-ID"
+  };
 
-    <div id="treinoContainer"></div>
-  </main>
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  <script>
-    const hamburguer = document.getElementById("hamburguer");
-    const navbarLinks = document.getElementById("navbarLinks");
+  const treinoSelect = document.getElementById("treinoSelect");
+  const iniciarBtn = document.getElementById("iniciarBtn");
+  const treinoContainer = document.getElementById("treinoContainer");
 
-    hamburguer.addEventListener("click", () => {
-      navbarLinks.classList.toggle("open");
-    });
-  </script>
+  let atual = 0;
+  let grupos = [];
+  let dadosPreenchidos = {};
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
+  const temporizadores = {};
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-      authDomain: "academia-bd-9d4da.firebaseapp.com",
-      databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
-      projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.firebasestorage.app",
-      messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
-      measurementId: "G-3J2FY1DEGW"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-    const db = getFirestore(app);
-
-    const treinoSelect = document.getElementById("treinoSelect");
-    const iniciarBtn = document.getElementById("iniciarBtn");
-    const treinoContainer = document.getElementById("treinoContainer");
-
-    let atual = 0;
-    let grupos = [];
-    let dadosPreenchidos = {};
-
-    async function carregarTreinos() {
-      const snapshot = await getDocs(collection(db, "treinos"));
-      treinoSelect.innerHTML = '<option value="">Selecione</option>';
-
-      snapshot.forEach(docSnap => {
-        const data = docSnap.data();
-        const option = document.createElement("option");
-        option.value = docSnap.id;
-        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
-        treinoSelect.appendChild(option);
-      });
-    }
-
-    carregarTreinos();
-
-    iniciarBtn.addEventListener("click", async () => {
-      const treinoId = treinoSelect.value;
-      if (!treinoId) {
-        alert("Selecione um treino");
-        return;
-      }
-
-      const docSnap = await getDoc(doc(db, "treinos", treinoId));
-      if (!docSnap.exists()) {
-        alert("Treino não encontrado");
-        return;
-      }
-
+  async function carregarTreinos() {
+    const snapshot = await getDocs(collection(db, "treinos"));
+    treinoSelect.innerHTML = '<option value="">Selecione</option>';
+    snapshot.forEach(docSnap => {
       const data = docSnap.data();
-      grupos = data.grupos;
-      atual = 0;
-      dadosPreenchidos = {};
+      const option = document.createElement("option");
+      option.value = docSnap.id;
+      option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+      treinoSelect.appendChild(option);
+    });
+  }
+  carregarTreinos();
 
-      treinoSelect.disabled = true;
-      iniciarBtn.disabled = true;
+  iniciarBtn.addEventListener("click", async () => {
+    const treinoId = treinoSelect.value;
+    if (!treinoId) {
+      alert("Selecione um treino");
+      return;
+    }
 
-      exibirExercicio(atual);
+    const docSnap = await getDoc(doc(db, "treinos", treinoId));
+    if (!docSnap.exists()) {
+      alert("Treino não encontrado");
+      return;
+    }
+
+    const data = docSnap.data();
+    grupos = data.grupos;
+    atual = 0;
+    dadosPreenchidos = {};
+    treinoSelect.disabled = true;
+    iniciarBtn.disabled = true;
+    exibirExercicio(atual);
+  });
+
+  function exibirExercicio(index) {
+    const grupo = grupos[index];
+    treinoContainer.innerHTML = "";
+
+    const chaveGrupo = `grupo${index}`;
+    if (!dadosPreenchidos[chaveGrupo]) {
+      dadosPreenchidos[chaveGrupo] = Array.from({ length: grupo.serie }).map(() => ({
+        repeticoes: grupo.repeticao || '',
+        carga: '',
+        check: false,
+        tempo: "01:00"
+      }));
+    }
+
+    const div = document.createElement("div");
+    div.className = "card";
+
+    div.innerHTML = `
+      <div class="atividade-header">
+        <h2>${grupo.grupo}</h2>
+      </div>
+      <div class="series">
+        ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
+          <div>
+            <label>Série ${i + 1}</label><br/>
+            <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps">
+            <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga">
+            <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''}> ✔
+            <div class="temporizador-container ${serie.check ? '' : 'hidden'}">
+              <span class="temporizador" id="tempo-${chaveGrupo}-${i}">${serie.tempo}</span>
+              <button class="temporizador-btn" data-serie="${i}" data-acao="start">▶️</button>
+              <button class="temporizador-btn" data-serie="${i}" data-acao="pause">⏸️</button>
+              <button class="temporizador-btn" data-serie="${i}" data-acao="reset">🔄</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="botoes-controle">
+        <button id="anteriorBtn" class="botao-pular">⬅️ Anterior</button>
+        <button id="proximoBtn" class="botao-completar">➡️ Próximo</button>
+      </div>
+
+      <button id="encerrarBtn" class="botao-encerrar" style="margin-top:20px;">⚡ Encerrar Treino</button>
+    `;
+
+    treinoContainer.appendChild(div);
+
+    document.querySelectorAll(".input-reps").forEach(input => {
+      input.addEventListener("input", (e) => {
+        const idx = e.target.dataset.serie;
+        dadosPreenchidos[chaveGrupo][idx].repeticoes = e.target.value;
+      });
     });
 
-    function exibirExercicio(index) {
-      const grupo = grupos[index];
+    document.querySelectorAll(".input-carga").forEach(input => {
+      input.addEventListener("input", (e) => {
+        const idx = e.target.dataset.serie;
+        dadosPreenchidos[chaveGrupo][idx].carga = e.target.value;
+      });
+    });
+
+    document.querySelectorAll(".check-serie").forEach(checkbox => {
+      checkbox.addEventListener("change", (e) => {
+        const idx = e.target.dataset.serie;
+        const container = e.target.nextElementSibling;
+        if (e.target.checked) {
+          dadosPreenchidos[chaveGrupo][idx].check = true;
+          container.classList.remove("hidden");
+        } else {
+          dadosPreenchidos[chaveGrupo][idx].check = false;
+          container.classList.add("hidden");
+          stopTemporizador(chaveGrupo, idx);
+        }
+      });
+    });
+
+    document.querySelectorAll(".temporizador-btn").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        const idx = e.target.dataset.serie;
+        const acao = e.target.dataset.acao;
+        if (acao === "start") startTemporizador(chaveGrupo, idx);
+        if (acao === "pause") pauseTemporizador(chaveGrupo, idx);
+        if (acao === "reset") resetTemporizador(chaveGrupo, idx);
+      });
+    });
+
+    document.getElementById("anteriorBtn").addEventListener("click", () => {
+      if (atual > 0) {
+        atual--;
+        exibirExercicio(atual);
+      }
+    });
+
+    document.getElementById("proximoBtn").addEventListener("click", () => {
+      if (atual < grupos.length - 1) {
+        atual++;
+        exibirExercicio(atual);
+      }
+    });
+
+    document.getElementById("encerrarBtn").addEventListener("click", finalizarTreino);
+  }
+
+  function startTemporizador(chave, idx) {
+    const key = `${chave}-${idx}`;
+    if (temporizadores[key]) return;
+
+    let [min, seg] = dadosPreenchidos[chave][idx].tempo.split(":").map(Number);
+    const element = document.getElementById(`tempo-${chave}-${idx}`);
+
+    temporizadores[key] = setInterval(() => {
+      if (seg === 0) {
+        if (min === 0) {
+          clearInterval(temporizadores[key]);
+          delete temporizadores[key];
+          return;
+        }
+        min--;
+        seg = 59;
+      } else {
+        seg--;
+      }
+      const texto = `${String(min).padStart(2, "0")}:${String(seg).padStart(2, "0")}`;
+      element.textContent = texto;
+      dadosPreenchidos[chave][idx].tempo = texto;
+    }, 1000);
+  }
+
+  function pauseTemporizador(chave, idx) {
+    const key = `${chave}-${idx}`;
+    clearInterval(temporizadores[key]);
+    delete temporizadores[key];
+  }
+
+  function resetTemporizador(chave, idx) {
+    pauseTemporizador(chave, idx);
+    dadosPreenchidos[chave][idx].tempo = "01:00";
+    const element = document.getElementById(`tempo-${chave}-${idx}`);
+    if (element) element.textContent = "01:00";
+  }
+
+  function stopTemporizador(chave, idx) {
+    pauseTemporizador(chave, idx);
+    dadosPreenchidos[chave][idx].tempo = "01:00";
+  }
+
+  async function finalizarTreino() {
+    try {
+      await setDoc(doc(db, "historico", Date.now().toString()), {
+        data: new Date().toISOString(),
+        treino: treinoSelect.options[treinoSelect.selectedIndex].text,
+        resultados: dadosPreenchidos
+      });
+      alert("Treino finalizado e salvo no histórico!");
       treinoContainer.innerHTML = "";
-
-      const chaveGrupo = `grupo${index}`;
-      if (!dadosPreenchidos[chaveGrupo]) {
-        dadosPreenchidos[chaveGrupo] = Array.from({ length: grupo.serie }).map(() => ({
-          repeticoes: grupo.repeticao || '',
-          carga: '',
-          check: false,
-          tempo: "00:00"
-        }));
-      }
-
-      const div = document.createElement("div");
-      div.className = "card";
-
-      div.innerHTML = `
-        <div class="atividade-header">
-          <h2>${grupo.grupo}</h2>
-        </div>
-
-        <div class="series">
-          ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
-            <div>
-              <label>Série ${i + 1}</label><br/>
-              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps">
-              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga">
-              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''}> ✔
-              <span class="cronometro-serie ${serie.check ? '' : 'hidden'}">${serie.tempo}</span>
-            </div>
-          `).join('')}
-        </div>
-
-        <div class="botoes-controle">
-          <button id="anteriorBtn" class="botao-pular">⬅️ Anterior</button>
-          <button id="proximoBtn" class="botao-completar">➡️ Próximo</button>
-        </div>
-
-        <button id="encerrarBtn" class="botao-encerrar" style="margin-top:20px;">⚡ Encerrar Treino</button>
-      `;
-
-      treinoContainer.appendChild(div);
-
-      document.querySelectorAll(".input-reps").forEach(input => {
-        input.addEventListener("input", (e) => {
-          const idx = e.target.dataset.serie;
-          dadosPreenchidos[chaveGrupo][idx].repeticoes = e.target.value;
-        });
-      });
-
-      document.querySelectorAll(".input-carga").forEach(input => {
-        input.addEventListener("input", (e) => {
-          const idx = e.target.dataset.serie;
-          dadosPreenchidos[chaveGrupo][idx].carga = e.target.value;
-        });
-      });
-
-      document.querySelectorAll(".check-serie").forEach(checkbox => {
-        checkbox.addEventListener("change", (e) => {
-          const idx = e.target.dataset.serie;
-          const spanTempo = e.target.nextElementSibling;
-          if (e.target.checked) {
-            dadosPreenchidos[chaveGrupo][idx].check = true;
-            spanTempo.classList.remove("hidden");
-            startCronometro(spanTempo, idx, chaveGrupo);
-          } else {
-            dadosPreenchidos[chaveGrupo][idx].check = false;
-            spanTempo.classList.add("hidden");
-            stopCronometro(idx, chaveGrupo);
-          }
-        });
-      });
-
-      document.getElementById("anteriorBtn").addEventListener("click", () => {
-        if (atual > 0) {
-          atual--;
-          exibirExercicio(atual);
-        }
-      });
-
-      document.getElementById("proximoBtn").addEventListener("click", () => {
-        if (atual < grupos.length - 1) {
-          atual++;
-          exibirExercicio(atual);
-        }
-      });
-
-      document.getElementById("encerrarBtn").addEventListener("click", finalizarTreino);
+      treinoSelect.disabled = false;
+      iniciarBtn.disabled = false;
+      treinoSelect.value = "";
+      dadosPreenchidos = {};
+      atual = 0;
+      grupos = [];
+    } catch (error) {
+      alert("Erro ao salvar treino: " + error.message);
     }
-
-    const cronometros = {};
-
-    function startCronometro(element, serieIndex, chaveGrupo) {
-      let seconds = 0;
-      stopCronometro(serieIndex, chaveGrupo); // Para evitar múltiplos timers
-
-      cronometros[`${chaveGrupo}-${serieIndex}`] = setInterval(() => {
-        seconds++;
-        const min = Math.floor(seconds / 60).toString().padStart(2, "0");
-        const seg = (seconds % 60).toString().padStart(2, "0");
-        element.textContent = `${min}:${seg}`;
-        dadosPreenchidos[chaveGrupo][serieIndex].tempo = element.textContent;
-      }, 1000);
-    }
-
-    function stopCronometro(serieIndex, chaveGrupo) {
-      const key = `${chaveGrupo}-${serieIndex}`;
-      if (cronometros[key]) {
-        clearInterval(cronometros[key]);
-        delete cronometros[key];
-      }
-    }
-
-    async function finalizarTreino() {
-      try {
-        await setDoc(doc(db, "historico", Date.now().toString()), {
-          data: new Date().toISOString(),
-          treino: treinoSelect.options[treinoSelect.selectedIndex].text,
-          resultados: dadosPreenchidos
-        });
-
-        alert("Treino finalizado e salvo no histórico!");
-        treinoContainer.innerHTML = "";
-        treinoSelect.disabled = false;
-        iniciarBtn.disabled = false;
-        treinoSelect.value = "";
-        dadosPreenchidos = {};
-        atual = 0;
-        grupos = [];
-      } catch (error) {
-        alert("Erro ao salvar treino: " + error.message);
-      }
-    }
-  </script>
+  }
+</script>
 </body>
 </html>
