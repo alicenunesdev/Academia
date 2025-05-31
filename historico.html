@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Histórico de Treinos</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f7f9fc;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #2c3e50;
+      color: #ecf0f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
+
+    .navbar h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.6rem;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
+
+    .main-content {
+      padding: 100px 30px 40px;
+      flex: 1;
+      max-width: 100%;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .card {
+      background: white;
+      color: #333;
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 600px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .card h3 {
+      margin-top: 0;
+    }
+
+    .btn-ver {
+      background: #2980b9;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.3s;
+      font-weight: 600;
+    }
+
+    .btn-ver:hover {
+      background: #2471a3;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.6);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 16px;
+      position: relative;
+    }
+
+    .close {
+      color: #aaa;
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: #000;
+    }
+
+    .exercicio {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    @media (max-width: 768px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 20px;
+      }
+
+      .navbar-links {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .main-content {
+        padding: 120px 20px 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar h2 {
+        font-size: 1.4rem;
+      }
+
+      .navbar a {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <h2>Academia</h2>
+    <div class="navbar-links">
+      <a href="index.html">Cadastro</a>
+      <a href="visualizar.html">Visualizar</a>
+      <a href="Treino.html">Treino</a>
+      <a href="historico.html" class="active">Histórico</a>
+    </div>
+  </nav>
+
+  <main class="main-content">
+    <h1>Histórico de Treinos</h1>
+    <div id="historicoContainer"></div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const historicoContainer = document.getElementById("historicoContainer");
+    const modal = document.getElementById("modal");
+    const modalBody = document.getElementById("modalBody");
+    const closeBtn = document.querySelector(".close");
+
+    async function carregarHistorico() {
+      const snapshot = await getDocs(collection(db, "treinos"));
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const div = document.createElement("div");
+        div.className = "card";
+
+        const dataAtual = new Date();
+        const dataFormatada = `${dataAtual.getDate().toString().padStart(2,'0')}/${(dataAtual.getMonth()+1).toString().padStart(2,'0')}/${dataAtual.getFullYear()}`;
+        const horaFormatada = `${dataAtual.getHours().toString().padStart(2,'0')}:${dataAtual.getMinutes().toString().padStart(2,'0')}`;
+
+        div.innerHTML = `
+          <h3>${data.tipoTreino}</h3>
+          <p><strong>Usuário:</strong> ${data.usuario}</p>
+          <p><strong>Data:</strong> ${dataFormatada} - <strong>Hora:</strong> ${horaFormatada}</p>
+          <button class="btn-ver">Ver treino completo</button>
+        `;
+
+        const btnVer = div.querySelector(".btn-ver");
+        btnVer.addEventListener("click", () => abrirModal(data));
+
+        historicoContainer.appendChild(div);
+      });
+    }
+
+    carregarHistorico();
+
+    function abrirModal(data) {
+      modalBody.innerHTML = `
+        <h2>${data.tipoTreino}</h2>
+        <p><strong>Usuário:</strong> ${data.usuario}</p>
+        ${data.grupos.map(grupo => `
+          <div class="exercicio">
+            <h4>Exercício: ${grupo.grupo}</h4>
+            <p><strong>Séries:</strong> ${grupo.serie} | <strong>Repetições:</strong> ${grupo.repeticao}</p>
+          </div>
+        `).join('')}
+      `;
+      modal.style.display = "block";
+    }
+
+    closeBtn.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
