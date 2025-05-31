@@ -8,6 +8,31 @@
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+  .navbar h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.6rem;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
 
     body {
       margin: 0;
