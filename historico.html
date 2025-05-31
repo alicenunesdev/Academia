@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Histórico de Treinos</title>
   <style>
     * {
@@ -14,8 +14,8 @@
       margin: 0;
       background: #f7f9fc;
       color: #333;
-      min-height: 100vh;
       display: flex;
+      min-height: 100vh;
       flex-direction: column;
     }
 
@@ -63,8 +63,7 @@
     main {
       padding: 100px 30px 40px;
       flex: 1;
-      max-width: 900px;
-      margin: 0 auto;
+      max-width: 100%;
     }
 
     h1 {
@@ -74,54 +73,66 @@
       color: #2c3e50;
     }
 
-    .card {
+    .historico-lista {
+      max-width: 600px;
+      margin: 0 auto;
       background: white;
+      border-radius: 12px;
       padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
 
-    .card h2 {
-      margin-top: 0;
-      color: #2c3e50;
-      font-size: 1.4rem;
-      margin-bottom: 10px;
+    .item-historico {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
     }
 
-    .card p {
-      margin: 6px 0;
+    .item-historico:last-child {
+      border-bottom: none;
+    }
+
+    .item-historico h3 {
+      margin: 0 0 8px;
+      color: #34495e;
+    }
+
+    .item-historico p {
+      margin: 4px 0;
+      font-size: 0.9rem;
       color: #555;
+    }
+
+    .btn-voltar {
+      display: block;
+      width: 120px;
+      margin: 30px auto 0;
+      padding: 10px;
+      background: #2980b9;
+      color: white;
+      text-align: center;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+
+    .btn-voltar:hover {
+      background: #2471a3;
     }
 
     @media (max-width: 768px) {
       main {
         padding: 120px 20px 40px;
       }
-
-      .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 10px 20px;
-      }
-
-      .navbar-links {
-        flex-direction: column;
+      .historico-lista {
         width: 100%;
-        gap: 10px;
-        margin-top: 10px;
+        padding: 15px;
+        box-shadow: none;
+        border-radius: 0;
       }
     }
 
-    @media (max-width: 480px) {
-      .navbar h2 {
-        font-size: 1.4rem;
-      }
-
-      .navbar a {
-        font-size: 0.9rem;
-      }
-    }
   </style>
 </head>
 <body>
@@ -138,59 +149,68 @@
 
   <main>
     <h1>Histórico de Treinos</h1>
-
-    <div id="historicoContainer">
-      <p>Carregando histórico...</p>
+    <div class="historico-lista" id="historicoLista">
+      Carregando histórico...
     </div>
+
+    <a href="treino.html" class="btn-voltar">Voltar ao Treino</a>
   </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
       authDomain: "academia-bd-9d4da.firebaseapp.com",
+      databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
       projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.appspot.com",
+      storageBucket: "academia-bd-9d4da.firebasestorage.app",
       messagingSenderId: "201289997890",
       appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+      measurementId: "G-3J2FY1DEGW"
     };
 
     const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
-    const historicoContainer = document.getElementById('historicoContainer');
+    const historicoLista = document.getElementById("historicoLista");
 
     async function carregarHistorico() {
-      historicoContainer.innerHTML = "<p>Carregando histórico...</p>";
-      const snapshot = await getDocs(collection(db, "treinos"));
+      const snapshot = await getDocs(collection(db, "historico"));
+      historicoLista.innerHTML = "";
 
       if (snapshot.empty) {
-        historicoContainer.innerHTML = "<p>Nenhum treino encontrado.</p>";
+        historicoLista.textContent = "Nenhum treino registrado ainda.";
         return;
       }
 
-      historicoContainer.innerHTML = "";
-
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
-        const card = document.createElement('div');
-        card.className = "card";
+        const div = document.createElement("div");
+        div.className = "item-historico";
 
-        card.innerHTML = `
-          <h2>${data.usuario} - ${data.tipoTreino}</h2>
-          <p><strong>Data:</strong> ${data.dataTreino || "Não informado"}</p>
-          <p><strong>Grupos:</strong> ${data.grupos ? data.grupos.length : 0}</p>
-          <p><strong>Observações:</strong> ${data.observacoes || "-"}</p>
+        const dataFormatada = new Date(data.data).toLocaleString("pt-BR", {
+          dateStyle: "short",
+          timeStyle: "short"
+        });
+
+        div.innerHTML = `
+          <h3>${data.treino}</h3>
+          <p><strong>Data:</strong> ${dataFormatada}</p>
+          <details>
+            <summary>Resultados</summary>
+            <pre style="white-space: pre-wrap;">${JSON.stringify(data.resultados, null, 2)}</pre>
+          </details>
         `;
 
-        historicoContainer.appendChild(card);
+        historicoLista.appendChild(div);
       });
     }
 
     carregarHistorico();
   </script>
-
 </body>
 </html>
