@@ -8,7 +8,46 @@
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+ .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #2c3e50;
+      color: #ecf0f1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 1000;
+    }
 
+    .navbar h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.6rem;
+    }
+
+    .navbar-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
     body {
       margin: 0;
       background: #f7f9fc;
@@ -118,7 +157,8 @@
     <div class="navbar-links">
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
-      <a href="Treino.html" class="active">Treino</a>
+      <a href="treino.html" class="active">Treino</a>
+      <a href="histórico.html" class="active">Treino</a>
     </div>
   </nav>
 
