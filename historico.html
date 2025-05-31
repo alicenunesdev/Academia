@@ -60,22 +60,6 @@
       color: white;
     }
 
-    /* Botão hamburguer */
-    .menu-toggle {
-      display: none;
-      flex-direction: column;
-      cursor: pointer;
-      width: 30px;
-      height: 24px;
-      justify-content: space-between;
-    }
-    .menu-toggle span {
-      background: #ecf0f1;
-      height: 4px;
-      border-radius: 2px;
-      transition: 0.3s;
-    }
-
     main {
       padding: 100px 30px 40px;
       flex: 1;
@@ -231,7 +215,24 @@
       font-size: 0.9rem;
     }
 
-    /* Responsividade */
+    /* Hamburger */
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      width: 25px;
+      height: 20px;
+      justify-content: space-between;
+    }
+
+    .menu-toggle span {
+      display: block;
+      height: 3px;
+      background: #ecf0f1;
+      border-radius: 3px;
+      transition: 0.3s;
+    }
+
     @media (max-width: 768px) {
       main {
         padding: 120px 20px 40px;
@@ -247,10 +248,12 @@
         display: none;
         flex-direction: column;
         width: 100%;
-        background: #2c3e50;
-        margin-top: 10px;
+        background: #34495e;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        padding: 10px 0;
         border-radius: 0 0 8px 8px;
-        padding-bottom: 10px;
       }
 
       .navbar-links.show {
@@ -258,8 +261,13 @@
       }
 
       .navbar-links a {
-        padding: 10px 15px;
+        padding: 12px 20px;
         border-radius: 0;
+        border-bottom: 1px solid #2c3e50;
+      }
+
+      .navbar-links a:last-child {
+        border-bottom: none;
       }
 
       .menu-toggle {
@@ -273,14 +281,11 @@
 
   <nav class="navbar">
     <h2>Academia</h2>
-
-    <!-- Botão hamburguer -->
-    <div class="menu-toggle" id="menuToggle" aria-label="Abrir menu" role="button" tabindex="0">
+    <div class="menu-toggle" id="menuToggle" tabindex="0" aria-label="Abrir menu">
       <span></span>
       <span></span>
       <span></span>
     </div>
-
     <div class="navbar-links" id="navbarLinks">
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
@@ -322,111 +327,102 @@
       projectId: "academia-bd-9d4da",
       storageBucket: "academia-bd-9d4da.appspot.com",
       messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:b3c97e4d6cc383e8e49621",
-      measurementId: "G-FMZ12MXZTW"
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+      measurementId: "G-3J2FY1DEGW"
     };
 
     const app = initializeApp(firebaseConfig);
     const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
-    const historicoLista = document.getElementById('historicoLista');
-    const modal = document.getElementById('modal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-    const closeModal = document.getElementById('closeModal');
+    const historicoLista = document.getElementById("historicoLista");
+    const modal = document.getElementById("modal");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const closeModal = document.getElementById("closeModal");
 
-    // Menu toggle
-    const menuToggle = document.getElementById('menuToggle');
-    const navbarLinks = document.getElementById('navbarLinks');
+    closeModal.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
 
-    menuToggle.addEventListener('click', () => {
-      navbarLinks.classList.toggle('show');
+    // Menu toggle logic
+    const menuToggle = document.getElementById("menuToggle");
+    const navbarLinks = document.getElementById("navbarLinks");
+
+    menuToggle.addEventListener("click", () => {
+      navbarLinks.classList.toggle("show");
     });
-    // Accessibility for Enter key on menuToggle
-    menuToggle.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
+
+    // Accessibility: toggle menu with Enter or Space keys
+    menuToggle.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        navbarLinks.classList.toggle('show');
+        navbarLinks.classList.toggle("show");
       }
     });
-
-    closeModal.onclick = () => {
-      modal.style.display = 'none';
-    };
-    window.onclick = (event) => {
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    };
-
-    // Função para criar item da lista de histórico
-    function criarItemHistorico(doc) {
-      const data = doc.data();
-
-      const divItem = document.createElement('div');
-      divItem.className = 'item-historico';
-
-      const titulo = document.createElement('h3');
-      titulo.textContent = `Treino - ${data.data || 'sem data'}`;
-      divItem.appendChild(titulo);
-
-      const resumo = document.createElement('p');
-      resumo.textContent = `Quantidade de séries: ${data.qtdSérie || 'N/A'}`;
-      divItem.appendChild(resumo);
-
-      const btnVerMais = document.createElement('button');
-      btnVerMais.textContent = 'Ver mais';
-      btnVerMais.className = 'btn-vermais';
-      btnVerMais.addEventListener('click', () => mostrarDetalhes(data));
-      divItem.appendChild(btnVerMais);
-
-      return divItem;
-    }
-
-    // Função para mostrar detalhes no modal
-    function mostrarDetalhes(data) {
-      modalTitle.textContent = `Treino - ${data.data || 'sem data'}`;
-
-      let html = '';
-      if (data.exercicios && Array.isArray(data.exercicios)) {
-        data.exercicios.forEach((ex, i) => {
-          html += `
-            <div class="grupo">
-              <h4>Exercício ${i + 1}: ${ex.nome}</h4>
-              <ul>
-                <li>Series: ${ex.series || 'N/A'}</li>
-                <li>Repetições: ${ex.repeticoes || 'N/A'}</li>
-                <li>Peso: ${ex.peso || 'N/A'}</li>
-              </ul>
-            </div>
-          `;
-        });
-      } else {
-        html = '<p>Sem detalhes disponíveis.</p>';
-      }
-
-      modalBody.innerHTML = html;
-      modal.style.display = 'block';
-    }
 
     async function carregarHistorico() {
-      try {
-        const querySnapshot = await getDocs(collection(db, "historico"));
-        historicoLista.innerHTML = '';
-        if (querySnapshot.empty) {
-          historicoLista.textContent = 'Nenhum treino registrado.';
-          return;
-        }
+      const snapshot = await getDocs(collection(db, "historico"));
+      historicoLista.innerHTML = "";
 
-        querySnapshot.forEach(doc => {
-          const item = criarItemHistorico(doc);
-          historicoLista.appendChild(item);
-        });
-      } catch (error) {
-        historicoLista.textContent = 'Erro ao carregar histórico.';
-        console.error(error);
+      if (snapshot.empty) {
+        historicoLista.textContent = "Nenhum treino registrado ainda.";
+        return;
       }
+
+      const lista = [];
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        lista.push({ id: docSnap.id, ...data });
+      });
+
+      // Ordenar do mais recente para o mais antigo
+      lista.sort((a, b) => b.data - a.data);
+
+      lista.forEach(data => {
+        const div = document.createElement("div");
+        div.className = "item-historico";
+
+        const dataFormatada = new Date(data.data).toLocaleString("pt-BR", {
+          dateStyle: "short",
+          timeStyle: "short"
+        });
+
+        div.innerHTML = `
+          <h3>${data.treino}</h3>
+          <p><strong>Data:</strong> ${dataFormatada}</p>
+          <button class="btn-vermais">Ver Mais</button>
+        `;
+
+        div.querySelector(".btn-vermais").addEventListener("click", () => {
+          modalTitle.textContent = data.treino;
+          modalBody.innerHTML = gerarHTMLDetalhes(data.resultados);
+          modal.style.display = "block";
+        });
+
+        historicoLista.appendChild(div);
+      });
+    }
+
+    function gerarHTMLDetalhes(resultados) {
+      let html = "";
+      for (const grupo in resultados) {
+        html += `<div class="grupo">
+          <h4>${grupo}</h4>
+          <ul>`;
+        resultados[grupo].forEach((item, idx) => {
+          html += `<li>
+            <strong>Exercício ${idx + 1}</strong><br>
+            Série: ${item.serie}<br>
+            Repetições: ${item.repeticao}<br>
+            Carga: ${item.carga || '-'}<br>
+            Tempo: ${item.tempo || '-'}<br>
+            Concluído: ${item.check ? '✅' : '❌'}
+          </li>`;
+        });
+        html += `</ul></div>`;
+      }
+      return html;
     }
 
     carregarHistorico();
