@@ -102,23 +102,21 @@
       color: #555;
     }
 
-    details summary {
+    .ver-mais-btn {
+      display: inline-block;
+      background-color: #2980b9;
+      color: white;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
       cursor: pointer;
+      margin-top: 8px;
       font-weight: 600;
-      color: #2980b9;
-      margin-top: 8px;
+      transition: background 0.3s;
     }
 
-    .detalhes-item {
-      background-color: #f4f6f9;
-      border-radius: 8px;
-      padding: 10px;
-      margin-top: 8px;
-    }
-
-    .detalhes-item p {
-      margin: 4px 0;
-      color: #333;
+    .ver-mais-btn:hover {
+      background-color: #2471a3;
     }
 
     .btn-voltar {
@@ -138,6 +136,58 @@
 
     .btn-voltar:hover {
       background: #2471a3;
+    }
+
+    /* Modal (Popup) */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 90%;
+      max-width: 500px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0;}
+      to {opacity: 1;}
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      color: #34495e;
+    }
+
+    .modal-content p {
+      margin: 8px 0;
     }
 
     @media (max-width: 768px) {
@@ -174,6 +224,14 @@
     <a href="treino.html" class="btn-voltar">Voltar ao Treino</a>
   </main>
 
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -195,6 +253,9 @@
     const db = getFirestore(app);
 
     const historicoLista = document.getElementById("historicoLista");
+    const modal = document.getElementById("modal");
+    const modalContent = document.getElementById("modalContent");
+    const spanClose = document.querySelector(".close");
 
     async function carregarHistorico() {
       const snapshot = await getDocs(collection(db, "historico"));
@@ -207,7 +268,7 @@
 
       const dadosOrdenados = snapshot.docs
         .map(doc => ({ id: doc.id, ...doc.data() }))
-        .sort((a, b) => b.data - a.data); // Ordena do mais novo para o mais antigo
+        .sort((a, b) => b.data - a.data); // Mais recente para mais antigo
 
       dadosOrdenados.forEach(data => {
         const div = document.createElement("div");
@@ -218,30 +279,49 @@
           timeStyle: "short"
         });
 
-        let detalhesHTML = '';
-
-        if (Array.isArray(data.resultados)) {
-          data.resultados.forEach(item => {
-            detalhesHTML += `
-              <div class="detalhes-item">
-                <p><strong>Grupo:</strong> ${item.grupo || "Não informado"}</p>
-                <p><strong>Carga:</strong> ${item.carga || 0} Kg</p>
-              </div>
-            `;
-          });
-        }
-
         div.innerHTML = `
           <h3>${data.treino}</h3>
           <p><strong>Data:</strong> ${dataFormatada}</p>
-          <details>
-            <summary>Ver mais</summary>
-            ${detalhesHTML}
-          </details>
+          <button class="ver-mais-btn" onclick="abrirModal('${data.id}')">Ver mais</button>
         `;
 
         historicoLista.appendChild(div);
+
+        data._detalhes = (Array.isArray(data.resultados) ? data.resultados : []);
+        window["data_" + data.id] = data;
       });
+    }
+
+    window.abrirModal = function(id) {
+      const data = window["data_" + id];
+      if (!data) return;
+
+      let detalhesHTML = `<h3>${data.treino}</h3>`;
+      if (data._detalhes.length === 0) {
+        detalhesHTML += `<p>Sem detalhes registrados.</p>`;
+      } else {
+        data._detalhes.forEach(item => {
+          detalhesHTML += `
+            <div style="background: #f4f6f9; border-radius: 8px; padding: 8px; margin-bottom: 8px;">
+              <p><strong>Grupo:</strong> ${item.grupo || "Não informado"}</p>
+              <p><strong>Carga:</strong> ${item.carga || 0} Kg</p>
+            </div>
+          `;
+        });
+      }
+
+      modalContent.innerHTML = detalhesHTML;
+      modal.style.display = "block";
+    }
+
+    spanClose.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
     }
 
     carregarHistorico();
