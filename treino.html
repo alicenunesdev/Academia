@@ -2,12 +2,14 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Treino</title>
+  <title>Iniciar Treino</title>
   <style>
+    /* === Mantém o mesmo estilo da página Visualizar === */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
+
     body {
       margin: 0;
       background: #f7f9fc;
@@ -15,47 +17,224 @@
       display: flex;
       min-height: 100vh;
     }
+
+    /* Navbar lateral */
+    .navbar {
+      background: #34495e;
+      color: #ecf0f1;
+      width: 220px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: fixed;
+    }
+
+    .navbar h2 {
+      margin: 0 0 40px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 12px 20px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+      display: block;
+      position: relative;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
+
+    /* Conteúdo principal */
     .main-content {
       margin-left: 220px;
       padding: 40px 30px;
       flex: 1;
       max-width: 100%;
     }
-    @media(max-width: 768px) {
-      .main-content {
-        margin-left: 60px;
-        padding: 20px 15px;
-      }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
     }
+
+    .card {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.07);
+      max-width: 600px;
+      margin: auto;
+      margin-bottom: 25px;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      background: #2980b9;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #2471a3;
+    }
+
+    .exercise-box {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: 15px;
+    }
+
+    .exercise-box h3 {
+      margin: 0 0 10px;
+      color: #2980b9;
+    }
+
+    .series {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .series input {
+      width: 80px;
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .cronometro {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e67e22;
+      margin-top: 10px;
+    }
+
   </style>
 </head>
 <body>
 
-<div id="navbar-container"></div>
+  <nav class="navbar">
+    <h2>Academia</h2>
+    <a href="index.html" data-tooltip="Cadastro">Cadastro</a>
+    <a href="visualizar.html" data-tooltip="Visualizar">Visualizar</a>
+    <a href="Treino.html" class="active" data-tooltip="Iniciar Treino">Treino</a>
+  </nav>
 
-<main class="main-content">
-  <h1>Cadastro de Treino</h1>
-  <!-- Conteúdo para criar e editar treino -->
-  <p>Conteúdo do cadastro de treino (treino.html)</p>
-</main>
+  <main class="main-content">
+    <h1>Iniciar Treino</h1>
 
-<script>
-async function loadNavbar() {
-  const response = await fetch('navbar.html');
-  const navbarHTML = await response.text();
-  document.getElementById('navbar-container').innerHTML = navbarHTML;
+    <div class="card">
+      <label for="treinoSelect">Selecione um treino:</label>
+      <select id="treinoSelect">
+        <option value="">Carregando...</option>
+      </select>
+      <button id="iniciarBtn">Iniciar Treino</button>
+    </div>
 
-  // Setar link ativo conforme página atual
-  const path = window.location.pathname.split('/').pop();
-  const links = document.querySelectorAll('.navbar a');
-  links.forEach(link => {
-    if (link.getAttribute('href') === path) {
-      link.classList.add('active');
+    <div id="treinoContainer"></div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const treinoSelect = document.getElementById("treinoSelect");
+    const iniciarBtn = document.getElementById("iniciarBtn");
+    const treinoContainer = document.getElementById("treinoContainer");
+
+    async function carregarTreinos() {
+      const snapshot = await getDocs(collection(db, "treinos"));
+      treinoSelect.innerHTML = '<option value="">Selecione</option>';
+
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const option = document.createElement("option");
+        option.value = docSnap.id;
+        option.textContent = `${data.usuario} - ${data.tipoTreino}`;
+        treinoSelect.appendChild(option);
+      });
     }
-  });
-}
-loadNavbar();
-</script>
 
+    carregarTreinos();
+
+    iniciarBtn.addEventListener("click", async () => {
+      const treinoId = treinoSelect.value;
+      if (!treinoId) {
+        alert("Selecione um treino");
+        return;
+      }
+
+      const docSnap = await getDoc(doc(db, "treinos", treinoId));
+      if (!docSnap.exists()) {
+        alert("Treino não encontrado");
+        return;
+      }
+
+      const data = docSnap.data();
+      treinoContainer.innerHTML = "";
+
+      data.grupos.forEach((grupo, idx) => {
+        const div = document.createElement("div");
+        div.className = "exercise-box";
+        div.innerHTML = `
+          <h3>${grupo.grupo}</h3>
+          <div>Séries: ${grupo.serie} - Repetições alvo: ${grupo.repeticao}</div>
+          <div class="series">
+            ${Array.from({ length: grupo.serie }).map((_, i) => `
+              <div>
+                <div>Série ${i + 1}</div>
+                <input placeholder="Reps" type="number" min="0">
+                <input placeholder="Carga (kg)" type="number" min="0" step="0.1">
+              </div>
+            `).join('')}
+          </div>
+        `;
+        treinoContainer.appendChild(div);
+      });
+    });
+
+  </script>
 </body>
 </html>
