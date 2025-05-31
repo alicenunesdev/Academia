@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - GYM LA</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(to right, #34495e, #2980b9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: white;
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.15);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 25px;
+      color: #2980b9;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      border-color: #2980b9;
+    }
+
+    button {
+      background: #2980b9;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #1f6393;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h1>GYM - LA</h1>
+  <div class="error" id="error-msg">Usuário ou senha incorretos</div>
+  <input type="text" id="username" placeholder="Usuário" required />
+  <input type="password" id="password" placeholder="Senha" required />
+  <button onclick="login()">Entrar</button>
+</div>
+
+<script>
+  const usuarios = [
+    { usuario: "Alice", senha: "2025" },
+    { usuario: "Laercio", senha: "2025" }
+  ];
+
+  function login() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('error-msg');
+
+    const userValid = usuarios.find(
+      user => user.usuario.toLowerCase() === username.toLowerCase() && user.senha === password
+    );
+
+    if (userValid) {
+      // Login bem-sucedido, redirecionar
+      window.location.href = 'index.html';
+    } else {
+      // Mostrar erro
+      errorMsg.style.display = 'block';
+    }
+  }
+</script>
+
+</body>
+</html>
