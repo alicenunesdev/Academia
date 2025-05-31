@@ -3,7 +3,205 @@
 <head>
   <meta charset="UTF-8" />
   <title>Visualizar Treinos</title>
-  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* CSS embutido igual da página anterior */
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f7f9fc;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Navbar lateral */
+    .navbar {
+      background: #34495e;
+      color: #ecf0f1;
+      width: 220px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      position: fixed;
+    }
+
+    .navbar h2 {
+      margin: 0 0 40px;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 12px 20px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+      display: block;
+      position: relative;
+    }
+
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
+
+    .navbar a[data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #2980b9;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      white-space: nowrap;
+      margin-left: 8px;
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    /* Conteúdo principal */
+    .main-content {
+      margin-left: 220px;
+      padding: 40px 30px;
+      flex: 1;
+      max-width: 100%;
+    }
+
+    /* Lista de treinos */
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .treino-card {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.07);
+      margin-bottom: 25px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+
+    .treino-card h2 {
+      margin: 0 0 15px;
+      color: #2980b9;
+      font-weight: 700;
+    }
+
+    .treino-info {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      color: #34495e;
+    }
+
+    .grupos-list {
+      border-top: 1px solid #ddd;
+      padding-top: 15px;
+    }
+
+    .grupo-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 1rem;
+      border-bottom: 1px solid #eee;
+      color: #2c3e50;
+    }
+
+    .grupo-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Botão excluir */
+    button.delete-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: background 0.3s;
+    }
+
+    button.delete-btn:hover {
+      background: #c0392b;
+    }
+
+    /* Mensagem de carregando */
+    #loading {
+      text-align: center;
+      font-size: 1.3rem;
+      color: #555;
+      margin-top: 100px;
+    }
+
+    /* Responsivo */
+    @media(max-width: 768px) {
+      .navbar {
+        width: 60px;
+        padding: 20px 5px;
+      }
+
+      .navbar h2 {
+        display: none;
+      }
+
+      .navbar a {
+        padding: 12px 8px;
+        font-size: 0;
+        position: relative;
+      }
+
+      .navbar a::before {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #2980b9;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 4px;
+        white-space: nowrap;
+        margin-left: 8px;
+        font-size: 0.85rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+
+      .navbar a:hover::before {
+        opacity: 1;
+      }
+
+      .main-content {
+        margin-left: 60px;
+        padding: 20px 15px;
+      }
+    }
+  </style>
 </head>
 <body>
   <nav class="navbar">
@@ -13,10 +211,9 @@
   </nav>
 
   <main class="main-content">
-    <div class="treino-lista" id="lista-treinos">
-      <h1>Treinos Cadastrados</h1>
-      <p>Carregando treinos...</p>
-    </div>
+    <h1>Treinos Cadastrados</h1>
+    <div id="loading">Carregando treinos...</div>
+    <div id="treinos-list"></div>
   </main>
 
   <script type="module">
@@ -35,70 +232,63 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    const listaTreinos = document.getElementById("lista-treinos");
+    const treinosList = document.getElementById("treinos-list");
+    const loading = document.getElementById("loading");
 
     async function carregarTreinos() {
-      listaTreinos.innerHTML = "<h1>Treinos Cadastrados</h1>";
+      loading.style.display = "block";
+      treinosList.innerHTML = "";
+
       try {
         const querySnapshot = await getDocs(collection(db, "treinos"));
+
         if (querySnapshot.empty) {
-          listaTreinos.innerHTML += "<p>Nenhum treino cadastrado.</p>";
+          loading.textContent = "Nenhum treino cadastrado.";
           return;
         }
 
-        querySnapshot.forEach(docSnap => {
-          const treino = docSnap.data();
+        loading.style.display = "none";
+
+        querySnapshot.forEach((docSnap) => {
+          const data = docSnap.data();
           const id = docSnap.id;
 
-          const treinoDiv = document.createElement("div");
-          treinoDiv.classList.add("treino-item");
+          const card = document.createElement("div");
+          card.classList.add("treino-card");
 
-          // Info do treino
-          const infoDiv = document.createElement("div");
-          infoDiv.classList.add("treino-info");
+          card.innerHTML = `
+            <h2>${data.usuario}</h2>
+            <div class="treino-info"><strong>Tipo de Treino:</strong> ${data.tipoTreino}</div>
+            <div class="grupos-list">
+              ${data.grupos.map(grupo => `
+                <div class="grupo-item">
+                  <span>${grupo.grupo}</span>
+                  <span>Séries: ${grupo.serie}</span>
+                  <span>Repetições: ${grupo.repeticao}</span>
+                </div>
+              `).join('')}
+            </div>
+            <button class="delete-btn">Excluir</button>
+          `;
 
-          const titulo = document.createElement("strong");
-          titulo.textContent = `${treino.usuario} — ${treino.tipoTreino}`;
-          infoDiv.appendChild(titulo);
+          // Adicionar evento para excluir
+          card.querySelector("button.delete-btn").addEventListener("click", async () => {
+            const confirmar = confirm(`Deseja realmente excluir o treino de ${data.usuario}?`);
+            if (!confirmar) return;
 
-          const gruposSpan = document.createElement("div");
-          gruposSpan.classList.add("groupos-lista");
-          treino.grupos.forEach(g => {
-            const span = document.createElement("span");
-            span.textContent = `${g.grupo}: Série ${g.serie} x ${g.repeticao}`;
-            gruposSpan.appendChild(span);
-          });
-          infoDiv.appendChild(gruposSpan);
-
-          // Botões de ação
-          const actionsDiv = document.createElement("div");
-          actionsDiv.classList.add("action-buttons");
-
-          // Botão excluir
-          const btnExcluir = document.createElement("button");
-          btnExcluir.classList.add("delete");
-          btnExcluir.textContent = "Excluir";
-          btnExcluir.addEventListener("click", async () => {
-            if (confirm(`Deseja realmente excluir o treino de ${treino.usuario}?`)) {
-              try {
-                await deleteDoc(doc(db, "treinos", id));
-                alert("Treino excluído com sucesso!");
-                carregarTreinos();
-              } catch (error) {
-                alert("Erro ao excluir treino: " + error.message);
-              }
+            try {
+              await deleteDoc(doc(db, "treinos", id));
+              alert("Treino excluído com sucesso!");
+              carregarTreinos();
+            } catch (error) {
+              alert("Erro ao excluir treino: " + error.message);
             }
           });
 
-          actionsDiv.appendChild(btnExcluir);
-
-          treinoDiv.appendChild(infoDiv);
-          treinoDiv.appendChild(actionsDiv);
-
-          listaTreinos.appendChild(treinoDiv);
+          treinosList.appendChild(card);
         });
       } catch (error) {
-        listaTreinos.innerHTML = `<p>Erro ao carregar treinos: ${error.message}</p>`;
+        loading.textContent = "Erro ao carregar treinos: " + error.message;
       }
     }
 
