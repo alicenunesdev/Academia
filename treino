@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Iniciar Treino</title>
   <style>
+    /* === Mantém o mesmo estilo da página Visualizar === */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,6 +18,7 @@
       min-height: 100vh;
     }
 
+    /* Navbar lateral */
     .navbar {
       background: #34495e;
       color: #ecf0f1;
@@ -53,6 +55,7 @@
       color: white;
     }
 
+    /* Conteúdo principal */
     .main-content {
       margin-left: 220px;
       padding: 40px 30px;
@@ -125,17 +128,15 @@
       text-align: center;
     }
 
-    .cronometro {
-      font-size: 1.1rem;
-      color: #e67e22;
-      margin-top: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    .hidden {
+      display: none;
     }
 
-    .cronometro span {
-      font-weight: bold;
+    .cronometro {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e67e22;
+      margin-top: 10px;
     }
 
   </style>
@@ -161,14 +162,11 @@
     </div>
 
     <div id="treinoContainer"></div>
-    <div style="text-align:center;">
-      <button id="salvarBtn" style="max-width: 300px;">Salvar Treino Realizado</button>
-    </div>
   </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDoc, getDocs, doc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
@@ -185,9 +183,6 @@
     const treinoSelect = document.getElementById("treinoSelect");
     const iniciarBtn = document.getElementById("iniciarBtn");
     const treinoContainer = document.getElementById("treinoContainer");
-    const salvarBtn = document.getElementById("salvarBtn");
-
-    const cronometros = {};
 
     async function carregarTreinos() {
       const snapshot = await getDocs(collection(db, "treinos"));
@@ -219,15 +214,10 @@
 
       const data = docSnap.data();
       treinoContainer.innerHTML = "";
-      cronometros = {};
 
       data.grupos.forEach((grupo, idx) => {
         const div = document.createElement("div");
         div.className = "exercise-box";
-
-        const cronometroId = `cron-${idx}`;
-        cronometros[cronometroId] = { tempo: 0, intervalo: null };
-
         div.innerHTML = `
           <h3>${grupo.grupo}</h3>
           <div>Séries: ${grupo.serie} - Repetições alvo: ${grupo.repeticao}</div>
@@ -240,91 +230,9 @@
               </div>
             `).join('')}
           </div>
-          <div class="cronometro">
-            <span id="${cronometroId}">00:00</span>
-            <button onclick="iniciarCronometro('${cronometroId}')">Iniciar</button>
-            <button onclick="pausarCronometro('${cronometroId}')">Pausar</button>
-            <button onclick="zerarCronometro('${cronometroId}')">Zerar</button>
-          </div>
         `;
-
         treinoContainer.appendChild(div);
       });
-    });
-
-    window.iniciarCronometro = (id) => {
-      if (cronometros[id].intervalo) return;
-
-      cronometros[id].intervalo = setInterval(() => {
-        cronometros[id].tempo++;
-        const minutos = String(Math.floor(cronometros[id].tempo / 60)).padStart(2, '0');
-        const segundos = String(cronometros[id].tempo % 60).padStart(2, '0');
-        document.getElementById(id).textContent = `${minutos}:${segundos}`;
-      }, 1000);
-    };
-
-    window.pausarCronometro = (id) => {
-      clearInterval(cronometros[id].intervalo);
-      cronometros[id].intervalo = null;
-    };
-
-    window.zerarCronometro = (id) => {
-      clearInterval(cronometros[id].intervalo);
-      cronometros[id].intervalo = null;
-      cronometros[id].tempo = 0;
-      document.getElementById(id).textContent = '00:00';
-    };
-
-    salvarBtn.addEventListener("click", async () => {
-      const treinoId = treinoSelect.value;
-      if (!treinoId) {
-        alert("Selecione um treino");
-        return;
-      }
-
-      const docSnap = await getDoc(doc(db, "treinos", treinoId));
-      if (!docSnap.exists()) {
-        alert("Treino não encontrado");
-        return;
-      }
-
-      const data = docSnap.data();
-
-      const resultado = {
-        usuario: data.usuario,
-        tipoTreino: data.tipoTreino,
-        data: new Date().toISOString(),
-        grupos: [],
-      };
-
-      const exercicios = treinoContainer.querySelectorAll(".exercise-box");
-
-      exercicios.forEach((box, idx) => {
-        const inputs = box.querySelectorAll("input");
-        const series = [];
-
-        for (let i = 0; i < inputs.length; i += 2) {
-          const reps = inputs[i].value;
-          const carga = inputs[i + 1].value;
-          series.push({ reps, carga });
-        }
-
-        const cronId = `cron-${idx}`;
-        const tempo = cronometros[cronId] ? cronometros[cronId].tempo : 0;
-
-        resultado.grupos.push({
-          grupo: data.grupos[idx].grupo,
-          series: series,
-          tempoSegundos: tempo,
-        });
-      });
-
-      try {
-        await addDoc(collection(db, "treinosRealizados"), resultado);
-        alert("Treino realizado salvo com sucesso!");
-      } catch (error) {
-        alert("Erro ao salvar treino: " + error.message);
-      }
     });
 
   </script>
