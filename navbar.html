@@ -1,42 +1,25 @@
 <nav class="navbar">
-  <div class="container">
-    <h2 class="logo">Academia</h2>
-    <button class="toggle-btn" aria-label="Menu">☰</button>
-    <div class="nav-links">
-      <a href="index.html" data-tooltip="Cadastro">Cadastro</a>
-      <a href="visualizar.html" data-tooltip="Visualizar Treinos">Visualizar</a>
-      <a href="treino.html" data-tooltip="Treino">Treino</a>
-    </div>
+  <h2 class="logo">Academia</h2>
+  <button class="toggle-btn" aria-label="Menu">☰</button>
+  <div class="nav-links">
+    <a href="index.html" data-tooltip="Cadastro">Cadastro</a>
+    <a href="visualizar.html" data-tooltip="Visualizar Treinos">Visualizar</a>
+    <a href="treino.html" data-tooltip="Treino">Treino</a>
   </div>
 </nav>
 
 <style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: Arial, sans-serif;
-  }
-
-  /* Navbar topo */
+  /* Navbar topo fixo */
   .navbar {
     width: 100%;
     background: #34495e;
     color: #ecf0f1;
-    padding: 10px 20px;
+    padding: 12px 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     position: fixed;
     top: 0;
     left: 0;
     z-index: 999;
-  }
-
-  .container {
-    max-width: 1100px;
-    margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -59,7 +42,7 @@
 
   .nav-links {
     display: flex;
-    gap: 25px;
+    gap: 24px;
   }
 
   .nav-links a {
@@ -103,7 +86,7 @@
 
     .nav-links {
       position: fixed;
-      top: 60px; /* altura navbar */
+      top: 56px; /* altura navbar */
       left: 0;
       width: 100%;
       background: #34495e;
@@ -120,7 +103,7 @@
     }
 
     .nav-links a {
-      padding: 15px 20px;
+      padding: 14px 20px;
       border-bottom: 1px solid #2c3e50;
     }
 
@@ -128,14 +111,10 @@
       border-bottom: none;
     }
 
+    /* Remove tooltip no mobile */
     .nav-links a[data-tooltip]:hover::after {
       display: none;
     }
-  }
-
-  /* Para evitar que o conteúdo fique "escondido" atrás do menu fixo */
-  main, body > *:not(nav) {
-    padding-top: 60px;
   }
 </style>
 
@@ -147,18 +126,10 @@
     navLinks.classList.toggle('open');
   });
 
-  document.addEventListener('click', (e) => {
+  // Fecha menu ao clicar fora
+  document.addEventListener('click', e => {
     if (!toggleBtn.contains(e.target) && !navLinks.contains(e.target)) {
       navLinks.classList.remove('open');
-    }
-  });
-
-  // Marca o link ativo de acordo com a URL atual
-  const path = window.location.pathname.split('/').pop();
-  const links = document.querySelectorAll('.nav-links a');
-  links.forEach(link => {
-    if(link.getAttribute('href') === path) {
-      link.classList.add('active');
     }
   });
 </script>
