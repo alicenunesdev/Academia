@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-br" >
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Treinos</title>
   <style>
-    /* CSS embutido */
-
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -17,9 +16,9 @@
       color: #333;
       display: flex;
       min-height: 100vh;
+      flex-direction: column;
     }
 
-    /* Navbar lateral */
     .navbar {
       background: #34495e;
       color: #ecf0f1;
@@ -56,23 +55,6 @@
       color: white;
     }
 
-    .navbar a[data-tooltip]:hover::after {
-      content: attr(data-tooltip);
-      position: absolute;
-      left: 100%;
-      top: 50%;
-      transform: translateY(-50%);
-      background: #2980b9;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 4px;
-      white-space: nowrap;
-      margin-left: 8px;
-      font-size: 0.85rem;
-      pointer-events: none;
-    }
-
-    /* Conteúdo principal */
     .main-content {
       margin-left: 220px;
       padding: 40px 30px;
@@ -80,7 +62,6 @@
       max-width: 100%;
     }
 
-    /* Formulário */
     form {
       background: white;
       padding: 30px 40px;
@@ -125,14 +106,12 @@
       transition: border-color 0.3s;
     }
 
-    input[type="text"]:focus,
-    input[type="number"]:focus,
+    input:focus,
     select:focus {
       border-color: #2980b9;
       outline: none;
     }
 
-    /* Container dos grupos */
     .group-container {
       margin-bottom: 20px;
     }
@@ -145,7 +124,6 @@
       padding-bottom: 6px;
     }
 
-    /* Linha de grupo */
     .group-row {
       display: flex;
       gap: 15px;
@@ -155,7 +133,6 @@
       background: #f0f4f7;
       padding: 12px 15px;
       border-radius: 8px;
-      position: relative;
     }
 
     .group-row > div {
@@ -164,13 +141,6 @@
       flex-direction: column;
     }
 
-    .group-row label {
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: #2c3e50;
-    }
-
-    /* Botão remover grupo */
     .group-row button.remove-group {
       background: #e74c3c;
       color: white;
@@ -189,7 +159,6 @@
       background: #c0392b;
     }
 
-    /* Botão adicionar grupo */
     button.add-group {
       background: #27ae60;
       color: white;
@@ -205,15 +174,12 @@
       width: 50px;
       height: 50px;
       font-weight: 700;
-      line-height: 1;
-      user-select: none;
     }
 
     button.add-group:hover {
       background: #219150;
     }
 
-    /* Botões salvar e cancelar */
     .buttons {
       display: flex;
       gap: 20px;
@@ -251,7 +217,7 @@
     }
 
     /* Responsivo */
-    @media(max-width: 768px) {
+    @media (max-width: 768px) {
       .navbar {
         width: 60px;
         padding: 20px 5px;
@@ -264,29 +230,6 @@
       .navbar a {
         padding: 12px 8px;
         font-size: 0;
-        position: relative;
-      }
-
-      .navbar a::before {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        background: #2980b9;
-        color: white;
-        padding: 6px 10px;
-        border-radius: 4px;
-        white-space: nowrap;
-        margin-left: 8px;
-        font-size: 0.85rem;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s;
-      }
-
-      .navbar a:hover::before {
-        opacity: 1;
       }
 
       .main-content {
@@ -301,6 +244,67 @@
       .form-row {
         flex-direction: column;
       }
+
+      .group-row {
+        flex-direction: column;
+      }
+
+      .group-row > div {
+        width: 100%;
+      }
+
+      .group-row button.remove-group {
+        align-self: flex-end;
+        margin-top: 10px;
+      }
+
+      .buttons {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      button.save,
+      button.cancel {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .navbar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+        padding: 10px 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 15px 10px;
+      }
+
+      form {
+        padding: 15px;
+      }
+
+      h1 {
+        font-size: 1.4rem;
+      }
+
+      .group-container h3 {
+        font-size: 1.1rem;
+      }
+
+      input,
+      select {
+        font-size: 0.95rem;
+      }
+
+      .navbar a {
+        font-size: 0.85rem;
+        padding: 10px;
+      }
     }
   </style>
 </head>
@@ -309,7 +313,7 @@
     <h2>Academia</h2>
     <a href="index.html" class="active" data-tooltip="Cadastro">Cadastro</a>
     <a href="visualizar.html" data-tooltip="Visualizar Treinos">Visualizar</a>
-    <a href="treino.html" data-tooltip="treino">treino</a>
+    <a href="treino.html" data-tooltip="Treino">Treino</a>
   </nav>
 
   <main class="main-content">
@@ -365,8 +369,8 @@
 
     const form = document.getElementById("form-treino");
     const gruposContainer = document.getElementById("grupos-container");
-    const addGroupBtn = document.querySelector("button.add-group");
-    const cancelBtn = document.querySelector("button.cancel");
+    const addGroupBtn = document.querySelector(".add-group");
+    const cancelBtn = document.querySelector(".cancel");
 
     function criarGrupo() {
       const div = document.createElement("div");
@@ -385,24 +389,16 @@
           <label>Repetição</label>
           <input type="number" name="repeticao" min="1" placeholder="Repetição" required />
         </div>
-        <button type="button" class="remove-group" title="Remover grupo" style="
-          background:#c0392b; color:white; border:none; padding:0 10px; border-radius:4px; cursor:pointer; height:30px; align-self:flex-end;
-        ">×</button>
+        <button type="button" class="remove-group" title="Remover grupo">×</button>
       `;
 
-      div.querySelector(".remove-group").addEventListener("click", () => {
-        div.remove();
-      });
-
+      div.querySelector(".remove-group").addEventListener("click", () => div.remove());
       gruposContainer.appendChild(div);
     }
 
-    // Inicia com um grupo
     criarGrupo();
 
-    addGroupBtn.addEventListener("click", () => {
-      criarGrupo();
-    });
+    addGroupBtn.addEventListener("click", criarGrupo);
 
     cancelBtn.addEventListener("click", () => {
       form.reset();
@@ -412,12 +408,8 @@
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
-
-      // Pegando dados do form
       const usuario = form.usuario.value.trim();
       const tipoTreino = form["tipo-treino"].value;
-
-      // Grupos
       const grupos = [];
       const gruposRows = gruposContainer.querySelectorAll(".group-row");
 
@@ -425,12 +417,10 @@
         const grupo = row.querySelector('input[name="grupo"]').value.trim();
         const serie = row.querySelector('input[name="serie"]').value.trim();
         const repeticao = row.querySelector('input[name="repeticao"]').value.trim();
-
         if (!grupo || !serie || !repeticao) {
           alert("Preencha todos os campos dos grupos!");
           return;
         }
-
         grupos.push({ grupo, serie: Number(serie), repeticao: Number(repeticao) });
       }
 
@@ -446,7 +436,6 @@
           grupos,
           criadoEm: new Date()
         });
-
         alert("Treino salvo com sucesso!");
         form.reset();
         gruposContainer.innerHTML = "";
