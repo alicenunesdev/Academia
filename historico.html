@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Histórico de Treinos</title>
+
   <style>
     * {
       box-sizing: border-box;
@@ -19,6 +20,7 @@
       flex-direction: column;
     }
 
+    /* Navbar */
     .navbar {
       position: fixed;
       top: 0;
@@ -60,6 +62,7 @@
       color: white;
     }
 
+    /* Conteúdo */
     .main-content {
       padding: 100px 30px 40px;
       flex: 1;
@@ -147,6 +150,7 @@
       border-bottom: 1px solid #ddd;
     }
 
+    /* Responsivo */
     @media (max-width: 768px) {
       .navbar {
         flex-direction: column;
@@ -177,18 +181,21 @@
     }
   </style>
 </head>
+
 <body>
 
+  <!-- Navbar -->
   <nav class="navbar">
     <h2>Academia</h2>
     <div class="navbar-links">
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
-      <a href="Treino.html">Treino</a>
+      <a href="treino.html">Treino</a>
       <a href="historico.html" class="active">Histórico</a>
     </div>
   </nav>
 
+  <!-- Conteúdo Principal -->
   <main class="main-content">
     <h1>Histórico de Treinos</h1>
     <div id="historicoContainer"></div>
@@ -202,6 +209,7 @@
     </div>
   </div>
 
+  <!-- Firebase e Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -212,7 +220,7 @@
       projectId: "academia-bd-9d4da",
       storageBucket: "academia-bd-9d4da.appspot.com",
       messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -258,7 +266,11 @@
         ${data.grupos.map(grupo => `
           <div class="exercicio">
             <h4>Exercício: ${grupo.grupo}</h4>
-            <p><strong>Séries:</strong> ${grupo.serie} | <strong>Repetições:</strong> ${grupo.repeticao}</p>
+            <p>
+              <strong>Séries:</strong> ${grupo.serie} |
+              <strong>Repetições:</strong> ${grupo.repeticao} |
+              <strong>Carga:</strong> ${grupo.carga ?? 'Não informado'} kg
+            </p>
           </div>
         `).join('')}
       `;
@@ -275,5 +287,6 @@
       }
     }
   </script>
+
 </body>
 </html>
