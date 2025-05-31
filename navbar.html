@@ -45,7 +45,6 @@
     border-radius: 6px;
     transition: background 0.3s, color 0.3s;
     font-weight: 600;
-    display: block;
     position: relative;
   }
 
@@ -55,6 +54,7 @@
     color: white;
   }
 
+  /* Tooltip */
   .navbar a[data-tooltip]:hover::after {
     content: attr(data-tooltip);
     position: absolute;
@@ -71,6 +71,7 @@
     pointer-events: none;
   }
 
+  /* Toggle button */
   .toggle-btn {
     display: none;
     background: #2980b9;
@@ -78,7 +79,7 @@
     border: none;
     padding: 10px;
     border-radius: 6px;
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     cursor: pointer;
     margin-bottom: 20px;
   }
@@ -129,7 +130,7 @@
     }
 
     .toggle-btn {
-      font-size: 1rem;
+      font-size: 1.2rem;
     }
   }
 </style>
@@ -140,5 +141,12 @@
 
   toggleBtn.addEventListener('click', () => {
     navbar.classList.toggle('open');
+  });
+
+  // Fechar navbar quando clicar fora (opcional, deixa mais elegante)
+  document.addEventListener('click', (e) => {
+    if (!navbar.contains(e.target) && !toggleBtn.contains(e.target)) {
+      navbar.classList.remove('open');
+    }
   });
 </script>
