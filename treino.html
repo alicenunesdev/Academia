@@ -212,7 +212,7 @@
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
       <a href="treino.html" class="active">Treino</a>
-       <a href="historico.html">Historico</a>
+      <a href="historico.html">Historico</a>
     </div>
   </nav>
 
@@ -319,9 +319,9 @@
           ${dadosPreenchidos[chaveGrupo].map((serie, i) => `
             <div>
               <label>Série ${i + 1}</label><br/>
-              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps">
-              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga">
-              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''}> ✔
+              <input type="number" placeholder="Reps" value="${serie.repeticoes}" data-serie="${i}" class="input-reps" />
+              <input type="number" placeholder="Carga (kg)" value="${serie.carga}" data-serie="${i}" class="input-carga" />
+              <input type="checkbox" class="check-serie" data-serie="${i}" ${serie.check ? 'checked' : ''} /> ✔
               <span class="cronometro-serie ${serie.check ? '' : 'hidden'}">${serie.tempo}</span>
             </div>
           `).join('')}
@@ -337,6 +337,7 @@
 
       treinoContainer.appendChild(div);
 
+      // Eventos inputs reps
       document.querySelectorAll(".input-reps").forEach(input => {
         input.addEventListener("input", (e) => {
           const idx = e.target.dataset.serie;
@@ -344,6 +345,7 @@
         });
       });
 
+      // Eventos inputs carga
       document.querySelectorAll(".input-carga").forEach(input => {
         input.addEventListener("input", (e) => {
           const idx = e.target.dataset.serie;
@@ -351,6 +353,7 @@
         });
       });
 
+      // Eventos checkbox série e cronômetro
       document.querySelectorAll(".check-serie").forEach((checkbox) => {
         checkbox.addEventListener("change", (e) => {
           const idx = e.target.dataset.serie;
@@ -368,6 +371,7 @@
         });
       });
 
+      // Botão anterior
       document.getElementById("anteriorBtn").addEventListener("click", () => {
         if (atual > 0) {
           atual--;
@@ -375,6 +379,7 @@
         }
       });
 
+      // Botão próximo
       document.getElementById("proximoBtn").addEventListener("click", () => {
         if (atual + 1 < grupos.length) {
           atual++;
@@ -384,6 +389,7 @@
         }
       });
 
+      // Botão encerrar treino
       document.getElementById("encerrarBtn").addEventListener("click", () => {
         encerrarTreino();
       });
