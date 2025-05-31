@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <title>Treino</title>
   <style>
-    /* Seu CSS atual aqui */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -58,9 +57,6 @@
       padding: 40px 30px;
       flex: 1;
       max-width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
 
     .exercise-card {
@@ -69,7 +65,7 @@
       border-radius: 10px;
       box-shadow: 0 0 15px rgba(0,0,0,0.05);
       max-width: 600px;
-      width: 100%;
+      margin: 0 auto;
       text-align: center;
     }
 
@@ -138,13 +134,6 @@
       background: #c0392b;
     }
 
-    .cronometro {
-      font-size: 1.4rem;
-      font-weight: 600;
-      color: #e67e22;
-      margin-top: 15px;
-    }
-
     @media(max-width: 768px) {
       .navbar {
         width: 60px;
@@ -180,17 +169,30 @@
   </nav>
 
   <main class="main-content">
-    <div class="exercise-card" id="exerciseCard">
-      <!-- Conteúdo será inserido via JS -->
-      <h2>Carregando treino...</h2>
+    <div class="exercise-card" id="exerciseCard" style="display:none;">
+      <h2 id="exerciseName"></h2>
+      <p><strong>Séries:</strong> <span id="seriesCount"></span></p>
+      <p><strong>Repetições:</strong> <span id="repetitionsCount"></span></p>
+
+      <div style="margin-top: 20px;">
+        <label for="carga"><strong>Carga (kg):</strong></label><br>
+        <input type="number" id="carga" placeholder="Kg" min="0" />
+      </div>
+
+      <div class="buttons">
+        <button class="complete" id="btnComplete">Completar</button>
+        <button class="skip" id="btnSkip">Pular</button>
+        <button class="end" id="btnEnd">Encerrar</button>
+      </div>
+
+      <div id="cronometro" style="margin-top:20px; font-weight:600; font-size:1.2rem; color:#e67e22;"></div>
     </div>
   </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // Config do seu Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
       authDomain: "academia-bd-9d4da.firebaseapp.com",
@@ -204,125 +206,111 @@
     const db = getFirestore(app);
 
     const exerciseCard = document.getElementById("exerciseCard");
+    const exerciseName = document.getElementById("exerciseName");
+    const seriesCount = document.getElementById("seriesCount");
+    const repetitionsCount = document.getElementById("repetitionsCount");
+    const cargaInput = document.getElementById("carga");
+    const btnComplete = document.getElementById("btnComplete");
+    const btnSkip = document.getElementById("btnSkip");
+    const btnEnd = document.getElementById("btnEnd");
+    const cronometroDisplay = document.getElementById("cronometro");
 
-    // ID do treino para carregar (ajuste conforme sua lógica, aqui coloque um fixo ou pegue da URL)
-    const treinoId = "ID_DO_TREINO_AQUI"; // troque pelo id do treino que quer puxar
+    let treinoExercicios = [];
+    let currentIndex = 0;
+    let timerInterval = null;
+    let timerSeconds = 0;
 
-    let treinoData = null;
-    let grupoAtual = 0;
-    let exercicioAtual = 0;
-    let cronometroInterval = null;
-    let segundos = 0;
+    async function carregarExercicios() {
+      try {
+        const snapshot = await getDocs(collection(db, "treinos"));
+        treinoExercicios = [];
 
-    async function carregarTreino() {
-      const docSnap = await getDoc(doc(db, "treinos", treinoId));
-      if (!docSnap.exists()) {
-        exerciseCard.innerHTML = "<h2>Treino não encontrado</h2>";
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          if(data.grupos && Array.isArray(data.grupos)) {
+            data.grupos.forEach(grupo => {
+              if(grupo.exercicios && Array.isArray(grupo.exercicios)) {
+                grupo.exercicios.forEach(exercicio => {
+                  treinoExercicios.push({
+                    nome: exercicio.nome || grupo.grupo || "Exercício",
+                    serie: exercicio.serie || grupo.serie || "-",
+                    repeticao: exercicio.repeticao || grupo.repeticao || "-",
+                  });
+                });
+              }
+            });
+          }
+        });
+
+        if(treinoExercicios.length > 0) {
+          mostrarExercicio(0);
+        } else {
+          exerciseCard.style.display = "none";
+          alert("Nenhum exercício encontrado.");
+        }
+      } catch(e) {
+        console.error("Erro ao carregar exercícios:", e);
+        alert("Erro ao carregar exercícios. Veja o console.");
+      }
+    }
+
+    function mostrarExercicio(index) {
+      if (index < 0 || index >= treinoExercicios.length) {
+        alert("Fim do treino!");
+        exerciseCard.style.display = "none";
+        pararCronometro();
         return;
       }
-
-      treinoData = docSnap.data();
-      grupoAtual = 0;
-      exercicioAtual = 0;
-      segundos = 0;
-
-      mostrarExercicio();
+      currentIndex = index;
+      const exercicio = treinoExercicios[index];
+      exerciseName.textContent = exercicio.nome;
+      seriesCount.textContent = exercicio.serie;
+      repetitionsCount.textContent = exercicio.repeticao;
+      cargaInput.value = "";
+      exerciseCard.style.display = "block";
       iniciarCronometro();
-    }
-
-    function mostrarExercicio() {
-      if (!treinoData) return;
-
-      const grupos = treinoData.grupos;
-      if (grupoAtual >= grupos.length) {
-        finalizarTreino();
-        return;
-      }
-
-      const grupo = grupos[grupoAtual];
-      if (exercicioAtual >= grupo.exercicios.length) {
-        // passou todos os exercícios do grupo atual, vai para próximo grupo
-        grupoAtual++;
-        exercicioAtual = 0;
-        mostrarExercicio();
-        return;
-      }
-
-      const ex = grupo.exercicios[exercicioAtual];
-
-      // Renderiza o exercício atual
-      exerciseCard.innerHTML = `
-        <h2>${ex.nome}</h2>
-        <p><strong>Grupo:</strong> ${grupo.grupo}</p>
-        <p><strong>Séries:</strong> ${grupo.serie}</p>
-        <p><strong>Repetições alvo:</strong> ${grupo.repeticao}</p>
-
-        <div style="margin-top: 20px;">
-          <label for="carga"><strong>Carga (kg):</strong></label><br>
-          <input type="number" id="carga" placeholder="Kg" min="0" step="0.1" />
-        </div>
-
-        <div class="cronometro" id="cronometro">Tempo: 00:00</div>
-
-        <div class="buttons">
-          <button class="complete" id="btnComplete">Completar</button>
-          <button class="skip" id="btnSkip">Pular</button>
-          <button class="end" id="btnEnd">Encerrar</button>
-        </div>
-      `;
-
-      // Configura os botões
-      document.getElementById("btnComplete").onclick = () => proximoExercicio();
-      document.getElementById("btnSkip").onclick = () => proximoExercicio();
-      document.getElementById("btnEnd").onclick = () => finalizarTreino();
-
-      segundos = 0; // reset cronômetro
-      atualizarCronometroVisual();
-      iniciarCronometro();
-    }
-
-    function proximoExercicio() {
-      pararCronometro();
-      exercicioAtual++;
-      mostrarExercicio();
-    }
-
-    function finalizarTreino() {
-      pararCronometro();
-      exerciseCard.innerHTML = `
-        <h2>Treino finalizado!</h2>
-        <p>Parabéns por completar o treino.</p>
-      `;
     }
 
     function iniciarCronometro() {
-      if(cronometroInterval) clearInterval(cronometroInterval);
-
-      cronometroInterval = setInterval(() => {
-        segundos++;
-        atualizarCronometroVisual();
+      pararCronometro();
+      timerSeconds = 0;
+      cronometroDisplay.textContent = formatarTempo(timerSeconds);
+      timerInterval = setInterval(() => {
+        timerSeconds++;
+        cronometroDisplay.textContent = formatarTempo(timerSeconds);
       }, 1000);
     }
 
     function pararCronometro() {
-      if (cronometroInterval) {
-        clearInterval(cronometroInterval);
-        cronometroInterval = null;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
       }
     }
 
-    function atualizarCronometroVisual() {
-      const cronometroEl = document.getElementById("cronometro");
-      if (!cronometroEl) return;
-
-      const minutos = String(Math.floor(segundos / 60)).padStart(2, "0");
-      const seg = String(segundos % 60).padStart(2, "0");
-      cronometroEl.textContent = `Tempo: ${minutos}:${seg}`;
+    function formatarTempo(segundos) {
+      const min = Math.floor(segundos / 60);
+      const seg = segundos % 60;
+      return `${String(min).padStart(2,'0')}:${String(seg).padStart(2,'0')}`;
     }
 
-    // Inicia a função de carregar o treino
-    carregarTreino();
+    btnComplete.addEventListener("click", () => {
+      alert(`Exercício "${treinoExercicios[currentIndex].nome}" completo!`);
+      mostrarExercicio(currentIndex + 1);
+    });
 
+    btnSkip.addEventListener("click", () => {
+      alert(`Exercício "${treinoExercicios[currentIndex].nome}" pulado!`);
+      mostrarExercicio(currentIndex + 1);
+    });
+
+    btnEnd.addEventListener("click", () => {
+      pararCronometro();
+      exerciseCard.style.display = "none";
+      alert("Treino encerrado!");
+    });
+
+    carregarExercicios();
   </script>
 </body>
 </html>
