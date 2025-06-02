@@ -19,7 +19,6 @@
       min-height: 100vh;
     }
 
-    /* Navbar */
     .navbar {
       position: fixed;
       top: 0;
@@ -61,7 +60,6 @@
       color: white;
     }
 
-    /* Botão hamburguer */
     .hamburguer {
       display: none;
       flex-direction: column;
@@ -80,7 +78,6 @@
       transition: 0.3s;
     }
 
-    /* Quando o menu está ativo (aberto) */
     .navbar-links.active {
       display: flex;
       flex-direction: column;
@@ -174,6 +171,21 @@
       background: #c0392b;
     }
 
+    button.edit-btn {
+      background: #f1c40f;
+      color: #2c3e50;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    button.edit-btn:hover {
+      background: #d4ac0d;
+    }
+
     #loading {
       text-align: center;
       font-size: 1.3rem;
@@ -181,7 +193,6 @@
       margin-top: 100px;
     }
 
-    /* Responsividade */
     @media (max-width: 900px) {
       .navbar {
         padding: 12px 20px;
@@ -204,13 +215,11 @@
         padding: 12px 20px;
       }
 
-      /* Esconder menu links inicialmente no mobile */
       .navbar-links {
         display: none;
         width: auto;
       }
 
-      /* Mostrar hamburguer no mobile */
       .hamburguer {
         display: flex;
       }
@@ -306,15 +315,19 @@
           <div class="grupos-list">
             ${data.grupos.map(grupo => `
               <div class="grupo-item">
-                <span>${grupo.grupo}</span>
-                <span>Séries: ${grupo.serie}</span>
-                <span>Repetições: ${grupo.repeticao}</span>
+                <div style="flex: 1;">
+                  <strong>${grupo.grupo}</strong><br>
+                  Séries: ${grupo.serie} | Repetições: ${grupo.repeticao}<br>
+                  <a href="${grupo.link}" target="_blank" style="color:#2980b9; text-decoration: underline;">Referência</a>
+                </div>
+                <button class="edit-btn" data-id="${id}" data-grupo="${grupo.grupo}">Editar</button>
               </div>
             `).join('')}
           </div>
           <button class="delete-btn">Excluir</button>
         `;
 
+        // Botão excluir
         card.querySelector("button.delete-btn").addEventListener("click", async () => {
           const confirmar = confirm(`Deseja realmente excluir o treino de ${data.usuario}?`);
           if (!confirmar) return;
@@ -328,6 +341,19 @@
           }
         });
 
+        // Botão editar
+        card.querySelectorAll("button.edit-btn").forEach(editBtn => {
+          editBtn.addEventListener("click", () => {
+            const grupoNome = editBtn.getAttribute("data-grupo");
+            const treinoId = editBtn.getAttribute("data-id");
+
+            alert(`Função de edição para o grupo "${grupoNome}" do treino "${data.usuario}" em desenvolvimento.`);
+
+            // Exemplo de redirecionamento para futura página de edição:
+            // window.location.href = `editar.html?id=${treinoId}&grupo=${encodeURIComponent(grupoNome)}`;
+          });
+        });
+
         treinosList.appendChild(card);
       });
     } catch (error) {
@@ -337,7 +363,6 @@
 
   carregarTreinos();
 
-  // Código para controlar o menu hamburguer
   const hamburguer = document.getElementById('hamburguer');
   const navbarLinks = document.getElementById('navbar-links');
 
