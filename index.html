@@ -105,12 +105,13 @@
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 20px;
+      position: relative;
     }
     .grupo h3 {
       margin-top: 0;
       color: #2980b9;
     }
-    .grupo button {
+    .grupo button.remove-btn {
       background: #e74c3c;
       color: white;
       border: none;
@@ -122,7 +123,7 @@
       transition: background 0.3s;
       margin-top: 10px;
     }
-    .grupo button:hover {
+    .grupo button.remove-btn:hover {
       background: #c0392b;
     }
     button {
@@ -242,13 +243,18 @@
       <label>Nome do Grupo</label>
       <input type="text" class="grupo-nome" required />
       <label>Séries</label>
-      <input type="number" class="grupo-serie" required />
+      <input type="number" class="grupo-serie" min="1" required />
       <label>Repetições</label>
-      <input type="number" class="grupo-repeticao" required />
+      <input type="number" class="grupo-repeticao" min="1" required />
       <label>Vídeo de Referência</label>
       <input type="file" accept="video/*" class="grupo-video" />
-      <button type="button" onclick="this.parentElement.remove()">Remover</button>
+      <button type="button" class="remove-btn">Remover</button>
     `;
+
+    // Adiciona evento para o botão remover
+    grupoDiv.querySelector('.remove-btn').addEventListener('click', () => {
+      grupoDiv.remove();
+    });
 
     gruposContainer.appendChild(grupoDiv);
   }
@@ -257,43 +263,62 @@
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    console.log("Submit disparado");
 
     const tipoTreino = document.getElementById('tipoTreino').value;
 
+    if (!tipoTreino) {
+      alert('Selecione um tipo de treino.');
+      return;
+    }
+
     const grupoDivs = Array.from(document.querySelectorAll('.grupo'));
 
-    const grupos = await Promise.all(grupoDivs.map(async (grupo) => {
-      const nome = grupo.querySelector('.grupo-nome').value.trim();
-      const serie = grupo.querySelector('.grupo-serie').value;
-      const repeticao = grupo.querySelector('.grupo-repeticao').value;
-      const videoFile = grupo.querySelector('.grupo-video').files[0];
-
-      let videoURL = '';
-
-      if (videoFile) {
-        const storageRef = ref(storage, `videos/${nome}_${videoFile.name}`);
-        const snapshot = await uploadBytes(storageRef, videoFile);
-        videoURL = await getDownloadURL(snapshot.ref);
-      }
-
-      return {
-        grupo: nome,
-        serie,
-        repeticao,
-        videoURL,
-      };
-    }));
+    if (grupoDivs.length === 0) {
+      alert('Adicione pelo menos um grupo muscular.');
+      return;
+    }
 
     try {
+      // Mapeia os grupos com upload dos vídeos (se houver)
+      const grupos = await Promise.all(grupoDivs.map(async (grupo) => {
+        const nome = grupo.querySelector('.grupo-nome').value.trim();
+        const serie = grupo.querySelector('.grupo-serie').value;
+        const repeticao = grupo.querySelector('.grupo-repeticao').value;
+        const videoFile = grupo.querySelector('.grupo-video').files[0];
+
+        if (!nome || !serie || !repeticao) {
+          throw new Error('Preencha todos os campos de cada grupo muscular.');
+        }
+
+        let videoURL = '';
+
+        if (videoFile) {
+          const storageRef = ref(storage, `videos/${Date.now()}_${nome}_${videoFile.name}`);
+          const snapshot = await uploadBytes(storageRef, videoFile);
+          videoURL = await getDownloadURL(snapshot.ref);
+        }
+
+        return {
+          grupo: nome,
+          serie: Number(serie),
+          repeticao: Number(repeticao),
+          videoURL,
+        };
+      }));
+
       await addDoc(collection(db, "treinos"), {
         tipoTreino,
-        grupos
+        grupos,
+        criadoEm: new Date()
       });
 
       alert('Treino cadastrado com sucesso!');
       form.reset();
       gruposContainer.innerHTML = '';
+
     } catch (error) {
+      console.error("Erro ao cadastrar treino:", error);
       alert('Erro ao cadastrar treino: ' + error.message);
     }
   });
