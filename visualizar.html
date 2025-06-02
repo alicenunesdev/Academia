@@ -147,7 +147,6 @@
       font-size: 1rem;
       border-bottom: 1px solid #eee;
       color: #2c3e50;
-      align-items: center;
     }
 
     .grupo-item:last-child {
@@ -173,18 +172,17 @@
     }
 
     button.edit-btn {
-      background: #27ae60;
+      background: #3498db;
       color: white;
       border: none;
+      padding: 4px 10px;
       border-radius: 6px;
-      padding: 6px 10px;
       cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s;
+      font-size: 0.9rem;
     }
 
     button.edit-btn:hover {
-      background: #1e8449;
+      background: #2980b9;
     }
 
     #loading {
@@ -194,12 +192,32 @@
       margin-top: 100px;
     }
 
-    @media (max-width: 768px) {
-      .navbar {
-        flex-direction: row;
-        align-items: center;
-      }
+    /* Modal */
+    #edit-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
 
+    #edit-modal-content {
+      background: white;
+      padding: 20px 25px;
+      border-radius: 10px;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      position: relative;
+    }
+
+    /* Responsivo */
+    @media (max-width: 768px) {
       .navbar-links {
         display: none;
       }
@@ -207,23 +225,9 @@
       .hamburguer {
         display: flex;
       }
-    }
 
-    @media (max-width: 480px) {
-      .main-content {
-        padding: 80px 15px 20px;
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .treino-card {
-        margin: 15px 5px;
-      }
-
-      .grupo-item span {
-        font-size: 0.95rem;
+      .navbar-links.active {
+        display: flex;
       }
     }
   </style>
@@ -232,13 +236,11 @@
 
 <nav class="navbar">
   <h2>Academia</h2>
-
   <div class="hamburguer" id="hamburguer">
     <span></span>
     <span></span>
     <span></span>
   </div>
-
   <div class="navbar-links" id="navbar-links">
     <a href="index.html">Cadastro</a>
     <a href="visualizar.html" class="active">Visualizar</a>
@@ -253,17 +255,40 @@
   <div id="treinos-list"></div>
 </main>
 
+<!-- Modal -->
+<div id="edit-modal">
+  <div id="edit-modal-content">
+    <h2>Editar Grupo</h2>
+    <form id="edit-form">
+      <label>Grupo:</label>
+      <input type="text" id="edit-grupo" required style="width:100%;"><br><br>
+
+      <label>Série:</label>
+      <input type="number" id="edit-serie" required style="width:100%;"><br><br>
+
+      <label>Repetição:</label>
+      <input type="text" id="edit-repeticao" required style="width:100%;"><br><br>
+
+      <label>Link (opcional):</label>
+      <input type="url" id="edit-link" style="width:100%;"><br><br>
+
+      <button type="submit" style="background:#27ae60; color:white; padding:6px 12px; border:none; border-radius:6px;">Salvar</button>
+      <button type="button" id="cancel-edit" style="background:#e74c3c; color:white; padding:6px 12px; border:none; border-radius:6px;">Cancelar</button>
+    </form>
+  </div>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-    authDomain: "academia-bd-9d4da.firebaseapp.com",
-    projectId: "academia-bd-9d4da",
-    storageBucket: "academia-bd-9d4da.appspot.com",
-    messagingSenderId: "201289997890",
-    appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+    apiKey: "SUA_API_KEY",
+    authDomain: "SUA_AUTH_DOMAIN",
+    projectId: "SUA_PROJECT_ID",
+    storageBucket: "SUA_STORAGE_BUCKET",
+    messagingSenderId: "SUA_MESSAGING_SENDER_ID",
+    appId: "SUA_APP_ID",
   };
 
   const app = initializeApp(firebaseConfig);
@@ -272,13 +297,16 @@
   const treinosList = document.getElementById("treinos-list");
   const loading = document.getElementById("loading");
 
+  let editTreinoId = null;
+  let editGrupoIndex = null;
+  let treinoDataCache = {};
+
   async function carregarTreinos() {
     loading.style.display = "block";
     treinosList.innerHTML = "";
 
     try {
       const querySnapshot = await getDocs(collection(db, "treinos"));
-
       if (querySnapshot.empty) {
         loading.textContent = "Nenhum treino cadastrado.";
         return;
@@ -289,6 +317,7 @@
       querySnapshot.forEach((docSnap) => {
         const data = docSnap.data();
         const id = docSnap.id;
+        treinoDataCache[id] = data;
 
         const card = document.createElement("div");
         card.classList.add("treino-card");
@@ -297,21 +326,22 @@
           <h2>${data.usuario}</h2>
           <div class="treino-info"><strong>Tipo de Treino:</strong> ${data.tipoTreino}</div>
           <div class="grupos-list">
-            ${data.grupos.map(grupo => `
+            ${data.grupos.map((grupo, index) => `
               <div class="grupo-item">
-                <div style="flex:1;">
+                <div>
                   <strong>${grupo.grupo}</strong><br>
-                  Séries: ${grupo.serie} | Repetições: ${grupo.repeticao}<br>
-                  ${grupo.link ? `<a href="${grupo.link}" target="_blank" style="color:#2980b9; text-decoration: underline;">Referência</a>` : ''}
+                  Séries: ${grupo.serie} | Repetições: ${grupo.repeticao}
+                  ${grupo.link ? `<br><a href="${grupo.link}" target="_blank">Ver referência</a>` : ""}
                 </div>
-                <button class="edit-btn" data-id="${id}" data-grupo="${grupo.grupo}">Editar</button>
+                <div>
+                  <button class="edit-btn" data-id="${id}" data-index="${index}">Editar</button>
+                </div>
               </div>
             `).join('')}
           </div>
           <button class="delete-btn">Excluir</button>
         `;
 
-        // Evento de excluir treino
         card.querySelector("button.delete-btn").addEventListener("click", async () => {
           const confirmar = confirm(`Deseja realmente excluir o treino de ${data.usuario}?`);
           if (!confirmar) return;
@@ -325,12 +355,18 @@
           }
         });
 
-        // Evento de editar (Apenas alerta neste exemplo — implemente conforme desejar)
         card.querySelectorAll("button.edit-btn").forEach((btn) => {
           btn.addEventListener("click", () => {
-            const grupo = btn.getAttribute("data-grupo");
-            alert(`Aqui você pode abrir um formulário para editar o grupo: ${grupo}`);
-            // Aqui você pode redirecionar para uma página de edição ou abrir um modal.
+            editTreinoId = btn.getAttribute("data-id");
+            editGrupoIndex = parseInt(btn.getAttribute("data-index"));
+            const grupo = treinoDataCache[editTreinoId].grupos[editGrupoIndex];
+
+            document.getElementById('edit-grupo').value = grupo.grupo;
+            document.getElementById('edit-serie').value = grupo.serie;
+            document.getElementById('edit-repeticao').value = grupo.repeticao;
+            document.getElementById('edit-link').value = grupo.link || '';
+
+            document.getElementById('edit-modal').style.display = 'flex';
           });
         });
 
@@ -340,6 +376,36 @@
       loading.textContent = "Erro ao carregar treinos: " + error.message;
     }
   }
+
+  document.getElementById('cancel-edit').addEventListener('click', () => {
+    document.getElementById('edit-modal').style.display = 'none';
+  });
+
+  document.getElementById('edit-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const grupoEditado = {
+      grupo: document.getElementById('edit-grupo').value.trim(),
+      serie: parseInt(document.getElementById('edit-serie').value),
+      repeticao: document.getElementById('edit-repeticao').value.trim(),
+      link: document.getElementById('edit-link').value.trim(),
+    };
+
+    try {
+      const treinoRef = doc(db, "treinos", editTreinoId);
+      const treinoData = treinoDataCache[editTreinoId];
+
+      treinoData.grupos[editGrupoIndex] = grupoEditado;
+
+      await setDoc(treinoRef, treinoData);
+
+      alert("Grupo editado com sucesso!");
+      document.getElementById('edit-modal').style.display = 'none';
+      carregarTreinos();
+    } catch (error) {
+      alert("Erro ao salvar edição: " + error.message);
+    }
+  });
 
   carregarTreinos();
 
