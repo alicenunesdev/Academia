@@ -147,6 +147,7 @@
       font-size: 1rem;
       border-bottom: 1px solid #eee;
       color: #2c3e50;
+      align-items: center;
     }
 
     .grupo-item:last-child {
@@ -172,8 +173,8 @@
     }
 
     button.edit-btn {
-      background: #f1c40f;
-      color: #2c3e50;
+      background: #27ae60;
+      color: white;
       border: none;
       border-radius: 6px;
       padding: 6px 10px;
@@ -183,7 +184,7 @@
     }
 
     button.edit-btn:hover {
-      background: #d4ac0d;
+      background: #1e8449;
     }
 
     #loading {
@@ -193,31 +194,14 @@
       margin-top: 100px;
     }
 
-    @media (max-width: 900px) {
-      .navbar {
-        padding: 12px 20px;
-      }
-
-      .navbar h2 {
-        font-size: 1.4rem;
-      }
-
-      .navbar-links {
-        gap: 15px;
-      }
-    }
-
     @media (max-width: 768px) {
       .navbar {
         flex-direction: row;
         align-items: center;
-        position: fixed;
-        padding: 12px 20px;
       }
 
       .navbar-links {
         display: none;
-        width: auto;
       }
 
       .hamburguer {
@@ -315,10 +299,10 @@
           <div class="grupos-list">
             ${data.grupos.map(grupo => `
               <div class="grupo-item">
-                <div style="flex: 1;">
+                <div style="flex:1;">
                   <strong>${grupo.grupo}</strong><br>
                   Séries: ${grupo.serie} | Repetições: ${grupo.repeticao}<br>
-                  <a href="${grupo.link}" target="_blank" style="color:#2980b9; text-decoration: underline;">Referência</a>
+                  ${grupo.link ? `<a href="${grupo.link}" target="_blank" style="color:#2980b9; text-decoration: underline;">Referência</a>` : ''}
                 </div>
                 <button class="edit-btn" data-id="${id}" data-grupo="${grupo.grupo}">Editar</button>
               </div>
@@ -327,7 +311,7 @@
           <button class="delete-btn">Excluir</button>
         `;
 
-        // Botão excluir
+        // Evento de excluir treino
         card.querySelector("button.delete-btn").addEventListener("click", async () => {
           const confirmar = confirm(`Deseja realmente excluir o treino de ${data.usuario}?`);
           if (!confirmar) return;
@@ -341,16 +325,12 @@
           }
         });
 
-        // Botão editar
-        card.querySelectorAll("button.edit-btn").forEach(editBtn => {
-          editBtn.addEventListener("click", () => {
-            const grupoNome = editBtn.getAttribute("data-grupo");
-            const treinoId = editBtn.getAttribute("data-id");
-
-            alert(`Função de edição para o grupo "${grupoNome}" do treino "${data.usuario}" em desenvolvimento.`);
-
-            // Exemplo de redirecionamento para futura página de edição:
-            // window.location.href = `editar.html?id=${treinoId}&grupo=${encodeURIComponent(grupoNome)}`;
+        // Evento de editar (Apenas alerta neste exemplo — implemente conforme desejar)
+        card.querySelectorAll("button.edit-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const grupo = btn.getAttribute("data-grupo");
+            alert(`Aqui você pode abrir um formulário para editar o grupo: ${grupo}`);
+            // Aqui você pode redirecionar para uma página de edição ou abrir um modal.
           });
         });
 
