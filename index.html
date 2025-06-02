@@ -211,7 +211,14 @@
   <h1>Cadastrar Treino</h1>
   <form id="treino-form">
     <label for="tipoTreino">Tipo de Treino</label>
-    <input type="text" id="tipoTreino" required />
+    <select id="tipoTreino" required>
+      <option value="" disabled selected>Selecione</option>
+      <option value="Peito">Peito</option>
+      <option value="Costas">Costas</option>
+      <option value="Perna">Perna</option>
+      <option value="Posterior/Glúteos">Posterior/Glúteos</option>
+      <option value="Braços">Braços</option>
+    </select>
 
     <div id="grupos-container"></div>
 
