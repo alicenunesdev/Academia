@@ -210,13 +210,6 @@
 <main class="main-content">
   <h1>Cadastrar Treino</h1>
   <form id="treino-form">
-    <label for="usuario">Usuário</label>
-    <select id="usuario" required>
-      <option value="">Selecione um usuário</option>
-      <option value="Alice">Alice</option>
-      <option value="Laercio">Laercio</option>
-    </select>
-
     <label for="tipoTreino">Tipo de Treino</label>
     <input type="text" id="tipoTreino" required />
 
@@ -277,7 +270,6 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const usuario = document.getElementById('usuario').value;
     const tipoTreino = document.getElementById('tipoTreino').value;
 
     const grupos = Array.from(document.querySelectorAll('.grupo')).map(grupo => ({
@@ -288,7 +280,6 @@
 
     try {
       await addDoc(collection(db, "treinos"), {
-        usuario,
         tipoTreino,
         grupos
       });
