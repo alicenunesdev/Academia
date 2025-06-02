@@ -215,7 +215,6 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
@@ -228,7 +227,6 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const storage = getStorage(app);
 
   const form = document.getElementById('treino-form');
   const gruposContainer = document.getElementById('grupos-container');
@@ -246,12 +244,11 @@
       <input type="number" class="grupo-serie" min="1" required />
       <label>Repetições</label>
       <input type="number" class="grupo-repeticao" min="1" required />
-      <label>Vídeo de Referência</label>
-      <input type="file" accept="video/*" class="grupo-video" />
+      <label>Link do Vídeo de Referência</label>
+      <input type="url" class="grupo-video-link" placeholder="https://exemplo.com/video" />
       <button type="button" class="remove-btn">Remover</button>
     `;
 
-    // Adiciona evento para o botão remover
     grupoDiv.querySelector('.remove-btn').addEventListener('click', () => {
       grupoDiv.remove();
     });
@@ -263,7 +260,6 @@
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    console.log("Submit disparado");
 
     const tipoTreino = document.getElementById('tipoTreino').value;
 
@@ -280,32 +276,25 @@
     }
 
     try {
-      // Mapeia os grupos com upload dos vídeos (se houver)
-      const grupos = await Promise.all(grupoDivs.map(async (grupo) => {
+      const grupos = grupoDivs.map(grupo => {
         const nome = grupo.querySelector('.grupo-nome').value.trim();
         const serie = grupo.querySelector('.grupo-serie').value;
         const repeticao = grupo.querySelector('.grupo-repeticao').value;
-        const videoFile = grupo.querySelector('.grupo-video').files[0];
+        const videoURL = grupo.querySelector('.grupo-video-link').value.trim();
 
         if (!nome || !serie || !repeticao) {
           throw new Error('Preencha todos os campos de cada grupo muscular.');
         }
 
-        let videoURL = '';
-
-        if (videoFile) {
-          const storageRef = ref(storage, `videos/${Date.now()}_${nome}_${videoFile.name}`);
-          const snapshot = await uploadBytes(storageRef, videoFile);
-          videoURL = await getDownloadURL(snapshot.ref);
-        }
+        // Se desejar, pode validar se videoURL é uma URL válida aqui.
 
         return {
           grupo: nome,
           serie: Number(serie),
           repeticao: Number(repeticao),
-          videoURL,
+          videoURL: videoURL || '',
         };
-      }));
+      });
 
       await addDoc(collection(db, "treinos"), {
         tipoTreino,
