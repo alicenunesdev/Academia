@@ -40,7 +40,6 @@
       font-size: 1.6rem;
     }
 
-    /* Botão hamburguer */
     .hamburguer {
       display: none;
       flex-direction: column;
@@ -191,8 +190,6 @@
       background: #2471a3;
     }
 
-    /* RESPONSIVO */
-
     @media (max-width: 768px) {
       .navbar {
         flex-direction: row;
@@ -246,13 +243,9 @@
 
   <nav class="navbar">
     <h2>Academia</h2>
-
     <div class="hamburguer" id="hamburguer">
-      <span></span>
-      <span></span>
-      <span></span>
+      <span></span><span></span><span></span>
     </div>
-
     <div class="navbar-links" id="navbarLinks">
       <a href="index.html">Cadastro</a>
       <a href="visualizar.html">Visualizar</a>
@@ -263,7 +256,6 @@
 
   <main class="main-content">
     <h1>Iniciar Treino</h1>
-
     <div class="card">
       <label for="treinoSelect">Selecione um treino:</label>
       <select id="treinoSelect">
@@ -271,14 +263,12 @@
       </select>
       <button id="iniciarBtn">Iniciar Treino</button>
     </div>
-
     <div id="treinoContainer"></div>
   </main>
 
   <script>
     const hamburguer = document.getElementById("hamburguer");
     const navbarLinks = document.getElementById("navbarLinks");
-
     hamburguer.addEventListener("click", () => {
       navbarLinks.classList.toggle("open");
     });
@@ -287,21 +277,18 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDoc, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-analytics.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
       authDomain: "academia-bd-9d4da.firebaseapp.com",
-      databaseURL: "https://academia-bd-9d4da-default-rtdb.firebaseio.com",
       projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.firebasestorage.app",
+      storageBucket: "academia-bd-9d4da.appspot.com",
       messagingSenderId: "201289997890",
       appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
       measurementId: "G-3J2FY1DEGW"
     };
 
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const db = getFirestore(app);
 
     const treinoSelect = document.getElementById("treinoSelect");
@@ -311,11 +298,11 @@
     let atual = 0;
     let grupos = [];
     let dadosPreenchidos = {};
+    const timers = {};
 
     async function carregarTreinos() {
       const snapshot = await getDocs(collection(db, "treinos"));
       treinoSelect.innerHTML = '<option value="">Selecione</option>';
-
       snapshot.forEach(docSnap => {
         const data = docSnap.data();
         const option = document.createElement("option");
@@ -333,35 +320,30 @@
         alert("Selecione um treino");
         return;
       }
-
       const docSnap = await getDoc(doc(db, "treinos", treinoId));
       if (!docSnap.exists()) {
         alert("Treino não encontrado");
         return;
       }
-
       const data = docSnap.data();
       grupos = data.grupos;
       atual = 0;
       dadosPreenchidos = {};
-
       treinoSelect.disabled = true;
       iniciarBtn.disabled = true;
-
       exibirExercicio(atual);
     });
 
     function exibirExercicio(index) {
       const grupo = grupos[index];
       treinoContainer.innerHTML = "";
-
       const chaveGrupo = `grupo${index}`;
       if (!dadosPreenchidos[chaveGrupo]) {
         dadosPreenchidos[chaveGrupo] = Array.from({ length: grupo.serie }).map(() => ({
           repeticoes: grupo.repeticao || '',
           carga: '',
           check: false,
-          tempo: "00:00"
+          tempo: "01:00"
         }));
       }
 
@@ -413,14 +395,31 @@
         checkbox.addEventListener("change", (e) => {
           const idx = e.target.dataset.serie;
           const spanTempo = e.target.nextElementSibling;
+          const key = `${chaveGrupo}-${idx}`;
+
           if (e.target.checked) {
             dadosPreenchidos[chaveGrupo][idx].check = true;
             spanTempo.classList.remove("hidden");
-            startCronometro(spanTempo, idx, chaveGrupo);
+
+            let seconds = 60;
+            spanTempo.textContent = "01:00";
+            clearInterval(timers[key]);
+            timers[key] = setInterval(() => {
+              seconds--;
+              const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+              const seg = String(seconds % 60).padStart(2, '0');
+              spanTempo.textContent = `${min}:${seg}`;
+              dadosPreenchidos[chaveGrupo][idx].tempo = `${min}:${seg}`;
+              if (seconds <= 0) {
+                clearInterval(timers[key]);
+              }
+            }, 1000);
+
           } else {
             dadosPreenchidos[chaveGrupo][idx].check = false;
             spanTempo.classList.add("hidden");
-            stopCronometro(idx, chaveGrupo);
+            clearInterval(timers[key]);
+            dadosPreenchidos[chaveGrupo][idx].tempo = "01:00";
           }
         });
       });
@@ -442,29 +441,6 @@
       document.getElementById("encerrarBtn").addEventListener("click", finalizarTreino);
     }
 
-    const cronometros = {};
-
-    function startCronometro(element, serieIndex, chaveGrupo) {
-      let seconds = 0;
-      stopCronometro(serieIndex, chaveGrupo); // Para evitar múltiplos timers
-
-      cronometros[`${chaveGrupo}-${serieIndex}`] = setInterval(() => {
-        seconds++;
-        const min = Math.floor(seconds / 60).toString().padStart(2, "0");
-        const seg = (seconds % 60).toString().padStart(2, "0");
-        element.textContent = `${min}:${seg}`;
-        dadosPreenchidos[chaveGrupo][serieIndex].tempo = element.textContent;
-      }, 1000);
-    }
-
-    function stopCronometro(serieIndex, chaveGrupo) {
-      const key = `${chaveGrupo}-${serieIndex}`;
-      if (cronometros[key]) {
-        clearInterval(cronometros[key]);
-        delete cronometros[key];
-      }
-    }
-
     async function finalizarTreino() {
       try {
         await setDoc(doc(db, "historico", Date.now().toString()), {
@@ -472,7 +448,6 @@
           treino: treinoSelect.options[treinoSelect.selectedIndex].text,
           resultados: dadosPreenchidos
         });
-
         alert("Treino finalizado e salvo no histórico!");
         treinoContainer.innerHTML = "";
         treinoSelect.disabled = false;
