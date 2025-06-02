@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cadastrar Treino</title>
   <style>
+    /* Mantém todo o seu CSS anterior */
     * {
       box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     body {
       margin: 0;
       background: #f7f9fc;
@@ -18,7 +18,6 @@
       min-height: 100vh;
       flex-direction: column;
     }
-
     .navbar {
       position: fixed;
       top: 0;
@@ -33,18 +32,15 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
     }
-
     .navbar h2 {
       margin: 0;
       font-weight: 700;
       font-size: 1.6rem;
     }
-
     .navbar-links {
       display: flex;
       gap: 20px;
     }
-
     .navbar a {
       color: #bdc3c7;
       text-decoration: none;
@@ -53,20 +49,17 @@
       transition: background 0.3s, color 0.3s;
       font-weight: 600;
     }
-
     .navbar a:hover,
     .navbar a.active {
       background: #2980b9;
       color: white;
     }
-
     .menu-toggle {
       display: none;
       flex-direction: column;
       cursor: pointer;
       gap: 5px;
     }
-
     .menu-toggle span {
       display: block;
       width: 25px;
@@ -74,20 +67,17 @@
       background: white;
       border-radius: 3px;
     }
-
     .main-content {
       padding: 90px 30px 40px;
       flex: 1;
       width: 100%;
     }
-
     h1 {
       text-align: center;
       margin-bottom: 30px;
       font-weight: 700;
       color: #2c3e50;
     }
-
     form {
       background: white;
       padding: 25px 30px;
@@ -96,14 +86,12 @@
       max-width: 600px;
       margin: 0 auto;
     }
-
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: 600;
       color: #34495e;
     }
-
     input, select {
       width: 100%;
       padding: 10px;
@@ -112,19 +100,16 @@
       border-radius: 6px;
       font-size: 1rem;
     }
-
     .grupo {
       border: 1px solid #ddd;
       padding: 15px;
       border-radius: 8px;
       margin-bottom: 20px;
     }
-
     .grupo h3 {
       margin-top: 0;
       color: #2980b9;
     }
-
     .grupo button {
       background: #e74c3c;
       color: white;
@@ -137,11 +122,9 @@
       transition: background 0.3s;
       margin-top: 10px;
     }
-
     .grupo button:hover {
       background: #c0392b;
     }
-
     button {
       background: #2980b9;
       color: white;
@@ -154,24 +137,19 @@
       transition: background 0.3s;
       margin-right: 10px;
     }
-
     button:hover {
       background: #1f6391;
     }
-
     #add-grupo {
       background: #27ae60;
     }
-
     #add-grupo:hover {
       background: #219150;
     }
-
     @media (max-width: 768px) {
       .menu-toggle {
         display: flex;
       }
-
       .navbar-links {
         display: none;
         flex-direction: column;
@@ -183,7 +161,6 @@
         padding: 10px 20px;
         gap: 10px;
       }
-
       .navbar-links.active {
         display: flex;
       }
@@ -237,6 +214,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
@@ -249,6 +227,7 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
+  const storage = getStorage(app);
 
   const form = document.getElementById('treino-form');
   const gruposContainer = document.getElementById('grupos-container');
@@ -266,6 +245,8 @@
       <input type="number" class="grupo-serie" required />
       <label>Repetições</label>
       <input type="number" class="grupo-repeticao" required />
+      <label>Vídeo de Referência</label>
+      <input type="file" accept="video/*" class="grupo-video" />
       <button type="button" onclick="this.parentElement.remove()">Remover</button>
     `;
 
@@ -279,10 +260,28 @@
 
     const tipoTreino = document.getElementById('tipoTreino').value;
 
-    const grupos = Array.from(document.querySelectorAll('.grupo')).map(grupo => ({
-      grupo: grupo.querySelector('.grupo-nome').value,
-      serie: grupo.querySelector('.grupo-serie').value,
-      repeticao: grupo.querySelector('.grupo-repeticao').value,
+    const grupoDivs = Array.from(document.querySelectorAll('.grupo'));
+
+    const grupos = await Promise.all(grupoDivs.map(async (grupo) => {
+      const nome = grupo.querySelector('.grupo-nome').value.trim();
+      const serie = grupo.querySelector('.grupo-serie').value;
+      const repeticao = grupo.querySelector('.grupo-repeticao').value;
+      const videoFile = grupo.querySelector('.grupo-video').files[0];
+
+      let videoURL = '';
+
+      if (videoFile) {
+        const storageRef = ref(storage, `videos/${nome}_${videoFile.name}`);
+        const snapshot = await uploadBytes(storageRef, videoFile);
+        videoURL = await getDownloadURL(snapshot.ref);
+      }
+
+      return {
+        grupo: nome,
+        serie,
+        repeticao,
+        videoURL,
+      };
     }));
 
     try {
