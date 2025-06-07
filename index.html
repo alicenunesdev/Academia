@@ -152,7 +152,104 @@
       background: linear-gradient(90deg, #89dce6, #edbc83);
     }
   </style>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "SUA_API_KEY",
+      authDomain: "SEU_AUTH_DOMAIN",
+      projectId: "SEU_PROJECT_ID",
+      storageBucket: "SEU_BUCKET",
+      messagingSenderId: "SEU_SENDER_ID",
+      appId: "SEU_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const treinosRef = collection(db, "treinos");
+
+    window.count = 1;
+
+    window.openModal = () => {
+      document.getElementById('modal').style.display = 'flex';
+    };
+
+    window.closeModal = () => {
+      document.getElementById('modal').style.display = 'none';
+    };
+
+    window.adicionarExercicio = () => {
+      count++;
+      const container = document.getElementById("exercicios");
+      const div = document.createElement("div");
+      div.className = "exercicio";
+      div.innerHTML = `
+        <h4>Exercício ${count}</h4>
+        <input type="text" placeholder="Nome do Exercício" />
+        <input type="number" placeholder="Séries" />
+        <input type="number" placeholder="Repetições" />
+        <input type="number" placeholder="Peso (kg)" />
+        <input type="number" placeholder="Descanso (seg)" />
+      `;
+      container.appendChild(div);
+    };
+
+    window.criarTreino = async () => {
+      const nomeTreino = document.querySelector('.modal input[type="text"]').value;
+      const exerciciosDOM = document.querySelectorAll("#exercicios .exercicio");
+      const exercicios = [];
+
+      exerciciosDOM.forEach(div => {
+        const inputs = div.querySelectorAll("input");
+        exercicios.push({
+          nome: inputs[0].value,
+          series: Number(inputs[1].value),
+          repeticoes: Number(inputs[2].value),
+          peso: Number(inputs[3].value),
+          descanso: Number(inputs[4].value),
+        });
+      });
+
+      const treino = {
+        nome: nomeTreino,
+        exercicios: exercicios,
+        criadoEm: new Date()
+      };
+
+      await addDoc(treinosRef, treino);
+      closeModal();
+      listarTreinos();
+    };
+
+    async function listarTreinos() {
+      const container = document.querySelector(".treinos");
+      const cards = await getDocs(treinosRef);
+
+      let html = `<h3>Seus Treinos</h3>`;
+      cards.forEach(doc => {
+        const treino = doc.data();
+        html += `
+          <div class="treino-card">
+            <h4>${treino.nome}</h4>
+            <p>${treino.exercicios.length} exercício(s)</p>
+            <p>⏱️ ~${treino.exercicios.length * 5} minutos</p>
+            <ul>
+              ${treino.exercicios.map(e => `<li>• ${e.nome} - ${e.series} séries</li>`).join("")}
+            </ul>
+            <button class="start-btn">▶ Iniciar Treino</button>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    window.addEventListener("DOMContentLoaded", listarTreinos);
+  </script>
 </head>
+
 <body>
   <header class="header">
     <div class="logo">
@@ -170,42 +267,20 @@
     <p>Pronto para mais um treino incrível?</p>
 
     <section class="stats">
-      <div class="card">
-        <p>Total de Treinos</p>
-        <h3>1</h3>
-      </div>
-      <div class="card">
-        <p>Esta Semana</p>
-        <h3>1</h3>
-      </div>
-      <div class="card">
-        <p>Exercícios</p>
-        <h3>2</h3>
-      </div>
-      <div class="card">
-        <p>Duração Média</p>
-        <h3>9min</h3>
-      </div>
+      <div class="card"><p>Total de Treinos</p><h3>1</h3></div>
+      <div class="card"><p>Esta Semana</p><h3>1</h3></div>
+      <div class="card"><p>Exercícios</p><h3>2</h3></div>
+      <div class="card"><p>Duração Média</p><h3>9min</h3></div>
     </section>
 
     <button class="create-btn" onclick="openModal()">+ Criar Novo Treino</button>
 
     <section class="treinos">
       <h3>Seus Treinos</h3>
-      <div class="treino-card">
-        <h4>peito</h4>
-        <p>2 exercícios</p>
-        <p>⏱️ ~9 minutos</p>
-        <ul>
-          <li>• upino - 3 séries</li>
-          <li>• teste - 3 séries</li>
-        </ul>
-        <button class="start-btn">▶ Iniciar Treino</button>
-      </div>
+      <!-- Conteúdo carregado dinamicamente -->
     </section>
   </main>
 
-  <!-- Modal -->
   <div class="modal-overlay" id="modal">
     <div class="modal">
       <div class="modal-header">
@@ -232,37 +307,9 @@
 
       <div class="modal-footer">
         <button onclick="closeModal()">Cancelar</button>
-        <button>Criar Treino</button>
+        <button onclick="criarTreino()">Criar Treino</button>
       </div>
     </div>
   </div>
-
-  <script>
-    let count = 1;
-
-    function openModal() {
-      document.getElementById('modal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-    }
-
-    function adicionarExercicio() {
-      count++;
-      const container = document.getElementById("exercicios");
-      const div = document.createElement("div");
-      div.className = "exercicio";
-      div.innerHTML = `
-        <h4>Exercício ${count}</h4>
-        <input type="text" placeholder="Nome do Exercício" />
-        <input type="number" placeholder="Séries" />
-        <input type="number" placeholder="Repetições" />
-        <input type="number" placeholder="Peso (kg)" />
-        <input type="number" placeholder="Descanso (seg)" />
-      `;
-      container.appendChild(div);
-    }
-  </script>
 </body>
 </html>
