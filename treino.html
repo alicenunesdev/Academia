@@ -1,88 +1,119 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Treinos - Fitlice</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Treinos</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <div class="navbar">
-    <div class="brand">
-      <img src="icon.png" alt="Logo" class="icon"/>
-      <span class="title">Fitlice</span>
-    </div>
-    <div class="menu">
-      <button class="btn" id="openModalBtn">Criar Novo Treino</button>
-    </div>
+
+<nav class="navbar">
+  <h2>Academia</h2>
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
-
-  <div class="container">
-    <h2 class="subtitle">Seus Treinos</h2>
-    <div class="treinos">
-      <div class="empty">
-        <div class="empty-icon">🎯</div>
-        <p>Nenhum treino criado ainda</p>
-        <p class="muted">Crie seu primeiro treino para começar sua jornada fitness!</p>
-        <button class="btn-secondary" id="openModalBtn2">+ Criar Primeiro Treino</button>
-      </div>
-    </div>
+  <div class="navbar-links" id="navbar-links">
+    <a href="index.html" class="active">Cadastro</a>
+    <a href="visualizar.html">Visualizar</a>
+    <a href="treino.html">Treino</a>
+    <a href="historico.html">Histórico</a>
   </div>
+</nav>
 
-  <!-- Modal Criar Novo Treino -->
-  <div class="modal hidden" id="modalTreino">
-    <div class="modal-content">
-      <h3>Criar Novo Treino</h3>
-      <label>Nome do Treino</label>
-      <input type="text" placeholder="Ex: Treino de Peito e Tríceps" />
+<main class="main-content">
+  <h1>Meus Treinos</h1>
+  <button id="btn-criar-treino">Criar Novo Treino</button>
+  <div id="lista-treinos"></div>
+</main>
 
-      <div class="exercicio">
-        <h5>Exercício 1</h5>
-        <label>Nome do Exercício</label>
-        <input type="text" placeholder="Ex: Supino Reto" />
-        <div class="grid">
-          <div>
-            <label>Séries</label>
-            <input type="number" value="3" />
-          </div>
-          <div>
-            <label>Repetições</label>
-            <input type="number" value="12" />
-          </div>
-        </div>
-        <div class="grid">
-          <div>
-            <label>Peso (kg)</label>
-            <input type="number" value="0" />
-          </div>
-          <div>
-            <label>Descanso (seg)</label>
-            <input type="number" value="60" />
-          </div>
-        </div>
-      </div>
-
-      <div style="text-align: right; margin-top: 1rem;">
-        <button class="btn-primary">+ Adicionar</button>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-secondary" id="closeModalBtn">Cancelar</button>
-        <button class="btn-primary">Criar Treino</button>
-      </div>
-    </div>
+<!-- Modal -->
+<div id="modal-treino" class="modal hidden">
+  <div class="modal-content">
+    <span class="close" onclick="fecharModal()">&times;</span>
+    <h2>Criar Treino</h2>
+    <input type="text" placeholder="Ex: Treino A" id="input-nome-treino">
+    <input type="text" placeholder="Ex: Supino Reto" id="input-exercicio">
+    <input type="number" placeholder="3" id="input-series">
+    <input type="number" placeholder="12" id="input-repeticoes">
+    <input type="number" placeholder="0" id="input-peso">
+    <input type="number" placeholder="60" id="input-descanso">
+    <button onclick="salvarTreino()">Criar Treino</button>
   </div>
+</div>
 
-  <script>
-    const modal = document.getElementById('modalTreino');
-    const openBtns = [document.getElementById('openModalBtn'), document.getElementById('openModalBtn2')];
-    const closeBtn = document.getElementById('closeModalBtn');
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+    authDomain: "academia-bd-9d4da.firebaseapp.com",
+    projectId: "academia-bd-9d4da",
+    storageBucket: "academia-bd-9d4da.appspot.com",
+    messagingSenderId: "201289997890",
+    appId: "1:201289997890:web:19bece6aa0b3d52e3417db"
+  };
 
-    openBtns.forEach(btn => {
-      btn.addEventListener('click', () => modal.classList.remove('hidden'));
-    });
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-    closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
-  </script>
+  const modal = document.getElementById('modal-treino');
+  const btnCriarTreino = document.getElementById('btn-criar-treino');
+
+  btnCriarTreino.addEventListener('click', () => {
+    modal.classList.remove('hidden');
+  });
+
+  function fecharModal() {
+    modal.classList.add('hidden');
+  }
+
+  async function salvarTreino() {
+    const nomeTreino = document.getElementById('input-nome-treino').value;
+    const exercicio = document.getElementById('input-exercicio').value;
+    const series = document.getElementById('input-series').value;
+    const repeticoes = document.getElementById('input-repeticoes').value;
+    const peso = document.getElementById('input-peso').value;
+    const descanso = document.getElementById('input-descanso').value;
+
+    if (!nomeTreino || !exercicio) {
+      alert('Preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const treino = {
+      nome: nomeTreino,
+      exercicios: [
+        {
+          nome: exercicio,
+          series: parseInt(series),
+          repeticoes: parseInt(repeticoes),
+          peso: parseFloat(peso),
+          descanso: parseInt(descanso)
+        }
+      ],
+      criadoEm: new Date()
+    };
+
+    try {
+      await db.collection("treinos").add(treino);
+      alert("Treino salvo com sucesso!");
+      fecharModal();
+    } catch (error) {
+      console.error("Erro ao salvar treino:", error);
+      alert("Erro ao salvar treino.");
+    }
+  }
+
+  function toggleMenu() {
+    const navbarLinks = document.getElementById('navbar-links');
+    navbarLinks.classList.toggle('active');
+  }
+</script>
+
 </body>
 </html>
