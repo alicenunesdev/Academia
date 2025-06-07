@@ -3,62 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Painel - Academia</title>
+  <title>Meus Treinos</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
   <nav class="navbar">
-    <div class="brand">
-      <img src="icon.png" alt="Ícone" class="icon" />
-      <span class="title">Academia</span>
-    </div>
-    <div class="menu">
-      <a href="index.html" class="btn">Início</a>
-      <a href="visualizar.html" class="btn">Visualizar</a>
-      <a href="treino.html" class="btn">Treino</a>
-      <a href="historico.html" class="btn">Histórico</a>
+    <h2>Academia</h2>
+    <div class="navbar-links">
+      <a href="index.html" class="active">Cadastro</a>
+      <a href="visualizar.html">Visualizar</a>
+      <a href="treino.html">Treino</a>
+      <a href="historico.html">Histórico</a>
     </div>
   </nav>
 
-  <div class="container">
-    <h2 class="subtitle">Bem-vindo(a) ao Painel</h2>
-    <div class="actions">
-      <button id="btnNovoTreino" class="btn-primary">Criar Novo Treino</button>
-    </div>
-    <div class="empty">
-      <div class="empty-icon">💪</div>
-      <p>Nenhum treino encontrado ainda.</p>
-      <p class="muted">Clique no botão acima para criar seu primeiro treino.</p>
-    </div>
-  </div>
+  <main class="main-content">
+    <button id="btnNovoTreino">➕ Criar Novo Treino</button>
 
-  <!-- Modal -->
-  <div id="modalCriarTreino" class="modal hidden">
-    <div class="modal-content">
-      <h3>Criar Novo Treino</h3>
-      <form id="formCriarTreino">
-        <label for="tipoTreino">Tipo de Treino</label>
-        <select id="tipoTreino" required>
-          <option value="" disabled selected>Selecione</option>
-          <option value="Peito">Peito</option>
-          <option value="Costas">Costas</option>
-          <option value="Perna">Perna</option>
-          <option value="Posterior/Glúteos">Posterior/Glúteos</option>
-          <option value="Braços">Braços</option>
-        </select>
-
-        <div id="grupos-container"></div>
-
-        <button type="button" id="addGrupo" class="btn-secondary">Adicionar Grupo</button>
-
-        <div class="modal-actions">
-          <button type="submit" class="btn-primary">Salvar</button>
-          <button type="button" id="fecharModal" class="btn-secondary">Cancelar</button>
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal" id="modal">
+        <div class="modal-header">
+          <h3>Criar Novo Treino</h3>
+          <button class="close-modal" onclick="fecharModal()">×</button>
         </div>
-      </form>
+        <form id="formTreino">
+          <label>Nome do Treino</label>
+          <input type="text" id="nomeTreino" placeholder="Ex: Treino de Peito e Tríceps" required />
+
+          <h4>Exercícios</h4>
+          <div id="exerciciosContainer"></div>
+          <button type="button" id="addExercicio">+ Adicionar</button>
+
+          <div class="modal-footer">
+            <button type="button" onclick="fecharModal()">Cancelar</button>
+            <button type="submit">Criar Treino</button>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+  </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -70,91 +54,82 @@
       projectId: "academia-bd-9d4da",
       storageBucket: "academia-bd-9d4da.appspot.com",
       messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:19bece6aa0b3d52e3417db"
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    const modalOverlay = document.getElementById('modalOverlay');
+    const form = document.getElementById('formTreino');
     const btnNovoTreino = document.getElementById('btnNovoTreino');
-    const modal = document.getElementById('modalCriarTreino');
-    const fecharModal = document.getElementById('fecharModal');
-    const addGrupo = document.getElementById('addGrupo');
-    const gruposContainer = document.getElementById('grupos-container');
-    const form = document.getElementById('formCriarTreino');
+    const exerciciosContainer = document.getElementById('exerciciosContainer');
+    const addExercicioBtn = document.getElementById('addExercicio');
+
+    let contador = 1;
 
     btnNovoTreino.addEventListener('click', () => {
-      modal.classList.remove('hidden');
+      abrirModal();
     });
 
-    fecharModal.addEventListener('click', () => {
-      modal.classList.add('hidden');
-      form.reset();
-      gruposContainer.innerHTML = '';
-    });
-
-    function criarGrupo() {
-      const grupo = document.createElement('div');
-      grupo.classList.add('exercicio');
-      grupo.innerHTML = `
-        <h5>Grupo Muscular</h5>
-        <label>Nome</label>
-        <input type="text" class="grupo-nome" required />
-        <label>Séries</label>
-        <input type="number" class="grupo-serie" min="1" required />
-        <label>Repetições</label>
-        <input type="number" class="grupo-repeticao" min="1" required />
-        <label>Vídeo de Referência (opcional)</label>
-        <input type="url" class="grupo-video-link" />
-        <button type="button" class="remove-btn">Remover</button>
-      `;
-
-      grupo.querySelector('.remove-btn').addEventListener('click', () => grupo.remove());
-      gruposContainer.appendChild(grupo);
+    function abrirModal() {
+      modalOverlay.style.display = 'flex';
+      adicionarExercicio(); // Adiciona pelo menos um exercício
     }
 
-    addGrupo.addEventListener('click', criarGrupo);
+    function fecharModal() {
+      modalOverlay.style.display = 'none';
+      form.reset();
+      exerciciosContainer.innerHTML = '';
+      contador = 1;
+    }
+
+    function adicionarExercicio() {
+      const div = document.createElement('div');
+      div.classList.add('exercicio');
+      div.innerHTML = `
+        <h5>Exercício ${contador++}</h5>
+        <input type="text" placeholder="Nome do Exercício" class="ex-nome" required />
+        <input type="number" placeholder="Séries" class="ex-series" required />
+        <input type="number" placeholder="Repetições" class="ex-repeticoes" required />
+        <input type="number" placeholder="Peso (kg)" class="ex-peso" />
+        <input type="number" placeholder="Descanso (seg)" class="ex-descanso" />
+      `;
+      exerciciosContainer.appendChild(div);
+    }
+
+    addExercicioBtn.addEventListener('click', adicionarExercicio);
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const tipoTreino = document.getElementById('tipoTreino').value;
-      const grupoDivs = gruposContainer.querySelectorAll('.exercicio');
+      const nomeTreino = document.getElementById('nomeTreino').value.trim();
+      const exercicios = Array.from(document.querySelectorAll('.exercicio')).map(ex => ({
+        nome: ex.querySelector('.ex-nome').value.trim(),
+        series: +ex.querySelector('.ex-series').value,
+        repeticoes: +ex.querySelector('.ex-repeticoes').value,
+        peso: +ex.querySelector('.ex-peso').value || 0,
+        descanso: +ex.querySelector('.ex-descanso').value || 0
+      }));
 
-      if (!tipoTreino || grupoDivs.length === 0) {
-        alert("Selecione um tipo de treino e adicione pelo menos um grupo.");
+      if (exercicios.some(ex => !ex.nome || !ex.series || !ex.repeticoes)) {
+        alert("Preencha todos os campos obrigatórios dos exercícios.");
         return;
       }
 
       try {
-        const grupos = Array.from(grupoDivs).map(g => {
-          const grupo = g.querySelector('.grupo-nome').value.trim();
-          const serie = parseInt(g.querySelector('.grupo-serie').value);
-          const repeticao = parseInt(g.querySelector('.grupo-repeticao').value);
-          const videoURL = g.querySelector('.grupo-video-link').value.trim();
-
-          if (!grupo || !serie || !repeticao) throw new Error("Preencha todos os campos do grupo.");
-
-          return { grupo, serie, repeticao, videoURL };
-        });
-
         await addDoc(collection(db, "treinos"), {
-          tipoTreino,
-          grupos,
+          nome: nomeTreino,
+          exercicios,
           criadoEm: new Date()
         });
-
-        alert("Treino salvo com sucesso!");
-        modal.classList.add('hidden');
-        form.reset();
-        gruposContainer.innerHTML = '';
-
-      } catch (error) {
-        alert("Erro ao salvar treino: " + error.message);
-        console.error(error);
+        alert("Treino criado com sucesso!");
+        fecharModal();
+      } catch (err) {
+        alert("Erro ao salvar: " + err.message);
+        console.error(err);
       }
     });
   </script>
-
 </body>
 </html>
