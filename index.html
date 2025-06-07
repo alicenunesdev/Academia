@@ -1,325 +1,317 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fitlice</title>
+  <title>Cadastrar Treino</title>
   <style>
+    /* Mantém todo o seu CSS anterior */
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f8f9fb;
-      color: #1f1f1f;
+      background: #f7f9fc;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
     }
-
-    .header {
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: #2c3e50;
+      color: #ecf0f1;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 2rem;
-      background-color: white;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .nav .btn {
-      margin-left: 1rem;
-      padding: 0.5rem 1rem;
-      background: #e0f0f7;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-
-    .main {
-      padding: 2rem;
-    }
-
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin: 1rem 0;
-    }
-
-    .card {
-      flex: 1 1 150px;
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
-    }
-
-    .create-btn {
-      background: linear-gradient(90deg, #89dce6, #edbc83);
-      padding: 0.75rem 1.5rem;
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .treinos {
-      margin-top: 2rem;
-    }
-
-    .treino-card {
-      background: white;
-      padding: 1rem;
-      border-radius: 10px;
-      margin-top: 1rem;
-      box-shadow: 0 1px 5px rgba(0,0,0,0.05);
-    }
-
-    .start-btn {
-      background: linear-gradient(90deg, #89dce6, #edbc83);
-      border: none;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 1rem;
-    }
-
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
+      padding: 15px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       z-index: 1000;
     }
-
-    .modal {
+    .navbar h2 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.6rem;
+    }
+    .navbar-links {
+      display: flex;
+      gap: 20px;
+    }
+    .navbar a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      transition: background 0.3s, color 0.3s;
+      font-weight: 600;
+    }
+    .navbar a:hover,
+    .navbar a.active {
+      background: #2980b9;
+      color: white;
+    }
+    .menu-toggle {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 5px;
+    }
+    .menu-toggle span {
+      display: block;
+      width: 25px;
+      height: 3px;
       background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      width: 90%;
+      border-radius: 3px;
+    }
+    .main-content {
+      padding: 90px 30px 40px;
+      flex: 1;
+      width: 100%;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+    form {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.07);
       max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
+      margin: 0 auto;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #34495e;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+    .grupo {
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
       position: relative;
     }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .grupo h3 {
+      margin-top: 0;
+      color: #2980b9;
     }
-
-    .modal input {
-      display: block;
-      width: 100%;
-      margin: 0.5rem 0;
-      padding: 0.5rem;
-      border-radius: 6px;
-      border: 1px solid #ddd;
-    }
-
-    .add-btn {
-      margin: 1rem 0;
-      background: #e0f7fa;
+    .grupo button.remove-btn {
+      background: #e74c3c;
+      color: white;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 8px 14px;
       border-radius: 6px;
+      font-size: 0.9rem;
       cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+      margin-top: 10px;
     }
-
-    .modal-footer {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 1.5rem;
+    .grupo button.remove-btn:hover {
+      background: #c0392b;
     }
-
-    .modal-footer button {
-      padding: 0.75rem 1.5rem;
+    button {
+      background: #2980b9;
+      color: white;
       border: none;
+      padding: 10px 18px;
       border-radius: 6px;
+      font-size: 1rem;
       cursor: pointer;
+      font-weight: 700;
+      transition: background 0.3s;
+      margin-right: 10px;
     }
-
-    .modal-footer button:first-child {
-      background: #f1f1f1;
+    button:hover {
+      background: #1f6391;
     }
-
-    .modal-footer button:last-child {
-      background: linear-gradient(90deg, #89dce6, #edbc83);
+    #add-grupo {
+      background: #27ae60;
+    }
+    #add-grupo:hover {
+      background: #219150;
+    }
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: flex;
+      }
+      .navbar-links {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        background: #2c3e50;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        padding: 10px 20px;
+        gap: 10px;
+      }
+      .navbar-links.active {
+        display: flex;
+      }
     }
   </style>
 </head>
 <body>
-  <header class="header">
-    <div class="logo">
-      <img src="logo-icon.png" alt="Ícone" />
-      <h1>Fitlice</h1>
-    </div>
-    <nav class="nav">
-      <button class="btn">Dashboard</button>
-      <button class="btn">Perfil</button>
-    </nav>
-  </header>
 
-  <main class="main">
-    <h2>Olá, Alice Nunes! 👋</h2>
-    <p>Pronto para mais um treino incrível?</p>
-
-    <section class="stats">
-      <div class="card"><p>Total de Treinos</p><h3 id="totalTreinos">0</h3></div>
-      <div class="card"><p>Esta Semana</p><h3>1</h3></div>
-      <div class="card"><p>Exercícios</p><h3 id="totalExercicios">0</h3></div>
-      <div class="card"><p>Duração Média</p><h3>9min</h3></div>
-    </section>
-
-    <button class="create-btn" onclick="openModal()">+ Criar Novo Treino</button>
-
-    <section class="treinos">
-      <h3>Seus Treinos</h3>
-      <div id="listaTreinos"></div>
-    </section>
-  </main>
-
-  <!-- Modal -->
-  <div class="modal-overlay" id="modal">
-    <div class="modal">
-      <div class="modal-header">
-        <h2>Criar Novo Treino</h2>
-        <button onclick="closeModal()">×</button>
-      </div>
-
-      <label>Nome do Treino</label>
-      <input id="nomeTreino" type="text" placeholder="Ex: Treino de Peito e Tríceps" />
-
-      <div id="exercicios">
-        <h3>Exercícios</h3>
-        <div class="exercicio">
-          <h4>Exercício 1</h4>
-          <input type="text" placeholder="Nome do Exercício" />
-          <input type="number" placeholder="Séries" />
-          <input type="number" placeholder="Repetições" />
-          <input type="number" placeholder="Peso (kg)" />
-          <input type="number" placeholder="Descanso (seg)" />
-        </div>
-      </div>
-
-      <button onclick="adicionarExercicio()" class="add-btn">+ Adicionar</button>
-
-      <div class="modal-footer">
-        <button onclick="closeModal()">Cancelar</button>
-        <button onclick="criarTreino()">Criar Treino</button>
-      </div>
-    </div>
+<nav class="navbar">
+  <h2>Academia</h2>
+  <div class="menu-toggle" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
   </div>
+  <div class="navbar-links" id="navbar-links">
+    <a href="index.html" class="active">Cadastro</a>
+    <a href="visualizar.html">Visualizar</a>
+    <a href="treino.html">Treino</a>
+    <a href="historico.html">Histórico</a>
+  </div>
+</nav>
 
-  <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+<main class="main-content">
+  <h1>Cadastrar Treino</h1>
+  <form id="treino-form">
+    <label for="tipoTreino">Tipo de Treino</label>
+    <select id="tipoTreino" required>
+      <option value="" disabled selected>Selecione</option>
+      <option value="Peito">Peito</option>
+      <option value="Costas">Costas</option>
+      <option value="Perna">Perna</option>
+      <option value="Posterior/Glúteos">Posterior/Glúteos</option>
+      <option value="Braços">Braços</option>
+    </select>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
-      authDomain: "academia-bd-9d4da.firebaseapp.com",
-      projectId: "academia-bd-9d4da",
-      storageBucket: "academia-bd-9d4da.appspot.com",
-      messagingSenderId: "201289997890",
-      appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
-    };
+    <div id="grupos-container"></div>
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const treinosRef = collection(db, "treinos");
+    <button type="button" id="add-grupo">Adicionar</button>
+    <button type="submit">Salvar Treino</button>
+  </form>
+</main>
 
-    async function criarTreino() {
-      const nomeTreino = document.getElementById("nomeTreino").value;
-      const exercicioElements = document.querySelectorAll("#exercicios .exercicio");
-      const exercicios = [];
+<script>
+  function toggleMenu() {
+    const navbarLinks = document.getElementById('navbar-links');
+    navbarLinks.classList.toggle('active');
+  }
+</script>
 
-      exercicioElements.forEach(div => {
-        const [nome, series, repeticoes, peso, descanso] = div.querySelectorAll("input");
-        exercicios.push({
-          nome: nome.value,
-          series: series.value,
-          repeticoes: repeticoes.value,
-          peso: peso.value,
-          descanso: descanso.value
-        });
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+    authDomain: "academia-bd-9d4da.firebaseapp.com",
+    projectId: "academia-bd-9d4da",
+    storageBucket: "academia-bd-9d4da.appspot.com",
+    messagingSenderId: "201289997890",
+    appId: "1:201289997890:web:19bece6aa0b3d52e3417db",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const form = document.getElementById('treino-form');
+  const gruposContainer = document.getElementById('grupos-container');
+  const addGrupoBtn = document.getElementById('add-grupo');
+
+  function criarGrupo() {
+    const grupoDiv = document.createElement('div');
+    grupoDiv.classList.add('grupo');
+
+    grupoDiv.innerHTML = `
+      <h3>Grupo Muscular</h3>
+      <label>Nome do Grupo</label>
+      <input type="text" class="grupo-nome" required />
+      <label>Séries</label>
+      <input type="number" class="grupo-serie" min="1" required />
+      <label>Repetições</label>
+      <input type="number" class="grupo-repeticao" min="1" required />
+      <label>Link do Vídeo de Referência</label>
+      <input type="url" class="grupo-video-link" placeholder="https://exemplo.com/video" />
+      <button type="button" class="remove-btn">Remover</button>
+    `;
+
+    grupoDiv.querySelector('.remove-btn').addEventListener('click', () => {
+      grupoDiv.remove();
+    });
+
+    gruposContainer.appendChild(grupoDiv);
+  }
+
+  addGrupoBtn.addEventListener('click', criarGrupo);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const tipoTreino = document.getElementById('tipoTreino').value;
+
+    if (!tipoTreino) {
+      alert('Selecione um tipo de treino.');
+      return;
+    }
+
+    const grupoDivs = Array.from(document.querySelectorAll('.grupo'));
+
+    if (grupoDivs.length === 0) {
+      alert('Adicione pelo menos um grupo muscular.');
+      return;
+    }
+
+    try {
+      const grupos = grupoDivs.map(grupo => {
+        const nome = grupo.querySelector('.grupo-nome').value.trim();
+        const serie = grupo.querySelector('.grupo-serie').value;
+        const repeticao = grupo.querySelector('.grupo-repeticao').value;
+        const videoURL = grupo.querySelector('.grupo-video-link').value.trim();
+
+        if (!nome || !serie || !repeticao) {
+          throw new Error('Preencha todos os campos de cada grupo muscular.');
+        }
+
+        // Se desejar, pode validar se videoURL é uma URL válida aqui.
+
+        return {
+          grupo: nome,
+          serie: Number(serie),
+          repeticao: Number(repeticao),
+          videoURL: videoURL || '',
+        };
       });
 
-      await addDoc(treinosRef, { nome: nomeTreino, exercicios });
-      closeModal();
-      listarTreinos();
-    }
-
-    function openModal() {
-      document.getElementById('modal').style.display = 'flex';
-    }
-
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-      document.getElementById("nomeTreino").value = "";
-      document.getElementById("exercicios").innerHTML = `
-        <h3>Exercícios</h3>
-        <div class="exercicio">
-          <h4>Exercício 1</h4>
-          <input type="text" placeholder="Nome do Exercício" />
-          <input type="number" placeholder="Séries" />
-          <input type="number" placeholder="Repetições" />
-          <input type="number" placeholder="Peso (kg)" />
-          <input type="number" placeholder="Descanso (seg)" />
-        </div>`;
-    }
-
-    let count = 1;
-    function adicionarExercicio() {
-      count++;
-      const container = document.getElementById("exercicios");
-      const div = document.createElement("div");
-      div.className = "exercicio";
-      div.innerHTML = `
-        <h4>Exercício ${count}</h4>
-        <input type="text" placeholder="Nome do Exercício" />
-        <input type="number" placeholder="Séries" />
-        <input type="number" placeholder="Repetições" />
-        <input type="number" placeholder="Peso (kg)" />
-        <input type="number" placeholder="Descanso (seg)" />
-      `;
-      container.appendChild(div);
-    }
-
-    async function listarTreinos() {
-      const lista = document.getElementById("listaTreinos");
-      lista.innerHTML = "";
-      const snap = await getDocs(treinosRef);
-      let totalExercicios = 0;
-
-      document.getElementById("totalTreinos").textContent = snap.size;
-
-      snap.forEach(doc => {
-        const t = doc.data();
-        const card = document.createElement("div");
-        card.className = "treino-card";
-        card.innerHTML = `
-          <h4>${t.nome}</h4>
-          <p>${t.exercicios.length} exercícios</p>
-          <p>⏱️ ~${t.exercicios.length * 4} minutos</p>
-          <ul>
-            ${t.exercicios.map(e => `<li>• ${e.nome} - ${e.series} séries</li>`).join("")}
-          </ul>
-          <button class="start-btn">▶ Iniciar Treino</button>
-        `;
-        lista.appendChild(card);
-        totalExercicios += t.exercicios.length;
+      await addDoc(collection(db, "treinos"), {
+        tipoTreino,
+        grupos,
+        criadoEm: new Date()
       });
 
-      document.getElementById("totalExercicios").textContent = totalExercicios;
-    }
+      alert('Treino cadastrado com sucesso!');
+      form.reset();
+      gruposContainer.innerHTML = '';
 
-    listarTreinos();
-  </script>
+    } catch (error) {
+      console.error("Erro ao cadastrar treino:", error);
+      alert('Erro ao cadastrar treino: ' + error.message);
+    }
+  });
+</script>
+
 </body>
 </html>
