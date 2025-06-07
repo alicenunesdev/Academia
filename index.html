@@ -1,73 +1,160 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fitlice - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Painel - Academia</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="navbar">
+
+  <nav class="navbar">
     <div class="brand">
-      <img src="logo.png" alt="Logo" class="icon" />
-      <span class="title">Fitlice</span>
+      <img src="icon.png" alt="Ícone" class="icon" />
+      <span class="title">Academia</span>
     </div>
-    <nav class="menu">
-      <button class="btn">🏠 Dashboard</button>
-      <button class="btn">👤 Perfil</button>
-    </nav>
-  </header>
+    <div class="menu">
+      <a href="index.html" class="btn">Início</a>
+      <a href="visualizar.html" class="btn">Visualizar</a>
+      <a href="treino.html" class="btn">Treino</a>
+      <a href="historico.html" class="btn">Histórico</a>
+    </div>
+  </nav>
 
-  <main class="container">
-    <h2 class="subtitle">Pronto para mais um treino incrível?</h2>
-
-    <section class="stats">
-      <div class="card">
-        <div class="card-icon">🎯</div>
-        <div class="card-content">
-          <span>Total de Treinos</span>
-          <strong id="totalTreinos">0</strong>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-icon">📅</div>
-        <div class="card-content">
-          <span>Esta Semana</span>
-          <strong id="treinosSemana">0</strong>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-icon">📈</div>
-        <div class="card-content">
-          <span>Exercícios</span>
-          <strong id="totalExercicios">0</strong>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-icon">⏱️</div>
-        <div class="card-content">
-          <span>Duração Média</span>
-          <strong id="duracaoMedia">0min</strong>
-        </div>
-      </div>
-    </section>
-
+  <div class="container">
+    <h2 class="subtitle">Bem-vindo(a) ao Painel</h2>
     <div class="actions">
-      <button class="btn-primary">+ Criar Novo Treino</button>
+      <button id="btnNovoTreino" class="btn-primary">Criar Novo Treino</button>
     </div>
+    <div class="empty">
+      <div class="empty-icon">💪</div>
+      <p>Nenhum treino encontrado ainda.</p>
+      <p class="muted">Clique no botão acima para criar seu primeiro treino.</p>
+    </div>
+  </div>
 
-    <section class="treinos">
-      <h3>Seus Treinos</h3>
-      <div class="empty">
-        <div class="empty-icon">🎯</div>
-        <p>Nenhum treino criado ainda</p>
-        <p class="muted">Crie seu primeiro treino para começar sua jornada fitness!</p>
-        <button class="btn-secondary">+ Criar Primeiro Treino</button>
-      </div>
-    </section>
-  </main>
+  <!-- Modal -->
+  <div id="modalCriarTreino" class="modal hidden">
+    <div class="modal-content">
+      <h3>Criar Novo Treino</h3>
+      <form id="formCriarTreino">
+        <label for="tipoTreino">Tipo de Treino</label>
+        <select id="tipoTreino" required>
+          <option value="" disabled selected>Selecione</option>
+          <option value="Peito">Peito</option>
+          <option value="Costas">Costas</option>
+          <option value="Perna">Perna</option>
+          <option value="Posterior/Glúteos">Posterior/Glúteos</option>
+          <option value="Braços">Braços</option>
+        </select>
 
-  <script src="firebase.js"></script>
-  <script src="dashboard.js"></script>
+        <div id="grupos-container"></div>
+
+        <button type="button" id="addGrupo" class="btn-secondary">Adicionar Grupo</button>
+
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary">Salvar</button>
+          <button type="button" id="fecharModal" class="btn-secondary">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAQZrwPVmbcNZTEcGdqqE-Hscn2TS-hnwY",
+      authDomain: "academia-bd-9d4da.firebaseapp.com",
+      projectId: "academia-bd-9d4da",
+      storageBucket: "academia-bd-9d4da.appspot.com",
+      messagingSenderId: "201289997890",
+      appId: "1:201289997890:web:19bece6aa0b3d52e3417db"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const btnNovoTreino = document.getElementById('btnNovoTreino');
+    const modal = document.getElementById('modalCriarTreino');
+    const fecharModal = document.getElementById('fecharModal');
+    const addGrupo = document.getElementById('addGrupo');
+    const gruposContainer = document.getElementById('grupos-container');
+    const form = document.getElementById('formCriarTreino');
+
+    btnNovoTreino.addEventListener('click', () => {
+      modal.classList.remove('hidden');
+    });
+
+    fecharModal.addEventListener('click', () => {
+      modal.classList.add('hidden');
+      form.reset();
+      gruposContainer.innerHTML = '';
+    });
+
+    function criarGrupo() {
+      const grupo = document.createElement('div');
+      grupo.classList.add('exercicio');
+      grupo.innerHTML = `
+        <h5>Grupo Muscular</h5>
+        <label>Nome</label>
+        <input type="text" class="grupo-nome" required />
+        <label>Séries</label>
+        <input type="number" class="grupo-serie" min="1" required />
+        <label>Repetições</label>
+        <input type="number" class="grupo-repeticao" min="1" required />
+        <label>Vídeo de Referência (opcional)</label>
+        <input type="url" class="grupo-video-link" />
+        <button type="button" class="remove-btn">Remover</button>
+      `;
+
+      grupo.querySelector('.remove-btn').addEventListener('click', () => grupo.remove());
+      gruposContainer.appendChild(grupo);
+    }
+
+    addGrupo.addEventListener('click', criarGrupo);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const tipoTreino = document.getElementById('tipoTreino').value;
+      const grupoDivs = gruposContainer.querySelectorAll('.exercicio');
+
+      if (!tipoTreino || grupoDivs.length === 0) {
+        alert("Selecione um tipo de treino e adicione pelo menos um grupo.");
+        return;
+      }
+
+      try {
+        const grupos = Array.from(grupoDivs).map(g => {
+          const grupo = g.querySelector('.grupo-nome').value.trim();
+          const serie = parseInt(g.querySelector('.grupo-serie').value);
+          const repeticao = parseInt(g.querySelector('.grupo-repeticao').value);
+          const videoURL = g.querySelector('.grupo-video-link').value.trim();
+
+          if (!grupo || !serie || !repeticao) throw new Error("Preencha todos os campos do grupo.");
+
+          return { grupo, serie, repeticao, videoURL };
+        });
+
+        await addDoc(collection(db, "treinos"), {
+          tipoTreino,
+          grupos,
+          criadoEm: new Date()
+        });
+
+        alert("Treino salvo com sucesso!");
+        modal.classList.add('hidden');
+        form.reset();
+        gruposContainer.innerHTML = '';
+
+      } catch (error) {
+        alert("Erro ao salvar treino: " + error.message);
+        console.error(error);
+      }
+    });
+  </script>
+
 </body>
 </html>
