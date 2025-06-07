@@ -1,63 +1,100 @@
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: #f4f6f8;
+  background-color: #f8f9fb;
+  color: #1f1f1f;
 }
 
-.navbar {
-  background: #2c3e50;
-  color: white;
-  padding: 15px 30px;
+.header {
   display: flex;
   justify-content: space-between;
+  padding: 1rem 2rem;
+  background-color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.logo {
+  display: flex;
   align-items: center;
+  gap: 10px;
 }
 
-.navbar-links a {
-  color: #ecf0f1;
-  margin-left: 20px;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.main-content {
-  padding: 100px 30px;
-  text-align: center;
-}
-
-#btnNovoTreino {
-  padding: 12px 20px;
-  font-size: 1rem;
+.nav .btn {
+  margin-left: 1rem;
+  padding: 0.5rem 1rem;
+  background: #e0f0f7;
   border: none;
-  background: #27ae60;
-  color: white;
   border-radius: 6px;
   cursor: pointer;
-  font-weight: 600;
 }
 
-#btnNovoTreino:hover {
-  background: #219150;
+.main {
+  padding: 2rem;
 }
 
-/* Modal styles */
+.stats {
+  display: flex;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.card {
+  flex: 1;
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+}
+
+.create-btn {
+  background: linear-gradient(90deg, #89dce6, #edbc83);
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.treinos {
+  margin-top: 2rem;
+}
+
+.treino-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+}
+
+.start-btn {
+  background: linear-gradient(90deg, #89dce6, #edbc83);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+/* Modal */
 .modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   justify-content: center;
   align-items: center;
-  z-index: 999;
 }
 
 .modal {
   background: white;
-  padding: 30px;
-  border-radius: 10px;
+  padding: 2rem;
+  border-radius: 12px;
   width: 90%;
   max-width: 600px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  max-height: 90vh;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -67,70 +104,41 @@ body {
   align-items: center;
 }
 
-.close-modal {
-  background: transparent;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.modal form {
-  margin-top: 20px;
-}
-
 .modal input {
   display: block;
   width: 100%;
-  margin: 8px 0 16px;
-  padding: 10px;
-  border: 1px solid #ccc;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
   border-radius: 6px;
+  border: 1px solid #ddd;
 }
 
-#addExercicio {
-  background: #3498db;
-  color: white;
+.add-btn {
+  margin: 1rem 0;
+  background: #e0f7fa;
   border: none;
-  padding: 10px;
-  margin-bottom: 20px;
+  padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
-}
-
-#addExercicio:hover {
-  background: #2980b9;
-}
-
-.exercicio {
-  border: 1px solid #eee;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  background: #f9f9f9;
 }
 
 .modal-footer {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: 1.5rem;
 }
 
 .modal-footer button {
-  flex: 1;
-  padding: 12px;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 6px;
-  font-weight: bold;
   cursor: pointer;
 }
 
 .modal-footer button:first-child {
-  background: #e74c3c;
-  color: white;
-  margin-right: 10px;
+  background: #f1f1f1;
 }
 
 .modal-footer button:last-child {
-  background: linear-gradient(to right, #74ebd5, #9face6);
-  color: #333;
+  background: linear-gradient(90deg, #89dce6, #edbc83);
 }
